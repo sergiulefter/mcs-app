@@ -162,25 +162,6 @@ flutter test --coverage
 - Sensitive keys should be stored in `.env` file (not committed to git)
 - `.gitignore` is configured to exclude sensitive files
 
-## 🤝 Contributing
-
-This is a private project. For any questions or suggestions, please contact the repository owner.
-
-## 📄 License
-
-This project is private and not licensed for public use.
-
-## 👥 Authors
-
-- **Serge** - [GitHub Profile](https://github.com/Sergetec)
-
-## 📚 Additional Documentation
-
-- [PROJECT_INFO.md](PROJECT_INFO.md) - Detailed project information and development log
-- [Flutter Documentation](https://docs.flutter.dev/)
-- [Firebase Documentation](https://firebase.google.com/docs)
-- [Provider Documentation](https://pub.dev/packages/provider)
-
 ---
 
-**Note**: This project is configured for mobile platforms (Android & iOS). Web, Windows, Linux, and macOS platforms are available in the project structure but are not actively maintained.
+**Note**: This project is configured for mobile platforms (Android & iOS).
