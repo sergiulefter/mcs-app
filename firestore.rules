@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Users collection - users can only read/write their own data
+    match /users/{userId} {
+      // Allow read if authenticated and accessing own document
+      allow read: if isAuthenticated() && isOwner(userId);
+
+      // Allow create only during signup (user creates their own document)
+      allow create: if isAuthenticated() && isOwner(userId);
+
+      // Allow update only if user owns the document
+      allow update: if isAuthenticated() && isOwner(userId);
+
+      // Prevent deletion for now (can be enabled later if needed)
+      allow delete: if false;
+    }
+
+    // Default rule: deny all access to any other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
