@@ -119,6 +119,48 @@ class AuthService {
     }
   }
 
+  // Update user profile
+  Future<UserModel?> updateUserProfile({
+    required String uid,
+    String? displayName,
+    String? photoUrl,
+  }) async {
+    try {
+      User? user = _auth.currentUser;
+      if (user == null) throw 'No user logged in';
+
+      Map<String, dynamic> updates = {};
+
+      // Update Firebase Auth profile if displayName is provided
+      if (displayName != null && displayName != user.displayName) {
+        await user.updateDisplayName(displayName);
+        updates['displayName'] = displayName;
+      }
+
+      // Update Firebase Auth photo URL if provided
+      if (photoUrl != null && photoUrl != user.photoURL) {
+        await user.updatePhotoURL(photoUrl);
+        updates['photoUrl'] = photoUrl;
+      }
+
+      // Reload Firebase Auth user to get updated info
+      await user.reload();
+      user = _auth.currentUser;
+
+      // Update Firestore document if there are changes
+      if (updates.isNotEmpty) {
+        await _firestore.collection('users').doc(uid).update(updates);
+      }
+
+      // Fetch and return updated user data
+      return await getUserData(uid);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw 'Error updating profile: $e';
+    }
+  }
+
   // Handle Firebase Auth exceptions
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {

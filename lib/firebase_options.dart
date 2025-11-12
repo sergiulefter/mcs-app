@@ -55,4 +55,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'mcs-app-f1e37.firebasestorage.app',
     iosBundleId: 'com.example.mcsApp',
   );
+
 }

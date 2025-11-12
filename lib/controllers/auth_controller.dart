@@ -125,6 +125,38 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  // Update user profile
+  Future<bool> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+  }) async {
+    if (_currentUser == null) {
+      _errorMessage = 'No user logged in';
+      notifyListeners();
+      return false;
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _currentUser = await _authService.updateUserProfile(
+        uid: _currentUser!.uid,
+        displayName: displayName,
+        photoUrl: photoUrl,
+      );
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Clear error message
   void clearError() {
     _errorMessage = null;
