@@ -2,86 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
-import '../../utils/validators.dart';
-import '../../utils/constants.dart';
 import '../../utils/app_theme.dart';
 import 'login_screen.dart';
+import 'complete_profile_screen.dart';
 
-class AccountScreen extends StatefulWidget {
+class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
-
-  @override
-  State<AccountScreen> createState() => _AccountScreenState();
-}
-
-class _AccountScreenState extends State<AccountScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _displayNameController = TextEditingController();
-  bool _isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize with current display name
-    final authController = context.read<AuthController>();
-    _displayNameController.text = authController.currentUser?.displayName ?? '';
-  }
-
-  @override
-  void dispose() {
-    _displayNameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _updateProfile() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final authController = context.read<AuthController>();
-    final success = await authController.updateUserProfile(
-      displayName: _displayNameController.text.trim(),
-    );
-
-    if (mounted) {
-      if (success) {
-        setState(() {
-          _isEditing = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('account.profile_updated_success'.tr()),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authController.errorMessage ?? 'errors.profile_save_failed'.tr()),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _cancelEdit() {
-    final authController = context.read<AuthController>();
-    setState(() {
-      _displayNameController.text = authController.currentUser?.displayName ?? '';
-      _isEditing = false;
-    });
-  }
-
-  Future<void> _handleLogout() async {
-    final authController = context.read<AuthController>();
-    await authController.signOut();
-
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,298 +16,574 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (user == null) {
       return Scaffold(
+        backgroundColor: AppTheme.backgroundLight,
         body: Center(
-          child: Text('account.no_user_logged_in'.tr()),
+          child: Text(
+            'account.no_user_logged_in'.tr(),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+          ),
         ),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('account.overview_title'.tr()),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          if (_isEditing)
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: _cancelEdit,
-              tooltip: 'common.cancel'.tr(),
-            ),
+      backgroundColor: AppTheme.backgroundLight,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacing24,
+            vertical: AppTheme.spacing24,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // User Header Section
+              _buildUserHeader(context, user),
+              const SizedBox(height: AppTheme.spacing32),
+
+              // Profile Details Section
+              _buildSectionHeader(context, 'account.profile_details'.tr()),
+              const SizedBox(height: AppTheme.spacing16),
+              _buildProfileDetailsCard(context, user),
+              const SizedBox(height: AppTheme.spacing32),
+
+              // Quick Actions Section
+              _buildSectionHeader(context, 'account.quick_actions'.tr()),
+              const SizedBox(height: AppTheme.spacing16),
+              _buildQuickActionsCard(context),
+              const SizedBox(height: AppTheme.spacing32),
+
+              // Account Section
+              _buildSectionHeader(context, 'account.account_section'.tr()),
+              const SizedBox(height: AppTheme.spacing16),
+              _buildAccountCard(context, user),
+              const SizedBox(height: AppTheme.spacing32),
+
+              // Sign Out Button
+              _buildSignOutButton(context),
+              const SizedBox(height: AppTheme.spacing16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserHeader(BuildContext context, dynamic user) {
+    final initials = _getInitials(user.displayName ?? user.email);
+
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacing24),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            blurRadius: AppTheme.elevationLow,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
-      body: authController.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(AppConstants.paddingLarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Profile Avatar
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                    child: user.photoUrl != null
-                        ? ClipOval(
-                            child: Image.network(
-                              user.photoUrl!,
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.person,
-                                  size: 60,
-                                );
-                              },
-                            ),
-                          )
-                        : Icon(
-                            Icons.person,
-                            size: 60,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
-                  ),
-                  const SizedBox(height: AppConstants.paddingLarge),
-
-                  // User Details Card
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppConstants.paddingLarge),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Section Header
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'account.profile_info'.tr(),
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              if (!_isEditing)
-                                IconButton(
-                                  icon: const Icon(Icons.edit),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isEditing = true;
-                                    });
-                                  },
-                                  tooltip: 'account.edit_profile'.tr(),
+      child: Row(
+        children: [
+          // Avatar with Initials
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+            ),
+            child: user.photoUrl != null
+                ? ClipOval(
+                    child: Image.network(
+                      user.photoUrl!,
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(
+                          child: Text(
+                            initials,
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  color: AppTheme.primaryBlue,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                            ],
                           ),
-                          const SizedBox(height: AppConstants.paddingMedium),
-
-                          // Display Name Field
-                          if (_isEditing)
-                            Form(
-                              key: _formKey,
-                              child: Column(
-                                children: [
-                                  TextFormField(
-                                    controller: _displayNameController,
-                                    decoration: InputDecoration(
-                                      labelText: 'account.display_name'.tr(),
-                                      hintText: 'account.enter_name_hint'.tr(),
-                                      prefixIcon: const Icon(Icons.person_outline),
-                                    ),
-                                    validator: Validators.validateName,
-                                    textInputAction: TextInputAction.done,
-                                    onFieldSubmitted: (_) => _updateProfile(),
-                                  ),
-                                  const SizedBox(height: AppConstants.paddingMedium),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: ElevatedButton.icon(
-                                      onPressed: _updateProfile,
-                                      icon: const Icon(Icons.save),
-                                      label: Text('account.save_changes'.tr()),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          else
-                            _buildInfoRow(
-                              context,
-                              Icons.person_outline,
-                              'account.display_name'.tr(),
-                              user.displayName ?? 'account.not_set'.tr(),
-                            ),
-
-                          if (!_isEditing) ...[
-                            const Divider(height: AppConstants.paddingLarge),
-
-                            // Email (non-editable)
-                            _buildInfoRow(
-                              context,
-                              Icons.email_outlined,
-                              'account.email_label'.tr(),
-                              user.email,
-                            ),
-
-                            const Divider(height: AppConstants.paddingLarge),
-
-                            // User ID
-                            _buildInfoRow(
-                              context,
-                              Icons.fingerprint,
-                              'account.user_id_label'.tr(),
-                              user.uid,
-                              isSmall: true,
-                            ),
-
-                            const Divider(height: AppConstants.paddingLarge),
-
-                            // Account Created Date
-                            _buildInfoRow(
-                              context,
-                              Icons.calendar_today_outlined,
-                              'account.member_since'.tr(),
-                              DateFormat('MMM dd, yyyy').format(user.createdAt),
-                            ),
-                          ],
-                        ],
+                        );
+                      },
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      initials,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: AppTheme.primaryBlue,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+          ),
+          const SizedBox(width: AppTheme.spacing16),
+          // User Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user.displayName ?? 'account.not_set'.tr(),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ),
+                ),
+                const SizedBox(height: AppTheme.spacing4),
+                Text(
+                  user.email,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                ),
+                const SizedBox(height: AppTheme.spacing8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacing12,
+                    vertical: AppTheme.spacing4,
                   ),
-
-                  const SizedBox(height: AppConstants.paddingLarge),
-
-                  // Additional Actions Card
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: Icon(
-                            Icons.lock_outline,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          title: Text('account.change_password'.tr()),
-                          subtitle: Text('account.update_password_subtitle'.tr()),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            // TODO: Navigate to change password screen
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('account.change_password_coming_soon'.tr()),
-                              ),
-                            );
-                          },
-                        ),
-                        const Divider(height: 1),
-                        ListTile(
-                          leading: Icon(
-                            Icons.image_outlined,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          title: Text('account.profile_picture'.tr()),
-                          subtitle: Text('account.upload_photo_subtitle'.tr()),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            // TODO: Navigate to profile picture upload
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('account.profile_picture_coming_soon'.tr()),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.secondaryGreen.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                   ),
+                  child: Text(
+                    'account.patient_account'.tr(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppTheme.secondaryGreen,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                  const SizedBox(height: AppConstants.paddingXLarge),
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: AppTheme.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+    );
+  }
 
-                  // Account Stats (optional)
+  Widget _buildProfileDetailsCard(BuildContext context, dynamic user) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            blurRadius: AppTheme.elevationLow,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildProfileDetailRow(
+            context,
+            Icons.cake_outlined,
+            'account.date_of_birth'.tr(),
+            user.dateOfBirth != null
+                ? DateFormat('dd MMMM yyyy').format(user.dateOfBirth!)
+                : 'account.not_provided'.tr(),
+          ),
+          _buildDivider(),
+          _buildProfileDetailRow(
+            context,
+            Icons.wc_outlined,
+            'account.sex'.tr(),
+            user.gender != null
+                ? 'profile.${user.gender}'.tr()
+                : 'account.not_provided'.tr(),
+          ),
+          _buildDivider(),
+          _buildProfileDetailRow(
+            context,
+            Icons.phone_outlined,
+            'account.phone'.tr(),
+            user.phone ?? 'account.not_provided'.tr(),
+          ),
+          _buildDivider(),
+          _buildProfileDetailRow(
+            context,
+            Icons.language_outlined,
+            'account.preferred_language'.tr(),
+            _getLanguageName(user.preferredLanguage),
+          ),
+          _buildDivider(),
+          _buildProfileDetailRow(
+            context,
+            Icons.calendar_today_outlined,
+            'account.member_since'.tr(),
+            DateFormat('dd MMMM yyyy').format(user.createdAt),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileDetailRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
+    final isNotProvided = value == 'account.not_provided'.tr();
+
+    return Padding(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+            ),
+            child: Icon(
+              icon,
+              size: AppTheme.iconMedium,
+              color: AppTheme.primaryBlue,
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacing12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppTheme.textTertiary,
+                      ),
+                ),
+                const SizedBox(height: AppTheme.spacing4),
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: isNotProvided
+                            ? AppTheme.textTertiary
+                            : AppTheme.textPrimary,
+                        fontStyle: isNotProvided ? FontStyle.italic : FontStyle.normal,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionsCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            blurRadius: AppTheme.elevationLow,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildActionTile(
+            context,
+            Icons.edit_outlined,
+            'account.edit_profile'.tr(),
+            'account.edit_profile_desc'.tr(),
+            () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CompleteProfileScreen(),
+                ),
+              );
+            },
+          ),
+          _buildDivider(),
+          _buildActionTile(
+            context,
+            Icons.language_outlined,
+            'account.change_language'.tr(),
+            'account.change_language_desc'.tr(),
+            () => _showLanguageDialog(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAccountCard(BuildContext context, dynamic user) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            blurRadius: AppTheme.elevationLow,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildActionTile(
+            context,
+            Icons.lock_outline,
+            'account.change_password'.tr(),
+            'account.change_password_desc'.tr(),
+            () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('account.change_password_coming_soon'.tr()),
+                  backgroundColor: AppTheme.infoBlue,
+                ),
+              );
+            },
+          ),
+          _buildDivider(),
+          _buildProfileDetailRow(
+            context,
+            Icons.fingerprint,
+            'account.user_id'.tr(),
+            user.uid.substring(0, 12) + '...',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionTile(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spacing16),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+              ),
+              child: Icon(
+                icon,
+                size: AppTheme.iconMedium,
+                color: AppTheme.primaryBlue,
+              ),
+            ),
+            const SizedBox(width: AppTheme.spacing12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    'account.account_active_days'.tr(namedArgs: {
-                      'days': DateTime.now().difference(user.createdAt).inDays.toString()
-                    }),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
+                    title,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
                         ),
                   ),
-
-                  const SizedBox(height: AppConstants.paddingXLarge),
-
-                  // Logout Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _handleLogout,
-                      icon: const Icon(Icons.logout, color: AppTheme.errorRed),
-                      label: Text(
-                        'auth.sign_out'.tr(),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppTheme.errorRed,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppTheme.errorRed),
-                        padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
-                      ),
-                    ),
+                  const SizedBox(height: AppTheme.spacing4),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
                   ),
                 ],
               ),
             ),
+            Icon(
+              Icons.chevron_right,
+              color: AppTheme.textTertiary,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildInfoRow(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value, {
-    bool isSmall = false,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: Theme.of(context).colorScheme.primary,
+  Widget _buildDivider() {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      color: AppTheme.dividerColor,
+      indent: AppTheme.spacing16,
+      endIndent: AppTheme.spacing16,
+    );
+  }
+
+  Widget _buildSignOutButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () => _handleSignOut(context),
+        icon: const Icon(Icons.logout, color: AppTheme.errorRed),
+        label: Text(
+          'auth.sign_out'.tr(),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppTheme.errorRed,
+                fontWeight: FontWeight.w600,
+              ),
         ),
-        const SizedBox(width: AppConstants.paddingSmall),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppTheme.errorRed),
+          padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context) {
+    final currentLocale = context.locale.languageCode;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('account.select_language'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLanguageOption(
+              dialogContext,
+              'English',
+              'en',
+              currentLocale == 'en',
+            ),
+            const SizedBox(height: AppTheme.spacing12),
+            _buildLanguageOption(
+              dialogContext,
+              'Română',
+              'ro',
+              currentLocale == 'ro',
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text('common.cancel'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String languageName,
+    String languageCode,
+    bool isSelected,
+  ) {
+    return InkWell(
+      onTap: () {
+        context.setLocale(Locale(languageCode));
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('account.language_changed'.tr()),
+            backgroundColor: AppTheme.successGreen,
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+      child: Container(
+        padding: const EdgeInsets.all(AppTheme.spacing12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppTheme.primaryBlue.withValues(alpha: 0.1)
+              : AppTheme.backgroundWhite,
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryBlue : AppTheme.dividerColor,
+            width: isSelected ? 2 : 1,
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                languageName,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppTheme.textPrimary,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: isSmall
-                    ? Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontFamily: 'monospace',
-                        )
-                    : Theme.of(context).textTheme.bodyLarge,
-                overflow: isSmall ? TextOverflow.ellipsis : TextOverflow.visible,
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle,
+                color: AppTheme.primaryBlue,
+                size: AppTheme.iconMedium,
               ),
-            ],
-          ),
+          ],
         ),
-      ],
+      ),
     );
+  }
+
+  Future<void> _handleSignOut(BuildContext context) async {
+    final authController = context.read<AuthController>();
+    await authController.signOut();
+
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    } else if (parts.isNotEmpty && parts[0].isNotEmpty) {
+      return parts[0][0].toUpperCase();
+    }
+    return '?';
+  }
+
+  String _getLanguageName(String languageCode) {
+    switch (languageCode) {
+      case 'ro':
+        return 'Română';
+      case 'en':
+      default:
+        return 'English';
+    }
   }
 }

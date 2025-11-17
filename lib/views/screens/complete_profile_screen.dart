@@ -20,12 +20,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   DateTime? _selectedDateOfBirth;
   String? _selectedGender;
 
-  // Gender keys for translation
-  final List<String> _genderKeys = [
+  // Sex keys for translation (biological sex for medical purposes)
+  final List<String> _sexKeys = [
     'male',
     'female',
-    'other',
-    'prefer_not_to_say',
   ];
 
   @override
@@ -175,7 +173,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: AppTheme.spacing16),
                 _buildDateOfBirthField(),
                 const SizedBox(height: AppTheme.spacing16),
-                _buildGenderField(),
+                _buildSexField(),
                 const SizedBox(height: AppTheme.spacing16),
                 _buildPhoneField(),
                 const SizedBox(height: AppTheme.spacing32),
@@ -350,12 +348,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildGenderField() {
+  Widget _buildSexField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'profile.gender'.tr(),
+          'profile.sex'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -365,16 +363,16 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         DropdownButtonFormField<String>(
           value: _selectedGender,
           decoration: InputDecoration(
-            hintText: 'profile.gender_hint'.tr(),
+            hintText: 'profile.sex_hint'.tr(),
             prefixIcon: const Icon(
               Icons.wc_outlined,
               color: AppTheme.textSecondary,
             ),
           ),
-          items: _genderKeys.map((String genderKey) {
+          items: _sexKeys.map((String sexKey) {
             return DropdownMenuItem<String>(
-              value: genderKey,
-              child: Text('profile.$genderKey'.tr()),
+              value: sexKey,
+              child: Text('profile.$sexKey'.tr()),
             );
           }).toList(),
           onChanged: (String? newValue) {
@@ -384,7 +382,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'validation.select_gender'.tr();
+              return 'validation.select_sex'.tr();
             }
             return null;
           },
