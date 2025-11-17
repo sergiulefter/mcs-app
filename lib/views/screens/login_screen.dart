@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/app_theme.dart';
@@ -117,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Title
         Text(
-          'Sign In',
+          'auth.sign_in'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -127,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // Subtitle
         Text(
-          'Access your medical consultations',
+          'auth.sign_in_subtitle'.tr(),
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: AppTheme.textSecondary,
               ),
@@ -141,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Email',
+          'auth.email'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -152,9 +153,9 @@ class _LoginScreenState extends State<LoginScreen> {
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          decoration: const InputDecoration(
-            hintText: 'Enter your email',
-            prefixIcon: Icon(
+          decoration: InputDecoration(
+            hintText: 'auth.email_hint'.tr(),
+            prefixIcon: const Icon(
               Icons.email_outlined,
               color: AppTheme.textSecondary,
             ),
@@ -170,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Password',
+          'auth.password'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -183,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _handleLogin(),
           decoration: InputDecoration(
-            hintText: 'Enter your password',
+            hintText: 'auth.password_hint'.tr(),
             prefixIcon: const Icon(
               Icons.lock_outlined,
               color: AppTheme.textSecondary,
@@ -222,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         child: Text(
-          'Forgot Password?',
+          'auth.forgot_password'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppTheme.primaryBlue,
                 fontWeight: FontWeight.w600,
@@ -246,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: AppTheme.textOnPrimary,
                   ),
                 )
-              : const Text('Sign In'),
+              : Text('auth.sign_in'.tr()),
         );
       },
     );
@@ -257,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Don't have an account?",
+          'auth.no_account'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
               ),
@@ -270,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           },
-          child: const Text('Create Account'),
+          child: Text('auth.sign_up'.tr()),
         ),
       ],
     );

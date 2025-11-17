@@ -17,6 +17,7 @@ class AuthService {
     required String email,
     required String password,
     String? displayName,
+    String? preferredLanguage,
   }) async {
     try {
       // Create user in Firebase Auth
@@ -35,13 +36,14 @@ class AuthService {
         user = _auth.currentUser;
       }
 
-      // Create user document in Firestore
+      // Create user document in Firestore with preferred language
       UserModel userModel = UserModel(
         uid: user!.uid,
         email: user.email ?? email,
         displayName: displayName,
         photoUrl: null,
         createdAt: DateTime.now(),
+        preferredLanguage: preferredLanguage ?? 'en',
       );
 
       await _firestore.collection('users').doc(user.uid).set(userModel.toMap());

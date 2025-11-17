@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../utils/app_theme.dart';
 
 class ConsultationsScreen extends StatelessWidget {
@@ -9,7 +10,7 @@ class ConsultationsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        title: const Text('My Consultations'),
+        title: Text('consultations.title'.tr()),
       ),
       body: Center(
         child: Padding(
@@ -32,7 +33,7 @@ class ConsultationsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing24),
               Text(
-                'My Consultations',
+                'consultations.title'.tr(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -40,7 +41,7 @@ class ConsultationsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing12),
               Text(
-                'View and track your second opinion requests',
+                'consultations.subtitle'.tr(),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -66,7 +67,7 @@ class ConsultationsScreen extends StatelessWidget {
                     const SizedBox(width: AppTheme.spacing12),
                     Expanded(
                       child: Text(
-                        'Your consultation history and status tracking will appear here once you submit your first request.',
+                        'consultations.placeholder_info'.tr(),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.textPrimary,
                             ),

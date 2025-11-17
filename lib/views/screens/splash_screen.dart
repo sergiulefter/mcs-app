@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/constants.dart';
+import 'language_selection_screen.dart';
 import 'login_screen.dart';
 import 'main_shell.dart';
 import 'onboarding_screen.dart';
@@ -28,17 +29,18 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!mounted) return;
 
-    // Check if onboarding has been completed
+    // Check preferences for language selection and onboarding
     final prefs = await SharedPreferences.getInstance();
+    final languageSelected = prefs.getBool('language_selected') ?? false;
     final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
 
     if (!mounted) return;
 
     // Check authentication status and navigate
-    _navigateToNextScreen(onboardingCompleted);
+    _navigateToNextScreen(languageSelected, onboardingCompleted);
   }
 
-  void _navigateToNextScreen(bool onboardingCompleted) {
+  void _navigateToNextScreen(bool languageSelected, bool onboardingCompleted) {
     final authController = context.read<AuthController>();
 
     Navigator.of(context).pushReplacement(
@@ -47,6 +49,11 @@ class _SplashScreenState extends State<SplashScreen> {
           // If user is authenticated, go directly to MainShell
           if (authController.isAuthenticated) {
             return const MainShell();
+          }
+
+          // If language not selected, show language selection first
+          if (!languageSelected) {
+            return const LanguageSelectionScreen();
           }
 
           // If onboarding not completed, show onboarding

@@ -1,0 +1,143 @@
+{
+  "app": {
+    "name": "Medical Correct Solution",
+    "description": "A Doua Opinie Medicală Profesională"
+  },
+  "language_selection": {
+    "title": "Alege Limba",
+    "subtitle": "Selectează limba preferată pentru aplicație",
+    "english": "English",
+    "romanian": "Română",
+    "continue_button": "Continuă"
+  },
+  "onboarding": {
+    "skip": "Omite",
+    "next": "Următorul",
+    "get_started": "Începe",
+    "slide1_title": "Opinii Medicale de Expert",
+    "slide1_description": "Conectează-te cu specialiști medicali verificați pentru a doua opinie profesională asupra diagnosticului tău",
+    "slide2_title": "Încarcă Documentele Medicale",
+    "slide2_description": "Încarcă în siguranță fișele medicale, rezultatele testelor și imagistica pentru evaluare de specialitate",
+    "slide3_title": "Primește Perspective de Expert",
+    "slide3_description": "Obține opinii profesionale detaliate care te ajută să iei decizii informate despre sănătatea ta"
+  },
+  "auth": {
+    "sign_in": "Autentificare",
+    "sign_up": "Creează Cont",
+    "sign_out": "Deconectare",
+    "email": "Email",
+    "password": "Parolă",
+    "confirm_password": "Confirmă Parola",
+    "full_name": "Nume Complet",
+    "forgot_password": "Ai uitat parola?",
+    "no_account": "Nu ai cont?",
+    "have_account": "Ai deja cont?",
+    "sign_in_subtitle": "Accesează consultațiile tale medicale",
+    "sign_up_subtitle": "Alătură-te platformei de consultații medicale",
+    "email_hint": "Introdu adresa de email",
+    "password_hint": "Introdu parola",
+    "create_password_hint": "Creează o parolă",
+    "confirm_password_hint": "Confirmă parola",
+    "name_hint": "Introdu numele complet"
+  },
+  "profile": {
+    "complete_title": "Completează Profilul",
+    "complete_subtitle": "Ajută-ne să personalizăm experiența ta oferind câteva informații suplimentare.",
+    "date_of_birth": "Data Nașterii",
+    "date_of_birth_hint": "Selectează data nașterii",
+    "gender": "Gen",
+    "gender_hint": "Selectează genul",
+    "phone": "Număr de Telefon",
+    "phone_hint": "Introdu numărul de telefon",
+    "preferred_language": "Limba Preferată",
+    "preferred_language_hint": "Selectează limba preferată",
+    "optional": "(Opțional)",
+    "complete_button": "Completează Profilul",
+    "skip_info": "Poți actualiza aceste informații mai târziu în setările contului.",
+    "profile_setup": "Configurare Profil",
+    "step_of": "Pasul {current} din {total}",
+    "male": "Masculin",
+    "female": "Feminin",
+    "other": "Altul",
+    "prefer_not_to_say": "Prefer să nu spun",
+    "english": "Engleză",
+    "romanian": "Română"
+  },
+  "navigation": {
+    "home": "Acasă",
+    "doctors": "Medici",
+    "consultations": "Consultații",
+    "account": "Cont"
+  },
+  "home": {
+    "title": "Acasă",
+    "welcome": "Bun venit, {name}!",
+    "subtitle": "Tabloul tău de bord",
+    "placeholder_info": "Tabloul de bord va afișa acțiuni rapide, consultații active și activitate recentă."
+  },
+  "doctors": {
+    "title": "Explorează Medicii",
+    "subtitle": "Găsește și conectează-te cu specialiști medicali",
+    "placeholder_info": "Caută medici după specialitate, vizualizează profilurile lor și solicită a doua opinie."
+  },
+  "consultations": {
+    "title": "Consultațiile Mele",
+    "subtitle": "Urmărește cererile de a doua opinie",
+    "placeholder_info": "Vizualizează istoricul consultațiilor, verifică statusul cererilor și accesează răspunsurile medicilor."
+  },
+  "account": {
+    "title": "Cont",
+    "overview_title": "Prezentare Generală Cont",
+    "profile_info": "Informații Profil",
+    "email_label": "Email",
+    "user_id_label": "ID Utilizator",
+    "member_since": "Membru din",
+    "account_settings": "Setări Cont",
+    "change_password": "Schimbă Parola",
+    "profile_picture": "Poză de Profil",
+    "display_name": "Nume Afișat",
+    "save": "Salvează",
+    "edit_profile": "Editează Profilul",
+    "enter_name_hint": "Introdu numele tău",
+    "save_changes": "Salvează Modificările",
+    "not_set": "Nesetat",
+    "update_password_subtitle": "Actualizează parola contului",
+    "change_password_coming_soon": "Funcția de schimbare parolă vine în curând!",
+    "upload_photo_subtitle": "Încarcă sau schimbă poza ta",
+    "profile_picture_coming_soon": "Încărcarea pozei de profil vine în curând!",
+    "account_active_days": "Cont activ de {days} zile",
+    "profile_updated_success": "Profilul a fost actualizat cu succes!",
+    "no_user_logged_in": "Niciun utilizator autentificat"
+  },
+  "common": {
+    "skip": "Omite",
+    "next": "Următorul",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "done": "Gata",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "loading": "Se încarcă...",
+    "error": "Eroare",
+    "success": "Succes",
+    "warning": "Avertisment",
+    "info": "Informație"
+  },
+  "validation": {
+    "required_field": "Acest câmp este obligatoriu",
+    "invalid_email": "Te rugăm să introduci o adresă de email validă",
+    "password_too_short": "Parola trebuie să aibă cel puțin 6 caractere",
+    "passwords_not_match": "Parolele nu se potrivesc",
+    "name_too_short": "Numele trebuie să aibă cel puțin 2 caractere",
+    "invalid_phone": "Te rugăm să introduci un număr de telefon valid",
+    "select_date_of_birth": "Te rugăm să selectezi data nașterii",
+    "select_gender": "Te rugăm să selectezi genul",
+    "please_enter_full_name": "Te rugăm să introduci numele complet"
+  },
+  "errors": {
+    "signup_failed": "Înregistrarea a eșuat",
+    "login_failed": "Autentificarea a eșuat",
+    "profile_save_failed": "Salvarea profilului a eșuat",
+    "unknown_error": "A apărut o eroare necunoscută"
+  }
+}

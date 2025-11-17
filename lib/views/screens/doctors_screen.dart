@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../utils/app_theme.dart';
 
 class DoctorsScreen extends StatelessWidget {
@@ -9,7 +10,7 @@ class DoctorsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        title: const Text('Browse Doctors'),
+        title: Text('doctors.title'.tr()),
       ),
       body: Center(
         child: Padding(
@@ -32,7 +33,7 @@ class DoctorsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing24),
               Text(
-                'Browse Doctors',
+                'doctors.title'.tr(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -40,7 +41,7 @@ class DoctorsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing12),
               Text(
-                'Search and filter doctors by specialty, language, and price',
+                'doctors.subtitle'.tr(),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -66,7 +67,7 @@ class DoctorsScreen extends StatelessWidget {
                     const SizedBox(width: AppTheme.spacing12),
                     Expanded(
                       child: Text(
-                        'Doctor listing and search functionality will be implemented in a future update.',
+                        'doctors.placeholder_info'.tr(),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.textPrimary,
                             ),

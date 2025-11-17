@@ -1,0 +1,143 @@
+{
+  "app": {
+    "name": "Medical Correct Solution",
+    "description": "Professional Medical Second Opinions"
+  },
+  "language_selection": {
+    "title": "Select Your Language",
+    "subtitle": "Choose your preferred language for the app",
+    "english": "English",
+    "romanian": "Română",
+    "continue_button": "Continue"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "get_started": "Get Started",
+    "slide1_title": "Expert Medical Opinions",
+    "slide1_description": "Connect with verified medical specialists for professional second opinions on your diagnosis",
+    "slide2_title": "Share Your Medical Documents",
+    "slide2_description": "Securely upload your medical records, test results, and imaging for expert review",
+    "slide3_title": "Receive Expert Insights",
+    "slide3_description": "Get detailed professional opinions to help you make informed decisions about your health"
+  },
+  "auth": {
+    "sign_in": "Sign In",
+    "sign_up": "Create Account",
+    "sign_out": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "full_name": "Full Name",
+    "forgot_password": "Forgot Password?",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "sign_in_subtitle": "Access your medical consultations",
+    "sign_up_subtitle": "Join the medical consultation platform",
+    "email_hint": "Enter your email",
+    "password_hint": "Enter your password",
+    "create_password_hint": "Create a password",
+    "confirm_password_hint": "Confirm your password",
+    "name_hint": "Enter your full name"
+  },
+  "profile": {
+    "complete_title": "Complete Your Profile",
+    "complete_subtitle": "Help us personalize your experience by providing some additional information.",
+    "date_of_birth": "Date of Birth",
+    "date_of_birth_hint": "Select your date of birth",
+    "gender": "Gender",
+    "gender_hint": "Select your gender",
+    "phone": "Phone Number",
+    "phone_hint": "Enter your phone number",
+    "preferred_language": "Preferred Language",
+    "preferred_language_hint": "Select your preferred language",
+    "optional": "(Optional)",
+    "complete_button": "Complete Profile",
+    "skip_info": "You can update this information later in your account settings.",
+    "profile_setup": "Profile Setup",
+    "step_of": "Step {current} of {total}",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "prefer_not_to_say": "Prefer not to say",
+    "english": "English",
+    "romanian": "Romanian"
+  },
+  "navigation": {
+    "home": "Home",
+    "doctors": "Doctors",
+    "consultations": "Consultations",
+    "account": "Account"
+  },
+  "home": {
+    "title": "Home",
+    "welcome": "Welcome, {name}!",
+    "subtitle": "Your patient dashboard",
+    "placeholder_info": "Your dashboard will show quick actions, active consultations, and recent activity."
+  },
+  "doctors": {
+    "title": "Browse Doctors",
+    "subtitle": "Find and connect with medical specialists",
+    "placeholder_info": "Search for doctors by specialty, view their profiles, and request second opinions."
+  },
+  "consultations": {
+    "title": "My Consultations",
+    "subtitle": "Track your second opinion requests",
+    "placeholder_info": "View your consultation history, check request status, and access doctor responses."
+  },
+  "account": {
+    "title": "Account",
+    "overview_title": "Account Overview",
+    "profile_info": "Profile Information",
+    "email_label": "Email",
+    "user_id_label": "User ID",
+    "member_since": "Member since",
+    "account_settings": "Account Settings",
+    "change_password": "Change Password",
+    "profile_picture": "Profile Picture",
+    "display_name": "Display Name",
+    "save": "Save",
+    "edit_profile": "Edit Profile",
+    "enter_name_hint": "Enter your name",
+    "save_changes": "Save Changes",
+    "not_set": "Not set",
+    "update_password_subtitle": "Update your account password",
+    "change_password_coming_soon": "Change password feature coming soon!",
+    "upload_photo_subtitle": "Upload or change your photo",
+    "profile_picture_coming_soon": "Profile picture upload coming soon!",
+    "account_active_days": "Account active for {days} days",
+    "profile_updated_success": "Profile updated successfully!",
+    "no_user_logged_in": "No user logged in"
+  },
+  "common": {
+    "skip": "Skip",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "done": "Done",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "validation": {
+    "required_field": "This field is required",
+    "invalid_email": "Please enter a valid email address",
+    "password_too_short": "Password must be at least 6 characters",
+    "passwords_not_match": "Passwords do not match",
+    "name_too_short": "Name must be at least 2 characters",
+    "invalid_phone": "Please enter a valid phone number",
+    "select_date_of_birth": "Please select your date of birth",
+    "select_gender": "Please select your gender",
+    "please_enter_full_name": "Please enter your full name"
+  },
+  "errors": {
+    "signup_failed": "Signup failed",
+    "login_failed": "Login failed",
+    "profile_save_failed": "Failed to save profile",
+    "unknown_error": "An unknown error occurred"
+  }
+}

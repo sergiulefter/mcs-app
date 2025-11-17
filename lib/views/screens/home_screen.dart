@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
 
@@ -14,7 +15,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text('home.title'.tr()),
       ),
       body: Center(
         child: Padding(
@@ -37,7 +38,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing24),
               Text(
-                'Welcome${user?.displayName != null ? ', ${user!.displayName}' : ''}!',
+                'home.welcome'.tr(namedArgs: {'name': user?.displayName ?? ''}),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
@@ -46,7 +47,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacing12),
               Text(
-                'Your patient dashboard',
+                'home.subtitle'.tr(),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -72,7 +73,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(width: AppTheme.spacing12),
                     Expanded(
                       child: Text(
-                        'Quick actions, active requests, and recent activity will be displayed here.',
+                        'home.placeholder_info'.tr(),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.textPrimary,
                             ),

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/app_theme.dart';
-import 'main_shell.dart';
+import 'complete_profile_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -34,20 +35,24 @@ class _SignupScreenState extends State<SignupScreen> {
     if (_formKey.currentState!.validate()) {
       final authController = context.read<AuthController>();
 
+      // Get the current language from EasyLocalization (set in LanguageSelectionScreen)
+      final currentLanguage = context.locale.languageCode;
+
       final success = await authController.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         displayName: _nameController.text.trim(),
+        preferredLanguage: currentLanguage,
       );
 
       if (success && mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainShell()),
+          MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authController.errorMessage ?? 'Signup failed'),
+            content: Text(authController.errorMessage ?? 'errors.signup_failed'.tr()),
             backgroundColor: AppTheme.errorRed,
           ),
         );
@@ -141,7 +146,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
         // Title
         Text(
-          'Create Account',
+          'auth.sign_up'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
@@ -151,7 +156,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
         // Subtitle
         Text(
-          'Join the medical consultation platform',
+          'auth.sign_up_subtitle'.tr(),
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: AppTheme.textSecondary,
               ),
@@ -165,7 +170,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Full Name',
+          'auth.full_name'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -177,9 +182,9 @@ class _SignupScreenState extends State<SignupScreen> {
           keyboardType: TextInputType.name,
           textInputAction: TextInputAction.next,
           textCapitalization: TextCapitalization.words,
-          decoration: const InputDecoration(
-            hintText: 'Enter your full name',
-            prefixIcon: Icon(
+          decoration: InputDecoration(
+            hintText: 'auth.name_hint'.tr(),
+            prefixIcon: const Icon(
               Icons.person_outlined,
               color: AppTheme.textSecondary,
             ),
@@ -195,7 +200,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Email',
+          'auth.email'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -206,9 +211,9 @@ class _SignupScreenState extends State<SignupScreen> {
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
           textInputAction: TextInputAction.next,
-          decoration: const InputDecoration(
-            hintText: 'Enter your email',
-            prefixIcon: Icon(
+          decoration: InputDecoration(
+            hintText: 'auth.email_hint'.tr(),
+            prefixIcon: const Icon(
               Icons.email_outlined,
               color: AppTheme.textSecondary,
             ),
@@ -224,7 +229,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Password',
+          'auth.password'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -236,7 +241,7 @@ class _SignupScreenState extends State<SignupScreen> {
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.next,
           decoration: InputDecoration(
-            hintText: 'Create a password',
+            hintText: 'auth.create_password_hint'.tr(),
             prefixIcon: const Icon(
               Icons.lock_outlined,
               color: AppTheme.textSecondary,
@@ -266,7 +271,7 @@ class _SignupScreenState extends State<SignupScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Confirm Password',
+          'auth.confirm_password'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
@@ -279,7 +284,7 @@ class _SignupScreenState extends State<SignupScreen> {
           textInputAction: TextInputAction.done,
           onFieldSubmitted: (_) => _handleSignup(),
           decoration: InputDecoration(
-            hintText: 'Confirm your password',
+            hintText: 'auth.confirm_password_hint'.tr(),
             prefixIcon: const Icon(
               Icons.lock_outlined,
               color: AppTheme.textSecondary,
@@ -321,7 +326,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     color: AppTheme.textOnPrimary,
                   ),
                 )
-              : const Text('Create Account'),
+              : Text('auth.sign_up'.tr()),
         );
       },
     );
@@ -332,14 +337,14 @@ class _SignupScreenState extends State<SignupScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Already have an account?',
+          'auth.have_account'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppTheme.textSecondary,
               ),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Sign In'),
+          child: Text('auth.sign_in'.tr()),
         ),
       ],
     );

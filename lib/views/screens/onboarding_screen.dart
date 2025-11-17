@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../utils/app_theme.dart';
 import 'login_screen.dart';
 
@@ -14,26 +15,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingSlide> _slides = [
-    OnboardingSlide(
-      icon: Icons.medical_services_outlined,
-      title: 'Expert Medical Opinions',
-      description:
-          'Get professional second opinions from verified doctors, anytime, anywhere.',
-    ),
-    OnboardingSlide(
-      icon: Icons.upload_file_outlined,
-      title: 'Share Your Medical Documents',
-      description:
-          'Upload your diagnosis, test results, and medical history securely.',
-    ),
-    OnboardingSlide(
-      icon: Icons.verified_user_outlined,
-      title: 'Receive Expert Insights',
-      description:
-          'Get detailed responses from specialists to make informed decisions.',
-    ),
-  ];
+  List<OnboardingSlide> get _slides => [
+        OnboardingSlide(
+          icon: Icons.medical_services_outlined,
+          titleKey: 'onboarding.slide1_title',
+          descriptionKey: 'onboarding.slide1_description',
+        ),
+        OnboardingSlide(
+          icon: Icons.upload_file_outlined,
+          titleKey: 'onboarding.slide2_title',
+          descriptionKey: 'onboarding.slide2_description',
+        ),
+        OnboardingSlide(
+          icon: Icons.verified_user_outlined,
+          titleKey: 'onboarding.slide3_title',
+          descriptionKey: 'onboarding.slide3_description',
+        ),
+      ];
 
   @override
   void dispose() {
@@ -110,7 +108,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: TextButton(
           onPressed: _completeOnboarding,
           child: Text(
-            'Skip',
+            'onboarding.skip'.tr(),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
@@ -145,7 +143,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           // Title
           Text(
-            slide.title,
+            slide.titleKey.tr(),
             style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w700,
@@ -156,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
           // Description
           Text(
-            slide.description,
+            slide.descriptionKey.tr(),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppTheme.textSecondary,
                   height: 1.6,
@@ -189,7 +187,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ElevatedButton(
               onPressed: _nextPage,
               child: Text(
-                _currentPage == _slides.length - 1 ? 'Get Started' : 'Next',
+                _currentPage == _slides.length - 1
+                    ? 'onboarding.get_started'.tr()
+                    : 'onboarding.next'.tr(),
               ),
             ),
           ),
@@ -216,12 +216,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 class OnboardingSlide {
   final IconData icon;
-  final String title;
-  final String description;
+  final String titleKey;
+  final String descriptionKey;
 
   OnboardingSlide({
     required this.icon,
-    required this.title,
-    required this.description,
+    required this.titleKey,
+    required this.descriptionKey,
   });
 }

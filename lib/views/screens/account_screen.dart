@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/constants.dart';
@@ -47,15 +47,15 @@ class _AccountScreenState extends State<AccountScreen> {
           _isEditing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
+          SnackBar(
+            content: Text('account.profile_updated_success'.tr()),
             backgroundColor: Colors.green,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authController.errorMessage ?? 'Failed to update profile'),
+            content: Text(authController.errorMessage ?? 'errors.profile_save_failed'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -89,16 +89,16 @@ class _AccountScreenState extends State<AccountScreen> {
     final user = authController.currentUser;
 
     if (user == null) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
-          child: Text('No user logged in'),
+          child: Text('account.no_user_logged_in'.tr()),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Account Overview'),
+        title: Text('account.overview_title'.tr()),
         centerTitle: true,
         elevation: 0,
         actions: [
@@ -106,7 +106,7 @@ class _AccountScreenState extends State<AccountScreen> {
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: _cancelEdit,
-              tooltip: 'Cancel',
+              tooltip: 'common.cancel'.tr(),
             ),
         ],
       ),
@@ -160,7 +160,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Profile Information',
+                                'account.profile_info'.tr(),
                                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -173,7 +173,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                       _isEditing = true;
                                     });
                                   },
-                                  tooltip: 'Edit Profile',
+                                  tooltip: 'account.edit_profile'.tr(),
                                 ),
                             ],
                           ),
@@ -187,10 +187,10 @@ class _AccountScreenState extends State<AccountScreen> {
                                 children: [
                                   TextFormField(
                                     controller: _displayNameController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Display Name',
-                                      hintText: 'Enter your name',
-                                      prefixIcon: Icon(Icons.person_outline),
+                                    decoration: InputDecoration(
+                                      labelText: 'account.display_name'.tr(),
+                                      hintText: 'account.enter_name_hint'.tr(),
+                                      prefixIcon: const Icon(Icons.person_outline),
                                     ),
                                     validator: Validators.validateName,
                                     textInputAction: TextInputAction.done,
@@ -202,7 +202,7 @@ class _AccountScreenState extends State<AccountScreen> {
                                     child: ElevatedButton.icon(
                                       onPressed: _updateProfile,
                                       icon: const Icon(Icons.save),
-                                      label: const Text('Save Changes'),
+                                      label: Text('account.save_changes'.tr()),
                                     ),
                                   ),
                                 ],
@@ -212,8 +212,8 @@ class _AccountScreenState extends State<AccountScreen> {
                             _buildInfoRow(
                               context,
                               Icons.person_outline,
-                              'Display Name',
-                              user.displayName ?? 'Not set',
+                              'account.display_name'.tr(),
+                              user.displayName ?? 'account.not_set'.tr(),
                             ),
 
                           if (!_isEditing) ...[
@@ -223,7 +223,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             _buildInfoRow(
                               context,
                               Icons.email_outlined,
-                              'Email',
+                              'account.email_label'.tr(),
                               user.email,
                             ),
 
@@ -233,7 +233,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             _buildInfoRow(
                               context,
                               Icons.fingerprint,
-                              'User ID',
+                              'account.user_id_label'.tr(),
                               user.uid,
                               isSmall: true,
                             ),
@@ -244,7 +244,7 @@ class _AccountScreenState extends State<AccountScreen> {
                             _buildInfoRow(
                               context,
                               Icons.calendar_today_outlined,
-                              'Member Since',
+                              'account.member_since'.tr(),
                               DateFormat('MMM dd, yyyy').format(user.createdAt),
                             ),
                           ],
@@ -268,14 +268,14 @@ class _AccountScreenState extends State<AccountScreen> {
                             Icons.lock_outline,
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          title: const Text('Change Password'),
-                          subtitle: const Text('Update your account password'),
+                          title: Text('account.change_password'.tr()),
+                          subtitle: Text('account.update_password_subtitle'.tr()),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
                             // TODO: Navigate to change password screen
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Change password feature coming soon!'),
+                              SnackBar(
+                                content: Text('account.change_password_coming_soon'.tr()),
                               ),
                             );
                           },
@@ -286,14 +286,14 @@ class _AccountScreenState extends State<AccountScreen> {
                             Icons.image_outlined,
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          title: const Text('Profile Picture'),
-                          subtitle: const Text('Upload or change your photo'),
+                          title: Text('account.profile_picture'.tr()),
+                          subtitle: Text('account.upload_photo_subtitle'.tr()),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
                             // TODO: Navigate to profile picture upload
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Profile picture upload coming soon!'),
+                              SnackBar(
+                                content: Text('account.profile_picture_coming_soon'.tr()),
                               ),
                             );
                           },
@@ -306,7 +306,9 @@ class _AccountScreenState extends State<AccountScreen> {
 
                   // Account Stats (optional)
                   Text(
-                    'Account active for ${DateTime.now().difference(user.createdAt).inDays} days',
+                    'account.account_active_days'.tr(namedArgs: {
+                      'days': DateTime.now().difference(user.createdAt).inDays.toString()
+                    }),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
                         ),
@@ -321,7 +323,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       onPressed: _handleLogout,
                       icon: const Icon(Icons.logout, color: AppTheme.errorRed),
                       label: Text(
-                        'Sign Out',
+                        'auth.sign_out'.tr(),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: AppTheme.errorRed,
                               fontWeight: FontWeight.w600,
