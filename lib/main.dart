@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'controllers/auth_controller.dart';
-import 'views/screens/login_screen.dart';
-import 'views/screens/home_screen.dart';
+import 'views/screens/splash_screen.dart';
+import 'utils/app_theme.dart';
+import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Set system UI overlay style for a professional appearance
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: AppTheme.backgroundWhite,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -27,40 +39,10 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: MaterialApp(
-        title: 'MCS App',
+        title: AppConstants.appName,
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFFDC143C), // Medical red (crimson)
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            filled: true,
-            fillColor: Colors.grey[50],
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-          ),
-        ),
-        home: Consumer<AuthController>(
-          builder: (context, authController, child) {
-            // Check if user is already logged in
-            if (authController.isAuthenticated) {
-              return const HomeScreen();
-            } else {
-              return const LoginScreen();
-            }
-          },
-        ),
+        theme: AppTheme.lightTheme,
+        home: const SplashScreen(),
       ),
     );
   }

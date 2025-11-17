@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class DoctorsScreen extends StatelessWidget {
+  const DoctorsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authController = context.watch<AuthController>();
-    final user = authController.currentUser;
-
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
-        title: const Text('Home'),
+        title: const Text('Browse Doctors'),
       ),
       body: Center(
         child: Padding(
@@ -30,23 +25,22 @@ class HomeScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                 ),
                 child: const Icon(
-                  Icons.home_outlined,
+                  Icons.search_outlined,
                   size: 56,
                   color: AppTheme.primaryBlue,
                 ),
               ),
               const SizedBox(height: AppTheme.spacing24),
               Text(
-                'Welcome${user?.displayName != null ? ', ${user!.displayName}' : ''}!',
+                'Browse Doctors',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppTheme.spacing12),
               Text(
-                'Your patient dashboard',
+                'Search and filter doctors by specialty, language, and price',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppTheme.textSecondary,
                     ),
@@ -72,7 +66,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(width: AppTheme.spacing12),
                     Expanded(
                       child: Text(
-                        'Quick actions, active requests, and recent activity will be displayed here.',
+                        'Doctor listing and search functionality will be implemented in a future update.',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.textPrimary,
                             ),

@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/constants.dart';
+import '../../utils/app_theme.dart';
+import 'login_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -67,6 +69,18 @@ class _AccountScreenState extends State<AccountScreen> {
       _displayNameController.text = authController.currentUser?.displayName ?? '';
       _isEditing = false;
     });
+  }
+
+  Future<void> _handleLogout() async {
+    final authController = context.read<AuthController>();
+    await authController.signOut();
+
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -296,6 +310,28 @@ class _AccountScreenState extends State<AccountScreen> {
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.grey[600],
                         ),
+                  ),
+
+                  const SizedBox(height: AppConstants.paddingXLarge),
+
+                  // Logout Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _handleLogout,
+                      icon: const Icon(Icons.logout, color: AppTheme.errorRed),
+                      label: Text(
+                        'Sign Out',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppTheme.errorRed,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppTheme.errorRed),
+                        padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
+                      ),
+                    ),
                   ),
                 ],
               ),
