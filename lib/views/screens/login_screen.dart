@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/app_text_field.dart';
 import 'signup_screen.dart';
 import 'main_shell.dart';
 
@@ -138,74 +139,35 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildEmailField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.email'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            hintText: 'auth.email_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.email_outlined,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          validator: Validators.validateEmail,
-        ),
-      ],
+    return AppTextField(
+      label: 'auth.email'.tr(),
+      hintText: 'auth.email_hint'.tr(),
+      controller: _emailController,
+      prefixIcon: Icons.email_outlined,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      validator: Validators.validateEmail,
     );
   }
 
   Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.password'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => _handleLogin(),
-          decoration: InputDecoration(
-            hintText: 'auth.password_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.lock_outlined,
-              color: AppTheme.textSecondary,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-                color: AppTheme.textSecondary,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
-            ),
-          ),
-          validator: Validators.validatePassword,
-        ),
-      ],
+    return AppTextField(
+      label: 'auth.password'.tr(),
+      hintText: 'auth.password_hint'.tr(),
+      controller: _passwordController,
+      prefixIcon: Icons.lock_outlined,
+      suffixIcon: _obscurePassword
+          ? Icons.visibility_outlined
+          : Icons.visibility_off_outlined,
+      onSuffixIconTap: () {
+        setState(() {
+          _obscurePassword = !_obscurePassword;
+        });
+      },
+      obscureText: _obscurePassword,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _handleLogin(),
+      validator: Validators.validatePassword,
     );
   }
 

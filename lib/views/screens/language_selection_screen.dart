@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/language_selection_card.dart';
 import 'onboarding_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -145,97 +146,20 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   Widget _buildLanguageOptions() {
     return Column(
       children: [
-        // Romanian option
-        _buildLanguageCard(
+        LanguageSelectionCard(
           languageCode: 'ro',
           languageName: 'language_selection.romanian'.tr(),
-          flagEmoji: '🇷🇴',
+          isSelected: _selectedLanguage == 'ro',
+          onTap: () => _selectLanguage('ro'),
         ),
         const SizedBox(height: AppTheme.spacing16),
-
-        // English option
-        _buildLanguageCard(
+        LanguageSelectionCard(
           languageCode: 'en',
           languageName: 'language_selection.english'.tr(),
-          flagEmoji: '🇬🇧',
+          isSelected: _selectedLanguage == 'en',
+          onTap: () => _selectLanguage('en'),
         ),
       ],
-    );
-  }
-
-  Widget _buildLanguageCard({
-    required String languageCode,
-    required String languageName,
-    required String flagEmoji,
-  }) {
-    final isSelected = _selectedLanguage == languageCode;
-
-    return InkWell(
-      onTap: () => _selectLanguage(languageCode),
-      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppTheme.spacing20),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.primaryBlue.withValues(alpha: 0.05)
-              : AppTheme.backgroundWhite,
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryBlue : AppTheme.dividerColor,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        ),
-        child: Row(
-          children: [
-            // Flag
-            Text(
-              flagEmoji,
-              style: const TextStyle(fontSize: 32),
-            ),
-            const SizedBox(width: AppTheme.spacing16),
-
-            // Language name
-            Expanded(
-              child: Text(
-                languageName,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    ),
-              ),
-            ),
-
-            // Check icon for selected
-            if (isSelected)
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-                ),
-                child: const Icon(
-                  Icons.check,
-                  size: 18,
-                  color: AppTheme.textOnPrimary,
-                ),
-              )
-            else
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppTheme.dividerColor,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-                ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 

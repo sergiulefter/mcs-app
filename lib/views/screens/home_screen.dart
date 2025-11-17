@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:intl/intl.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/quick_action_card.dart';
 import 'complete_profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -164,30 +164,28 @@ class HomeScreen extends StatelessWidget {
               ),
         ),
         const SizedBox(height: AppTheme.spacing16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildQuickActionCard(
-                context,
-                icon: Icons.medical_services_outlined,
-                title: 'home.request_opinion'.tr(),
-                description: 'home.request_opinion_desc'.tr(),
-                color: AppTheme.primaryBlue,
-                onTap: () {
+          Row(
+            children: [
+              Expanded(
+                child: QuickActionCard(
+                  icon: Icons.medical_services_outlined,
+                  title: 'home.request_opinion'.tr(),
+                  description: 'home.request_opinion_desc'.tr(),
+                  color: AppTheme.primaryBlue,
+                  onTap: () {
                   // Navigate to Doctors tab (index 1) to start the flow
                   _navigateToTab(context, 1);
                 },
               ),
-            ),
-            const SizedBox(width: AppTheme.spacing16),
-            Expanded(
-              child: _buildQuickActionCard(
-                context,
-                icon: Icons.search_outlined,
-                title: 'home.browse_doctors'.tr(),
-                description: 'home.browse_doctors_desc'.tr(),
-                color: AppTheme.secondaryGreen,
-                onTap: () {
+              ),
+              const SizedBox(width: AppTheme.spacing16),
+              Expanded(
+                child: QuickActionCard(
+                  icon: Icons.search_outlined,
+                  title: 'home.browse_doctors'.tr(),
+                  description: 'home.browse_doctors_desc'.tr(),
+                  color: AppTheme.secondaryGreen,
+                  onTap: () {
                   // Navigate to Doctors tab (index 1)
                   _navigateToTab(context, 1);
                 },
@@ -195,70 +193,9 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActionCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String description,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-      child: Container(
-        padding: const EdgeInsets.all(AppTheme.spacing16),
-        decoration: BoxDecoration(
-          color: AppTheme.backgroundWhite,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.textPrimary.withValues(alpha: 0.08),
-              blurRadius: AppTheme.elevationLow,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-              ),
-              child: Icon(
-                icon,
-                size: AppTheme.iconLarge,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: AppTheme.spacing12),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: AppTheme.spacing4),
-            Text(
-              description,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+        ],
+      );
+    }
 
   Widget _buildActiveConsultationsSection(BuildContext context) {
     return Column(

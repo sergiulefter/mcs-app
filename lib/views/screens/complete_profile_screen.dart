@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/app_text_field.dart';
+import '../widgets/app_date_picker_field.dart';
+import '../widgets/app_dropdown_field.dart';
 import 'main_shell.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -20,7 +23,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   DateTime? _selectedDateOfBirth;
   String? _selectedGender;
 
-  // Sex keys for translation (biological sex for medical purposes)
+  // Keys for translation (biological sex for medical purposes)
   final List<String> _sexKeys = [
     'male',
     'female',
@@ -41,39 +44,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     _nameController.dispose();
     _phoneController.dispose();
     super.dispose();
-  }
-
-  Future<void> _selectDateOfBirth() async {
-    final DateTime now = DateTime.now();
-    final DateTime minDate = DateTime(now.year - 120);
-    final DateTime maxDate = DateTime(now.year - 18);
-
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDateOfBirth ?? maxDate,
-      firstDate: minDate,
-      lastDate: maxDate,
-      helpText: 'profile.date_of_birth_hint'.tr(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primaryBlue,
-              onPrimary: AppTheme.textOnPrimary,
-              surface: AppTheme.backgroundWhite,
-              onSurface: AppTheme.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-
-    if (picked != null && picked != _selectedDateOfBirth) {
-      setState(() {
-        _selectedDateOfBirth = picked;
-      });
-    }
   }
 
   Future<void> _handleCompleteProfile() async {
@@ -137,6 +107,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
@@ -169,13 +141,81 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: AppTheme.spacing32),
 
                 // Form Fields
-                _buildNameField(),
+                AppTextField(
+                  label: 'auth.full_name'.tr(),
+                  hintText: 'auth.name_hint'.tr(),
+                  controller: _nameController,
+                  prefixIcon: Icons.person_outlined,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                  textCapitalization: TextCapitalization.words,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'validation.please_enter_full_name'.tr();
+                    }
+                    if (value.trim().length < 2) {
+                      return 'validation.name_too_short'.tr();
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: AppTheme.spacing16),
-                _buildDateOfBirthField(),
+
+                AppDatePickerField(
+                  label: 'profile.date_of_birth'.tr(),
+                  hintText: 'profile.date_of_birth_hint'.tr(),
+                  selectedDate: _selectedDateOfBirth,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _selectedDateOfBirth = date;
+                    });
+                  },
+                  firstDate: DateTime(now.year - 120),
+                  lastDate: DateTime(now.year - 18),
+                ),
                 const SizedBox(height: AppTheme.spacing16),
-                _buildSexField(),
+
+                AppDropdownField(
+                  label: 'profile.sex'.tr(),
+                  hintText: 'profile.sex_hint'.tr(),
+                  value: _selectedGender,
+                  items: _sexKeys,
+                  translationPrefix: 'profile',
+                  prefixIcon: Icons.wc_outlined,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'validation.select_sex'.tr();
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: AppTheme.spacing16),
-                _buildPhoneField(),
+
+                AppTextField(
+                  label: 'profile.phone'.tr(),
+                  hintText: 'profile.phone_hint'.tr(),
+                  controller: _phoneController,
+                  prefixIcon: Icons.phone_outlined,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
+                  isOptional: true,
+                  optionalText: 'profile.optional'.tr(),
+                  validator: (value) {
+                    if (value != null && value.trim().isNotEmpty) {
+                      // Basic phone validation - at least 10 digits
+                      final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+                      if (digitsOnly.length < 10) {
+                        return 'validation.invalid_phone'.tr();
+                      }
+                    }
+                    return null;
+                  },
+                ),
                 const SizedBox(height: AppTheme.spacing32),
 
                 // Complete Button
@@ -256,185 +296,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: AppTheme.textSecondary,
               ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNameField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.full_name'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _nameController,
-          keyboardType: TextInputType.name,
-          textInputAction: TextInputAction.next,
-          textCapitalization: TextCapitalization.words,
-          decoration: InputDecoration(
-            hintText: 'auth.name_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.person_outlined,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'validation.please_enter_full_name'.tr();
-            }
-            if (value.trim().length < 2) {
-              return 'validation.name_too_short'.tr();
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateOfBirthField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'profile.date_of_birth'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        InkWell(
-          onTap: _selectDateOfBirth,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          child: InputDecorator(
-            decoration: InputDecoration(
-              hintText: 'profile.date_of_birth_hint'.tr(),
-              prefixIcon: const Icon(
-                Icons.calendar_today_outlined,
-                color: AppTheme.textSecondary,
-              ),
-              suffixIcon: const Icon(
-                Icons.arrow_drop_down,
-                color: AppTheme.textSecondary,
-              ),
-              errorText: null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                borderSide:
-                    const BorderSide(color: AppTheme.dividerColor, width: 1),
-              ),
-            ),
-            child: Text(
-              _selectedDateOfBirth != null
-                  ? DateFormat('dd/MM/yyyy').format(_selectedDateOfBirth!)
-                  : 'profile.date_of_birth_hint'.tr(),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: _selectedDateOfBirth != null
-                        ? AppTheme.textPrimary
-                        : AppTheme.textTertiary,
-                  ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSexField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'profile.sex'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        DropdownButtonFormField<String>(
-          value: _selectedGender,
-          decoration: InputDecoration(
-            hintText: 'profile.sex_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.wc_outlined,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          items: _sexKeys.map((String sexKey) {
-            return DropdownMenuItem<String>(
-              value: sexKey,
-              child: Text('profile.$sexKey'.tr()),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedGender = newValue;
-            });
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'validation.select_sex'.tr();
-            }
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPhoneField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'profile.phone'.tr(),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(width: AppTheme.spacing8),
-            Text(
-              'profile.optional'.tr(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textTertiary,
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-          textInputAction: TextInputAction.done,
-          decoration: InputDecoration(
-            hintText: 'profile.phone_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.phone_outlined,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          validator: (value) {
-            if (value != null && value.trim().isNotEmpty) {
-              // Basic phone validation - at least 10 digits
-              final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
-              if (digitsOnly.length < 10) {
-                return 'validation.invalid_phone'.tr();
-              }
-            }
-            return null;
-          },
         ),
       ],
     );

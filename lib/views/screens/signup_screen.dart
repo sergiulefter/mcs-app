@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/app_text_field.dart';
 import 'complete_profile_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -84,12 +85,32 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: AppTheme.spacing40),
 
                 // Signup Form
-                _buildNameField(),
+                AppTextField(
+                  label: 'auth.full_name'.tr(),
+                  hintText: 'auth.name_hint'.tr(),
+                  controller: _nameController,
+                  prefixIcon: Icons.person_outlined,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                  textCapitalization: TextCapitalization.words,
+                  validator: Validators.validateName,
+                ),
                 const SizedBox(height: AppTheme.spacing16),
-                _buildEmailField(),
+
+                AppTextField(
+                  label: 'auth.email'.tr(),
+                  hintText: 'auth.email_hint'.tr(),
+                  controller: _emailController,
+                  prefixIcon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: Validators.validateEmail,
+                ),
                 const SizedBox(height: AppTheme.spacing16),
+
                 _buildPasswordField(),
                 const SizedBox(height: AppTheme.spacing16),
+
                 _buildConfirmPasswordField(),
                 const SizedBox(height: AppTheme.spacing32),
 
@@ -160,65 +181,6 @@ class _SignupScreenState extends State<SignupScreen> {
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: AppTheme.textSecondary,
               ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNameField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.full_name'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _nameController,
-          keyboardType: TextInputType.name,
-          textInputAction: TextInputAction.next,
-          textCapitalization: TextCapitalization.words,
-          decoration: InputDecoration(
-            hintText: 'auth.name_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.person_outlined,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          validator: Validators.validateName,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmailField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.email'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            hintText: 'auth.email_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.email_outlined,
-              color: AppTheme.textSecondary,
-            ),
-          ),
-          validator: Validators.validateEmail,
         ),
       ],
     );
