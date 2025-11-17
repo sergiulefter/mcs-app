@@ -123,10 +123,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacing32,
-            vertical: AppTheme.spacing24,
-          ),
+            padding: AppTheme.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
@@ -134,11 +131,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               children: [
                 // Progress Indicator
                 _buildProgressIndicator(),
-                const SizedBox(height: AppTheme.spacing32),
+                const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Header
                 _buildHeader(),
-                const SizedBox(height: AppTheme.spacing32),
+                const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Form Fields
                 AppTextField(
@@ -216,7 +213,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: AppTheme.spacing32),
+                const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Complete Button
                 _buildCompleteButton(),

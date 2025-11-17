@@ -58,7 +58,7 @@ class ActionTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacing16),
+        padding: AppTheme.cardPadding,
         child: Row(
           children: [
             // Icon Container

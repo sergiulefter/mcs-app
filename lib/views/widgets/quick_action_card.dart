@@ -74,7 +74,7 @@ class QuickActionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       child: Container(
-        padding: const EdgeInsets.all(AppTheme.spacing16),
+        padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
           color: AppTheme.backgroundWhite,
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),

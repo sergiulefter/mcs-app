@@ -29,13 +29,13 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppTheme.spacing24),
+          padding: AppTheme.screenPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Welcome Header
               _buildWelcomeHeader(context, user?.displayName),
-              const SizedBox(height: AppTheme.spacing24),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Profile Completion Banner (if incomplete)
               if (user != null && !user.profileCompleted)
@@ -43,11 +43,11 @@ class HomeScreen extends StatelessWidget {
 
               // Quick Actions Section
               _buildQuickActionsSection(context),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Active Consultations Section
               _buildActiveConsultationsSection(context),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Medical Disclaimer
               _buildMedicalDisclaimer(context),
@@ -93,8 +93,8 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildProfileCompletionBanner(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacing24),
-      padding: const EdgeInsets.all(AppTheme.spacing16),
+      margin: const EdgeInsets.only(bottom: AppTheme.sectionSpacing),
+      padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
         color: AppTheme.warningOrange.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
@@ -223,7 +223,7 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: AppTheme.spacing16),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(AppTheme.spacing24),
+          padding: AppTheme.cardPadding,
           decoration: BoxDecoration(
             color: AppTheme.backgroundWhite,
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
@@ -271,7 +271,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildMedicalDisclaimer(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacing16),
+      padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
         color: AppTheme.textTertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),

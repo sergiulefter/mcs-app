@@ -21,7 +21,7 @@ class AppTheme {
   // Semantic Colors
   static const Color errorRed = Color(0xFFDC3545);
   static const Color successGreen = Color(0xFF28A745);
-  static const Color warningOrange = Color(0xFFFFC107);
+  static const Color warningOrange = Color(0xFFD97706);
   static const Color infoBlue = Color(0xFF17A2B8);
 
   // Neutral Colors
@@ -38,7 +38,7 @@ class AppTheme {
   static const Color textOnSecondary = Color(0xFFFFFFFF);
 
   // Status Colors (for request badges)
-  static const Color statusSubmitted = Color(0xFFFFC107); // Yellow
+  static const Color statusSubmitted = warningOrange; // Accessible Orange
   static const Color statusInReview = Color(0xFF0066CC); // Blue
   static const Color statusInfoRequested = Color(0xFFFF8C00); // Orange
   static const Color statusCompleted = Color(0xFF28A745); // Green
@@ -60,6 +60,19 @@ class AppTheme {
   static const double spacing48 = 48.0;
   static const double spacing56 = 56.0;
   static const double spacing64 = 64.0;
+
+  // Spacing Presets (derived from new UX standards)
+  static const EdgeInsets screenPadding = EdgeInsets.symmetric(
+    horizontal: spacing32,
+    vertical: spacing32,
+  );
+  static const double sectionSpacing = spacing40;
+  static const EdgeInsets cardPadding = EdgeInsets.all(spacing20);
+  static const double buttonHeight = 56.0;
+  static const EdgeInsets buttonPadding = EdgeInsets.symmetric(
+    horizontal: spacing32,
+    vertical: spacing20,
+  );
 
   // ============================================================================
   // BORDER RADIUS
@@ -153,11 +166,8 @@ class AppTheme {
           foregroundColor: textOnPrimary,
           elevation: elevationNone,
           shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(
-            horizontal: spacing24,
-            vertical: spacing16,
-          ),
-          minimumSize: const Size(double.infinity, 52),
+          padding: buttonPadding,
+          minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMedium),
           ),
@@ -174,11 +184,8 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: primaryBlue,
           side: const BorderSide(color: primaryBlue, width: 1.5),
-          padding: const EdgeInsets.symmetric(
-            horizontal: spacing24,
-            vertical: spacing16,
-          ),
-          minimumSize: const Size(double.infinity, 52),
+          padding: buttonPadding,
+          minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMedium),
           ),
@@ -210,10 +217,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: backgroundWhite,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: spacing16,
-          vertical: spacing16,
-        ),
+        contentPadding: cardPadding,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
           borderSide: const BorderSide(color: dividerColor, width: 1),

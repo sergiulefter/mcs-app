@@ -36,10 +36,7 @@ class AccountScreen extends StatelessWidget {
       backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacing24,
-            vertical: AppTheme.spacing24,
-          ),
+            padding: AppTheme.screenPadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -51,25 +48,25 @@ class AccountScreen extends StatelessWidget {
                 userType: user.userType,
                 fallbackName: 'account.not_set'.tr(),
               ),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Profile Details Section
               _buildSectionHeader(context, 'account.profile_details'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildProfileDetailsCard(context, user),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Quick Actions Section
               _buildSectionHeader(context, 'account.quick_actions'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildQuickActionsCard(context),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Account Section
               _buildSectionHeader(context, 'account.account_section'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildAccountCard(context, user),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
 
               // Sign Out Button
               _buildSignOutButton(context),

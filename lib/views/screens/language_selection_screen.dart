@@ -71,10 +71,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       backgroundColor: AppTheme.backgroundWhite,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacing32,
-            vertical: AppTheme.spacing24,
-          ),
+          padding: AppTheme.screenPadding,
           child: Column(
             children: [
               const Spacer(flex: 2),
@@ -117,7 +114,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             color: AppTheme.primaryBlue,
           ),
         ),
-        const SizedBox(height: AppTheme.spacing32),
+        const SizedBox(height: AppTheme.sectionSpacing),
 
         // Title
         Text(

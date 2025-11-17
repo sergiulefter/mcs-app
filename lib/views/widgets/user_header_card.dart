@@ -52,7 +52,7 @@ class UserHeaderCard extends StatelessWidget {
     final initials = _getInitials(effectiveName);
 
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacing24),
+      padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
         color: AppTheme.backgroundWhite,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),

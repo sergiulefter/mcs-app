@@ -52,7 +52,7 @@ class ProfileDetailRow extends StatelessWidget {
         AppTheme.primaryBlue.withValues(alpha: 0.1);
 
     return Padding(
-      padding: const EdgeInsets.all(AppTheme.spacing16),
+      padding: AppTheme.cardPadding,
       child: Row(
         children: [
           // Icon Container

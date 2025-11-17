@@ -67,10 +67,7 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacing32,
-            vertical: AppTheme.spacing24,
-          ),
+            padding: AppTheme.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
@@ -82,7 +79,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 // App Branding
                 _buildHeader(),
-                const SizedBox(height: AppTheme.spacing40),
+                const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Signup Form
                 AppTextField(
@@ -112,7 +109,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: AppTheme.spacing16),
 
                 _buildConfirmPasswordField(),
-                const SizedBox(height: AppTheme.spacing32),
+                const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Sign Up Button
                 _buildSignUpButton(),

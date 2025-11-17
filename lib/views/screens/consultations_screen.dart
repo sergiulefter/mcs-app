@@ -14,7 +14,7 @@ class ConsultationsScreen extends StatelessWidget {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacing32),
+          padding: AppTheme.screenPadding,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -47,9 +47,9 @@ class ConsultationsScreen extends StatelessWidget {
                     ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppTheme.spacing32),
+              const SizedBox(height: AppTheme.sectionSpacing),
               Container(
-                padding: const EdgeInsets.all(AppTheme.spacing16),
+                padding: AppTheme.cardPadding,
                 decoration: BoxDecoration(
                   color: AppTheme.infoBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),

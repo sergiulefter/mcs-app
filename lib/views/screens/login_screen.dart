@@ -59,10 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.spacing32,
-              vertical: AppTheme.spacing24,
-            ),
+            padding: AppTheme.screenPadding,
             child: Form(
               key: _formKey,
               child: Column(
@@ -80,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Forgot Password
                   _buildForgotPassword(),
-                  const SizedBox(height: AppTheme.spacing32),
+                  const SizedBox(height: AppTheme.sectionSpacing),
 
                   // Sign In Button
                   _buildSignInButton(),

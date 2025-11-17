@@ -168,7 +168,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildBottomSection() {
     return Padding(
-      padding: const EdgeInsets.all(AppTheme.spacing32),
+      padding: AppTheme.screenPadding,
       child: Column(
         children: [
           // Page indicator dots
@@ -179,7 +179,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               (index) => _buildDot(index),
             ),
           ),
-          const SizedBox(height: AppTheme.spacing32),
+          const SizedBox(height: AppTheme.sectionSpacing),
 
           // Next / Get Started button
           SizedBox(
