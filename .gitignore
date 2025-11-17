@@ -55,4 +55,4 @@ app.*.map.json
 .env.*.local
 
 # Internal development documentation (not for public repo)
-PROJECT_INFO.md
+.project_docs/
