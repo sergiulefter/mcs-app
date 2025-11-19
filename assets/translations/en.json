@@ -90,7 +90,31 @@
   "doctors": {
     "title": "Browse Doctors",
     "subtitle": "Find and connect with medical specialists",
-    "placeholder_info": "Search for doctors by specialty, view their profiles, and request second opinions."
+    "search_hint": "Search by doctor name or specialty",
+    "results_title": "Available Specialists",
+    "results_count": "{count} doctors",
+    "view_profile": "View profile",
+    "availability_badge": {
+      "available": "Available now",
+      "unavailable": "Not available"
+    },
+    "availability_description": {
+      "available": "Accepting second opinion requests",
+      "unavailable": "Currently reviewing existing consultations"
+    },
+    "filters": {
+      "title": "Filters",
+      "clear": "Clear filters",
+      "specialty": "Specialty",
+      "all_specialties": "All specialties",
+      "availability": "Availability",
+      "available_now": "Only show available doctors"
+    },
+    "empty_state_title": "No doctors match your filters",
+    "empty_state_subtitle": "Adjust your filters or try searching for another specialty.",
+    "error_loading_title": "Error loading doctors",
+    "error_loading_subtitle": "Unable to load doctors. Please try again.",
+    "retry_button": "Retry"
   },
   "consultations": {
     "title": "My Consultations",

@@ -73,35 +73,60 @@ lib/
    flutter pub get
    ```
 
-3. **Configure environment variables**
+3. **Configure Firebase** (Required - generates Firebase config files)
+
+   Install Firebase CLI:
    ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
+   npm install -g firebase-tools
    ```
 
-4. **Configure Firebase**
-   - Ensure Firebase CLI is installed: `npm install -g firebase-tools`
-   - Login to Firebase: `firebase login`
-   - Install FlutterFire CLI: `dart pub global activate flutterfire_cli`
-   - Configure your Firebase project: `flutterfire configure`
+   Login to Firebase:
+   ```bash
+   firebase login
+   ```
 
-5. **Run the app**
+   Install FlutterFire CLI:
+   ```bash
+   dart pub global activate flutterfire_cli
+   ```
+
+   Configure Firebase project:
+   ```bash
+   flutterfire configure
+   ```
+
+   This will generate:
+   - `lib/firebase_options.dart`
+   - `android/app/google-services.json`
+   - `ios/Runner/GoogleService-Info.plist` (if iOS configured)
+
+4. **Run the app**
    ```bash
    flutter run
    ```
 
 ### Firebase Setup
 
-This project requires a Firebase project with the following services enabled:
+This project uses Firebase (`mcs-app-f1e37`) with the following services:
 
 1. **Authentication**
-   - Enable Email/Password sign-in method in Firebase Console
+   - Email/Password sign-in method
+   - Custom claims for role-based access (admin, patient, doctor)
 
 2. **Firestore Database**
-   - Create a Firestore database (start in test mode for development)
+   - Users collection (`users/`)
+   - Doctors collection (`doctors/`)
+   - Security rules defined in `firestore.rules`
 
-3. **Firebase Storage** (optional, for future features)
-   - Enable Firebase Storage if needed
+3. **Firebase Storage**
+   - For medical documents and images (future implementation)
+
+4. **Cloud Functions** (optional, configured in `functions/`)
+   - Admin claim management
+   - Server-side business logic
+
+**Important**: Firebase config files are **not committed to Git** for security.
+Run `flutterfire configure` to generate them locally.
 
 ## 🏃 Running the App
 
@@ -145,22 +170,59 @@ flutter test --coverage
 
 ### Core Dependencies
 - `provider: ^6.1.2` - State management
-- `firebase_core: ^3.8.1` - Firebase core functionality
-- `firebase_auth: ^5.3.3` - Firebase authentication
-- `cloud_firestore: ^5.5.2` - Cloud Firestore database
-- `firebase_storage: ^12.3.6` - Firebase storage
+- `firebase_core: ^4.2.1` - Firebase core functionality
+- `firebase_auth: ^6.1.2` - Firebase authentication
+- `cloud_firestore: ^6.1.0` - Cloud Firestore database
+- `firebase_storage: ^13.0.4` - Firebase storage
 - `google_fonts: ^6.2.1` - Google Fonts
-- `intl: ^0.19.0` - Internationalization
-- `flutter_dotenv: ^5.1.0` - Environment variables
+- `intl: ^0.20.2` - Internationalization and date formatting
+- `shared_preferences: ^2.3.3` - Local storage for app preferences
+- `easy_localization: ^3.0.7` - Multi-language support (RO/EN)
 
 ### Dev Dependencies
 - `flutter_lints: ^5.0.0` - Linting rules
+- `flutter_test` - Testing framework
 
 ## 🔐 Security
 
-- Firebase configuration is managed through `firebase_options.dart` (auto-generated)
-- Sensitive keys should be stored in `.env` file (not committed to git)
-- `.gitignore` is configured to exclude sensitive files
+### Firebase Configuration
+- Firebase config files are **auto-generated** and **not committed to Git**:
+  - `lib/firebase_options.dart`
+  - `android/app/google-services.json`
+  - `ios/Runner/GoogleService-Info.plist`
+- Run `flutterfire configure` to regenerate these files locally
+
+### Firebase API Keys
+- Firebase API keys are **public-safe** - they only identify your Firebase project
+- Real security comes from **Firebase Security Rules** (see `firestore.rules`)
+- Custom claims (`isAdmin`) control access to admin features
+
+### What's in .gitignore
+```
+# Firebase config files (regenerate with flutterfire configure)
+lib/firebase_options.dart
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Service account keys (NEVER commit these!)
+serviceAccountKey.json
+
+# Environment files
+.env
+.env.local
+.env.*.local
+```
+
+### Firestore Security Rules
+Security rules are defined in `firestore.rules`:
+- `users/` - Users can only read/write their own data
+- `doctors/` - Read: all authenticated users, Write: admins only
+- Custom claim `isAdmin: true` required for admin operations
+
+Deploy rules:
+```bash
+firebase deploy --only firestore:rules
+```
 
 ---
 

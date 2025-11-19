@@ -260,7 +260,7 @@ class AppTheme {
         selectedItemColor: primaryBlue,
         unselectedItemColor: textSecondary,
         type: BottomNavigationBarType.fixed,
-        elevation: elevationMedium,
+        elevation: elevationLow, // Reduced shadow
         selectedLabelStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,

@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
+import '../../utils/seed_doctors.dart';
 import '../widgets/user_header_card.dart';
 import '../widgets/profile_detail_row.dart';
 import '../widgets/action_tile.dart';
@@ -67,6 +69,12 @@ class AccountScreen extends StatelessWidget {
               const SizedBox(height: AppTheme.spacing16),
               _buildAccountCard(context, user),
               const SizedBox(height: AppTheme.sectionSpacing),
+
+              // Debug Section (only in debug mode)
+              if (kDebugMode) ...[
+                _buildDebugSection(context),
+                const SizedBox(height: AppTheme.sectionSpacing),
+              ],
 
               // Sign Out Button
               _buildSignOutButton(context),
@@ -227,6 +235,56 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDebugSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundWhite,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(color: AppTheme.warningOrange, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.warningOrange.withValues(alpha: 0.15),
+            blurRadius: AppTheme.elevationLow,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacing16),
+            decoration: BoxDecoration(
+              color: AppTheme.warningOrange.withValues(alpha: 0.1),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(AppTheme.radiusMedium),
+                topRight: Radius.circular(AppTheme.radiusMedium),
+              ),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.bug_report, color: AppTheme.warningOrange),
+                const SizedBox(width: AppTheme.spacing12),
+                Text(
+                  'Debug Tools',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppTheme.warningOrange,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          ActionTile(
+            icon: Icons.medical_services_outlined,
+            title: 'Seed Doctors Database',
+            subtitle: 'Add 7 sample doctors to Firestore (requires admin)',
+            onTap: () => _handleSeedDoctors(context),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDivider() {
     return Divider(
       height: 1,
@@ -256,6 +314,56 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _handleSeedDoctors(BuildContext context) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(AppTheme.spacing24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: AppTheme.spacing16),
+                Text('Seeding doctors...'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final seeder = DoctorSeeder();
+      await seeder.seedDoctors();
+
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✓ Successfully seeded 7 doctors!'),
+            backgroundColor: AppTheme.successGreen,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.of(context).pop(); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✗ Error seeding doctors: $e'),
+            backgroundColor: AppTheme.errorRed,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    }
   }
 
   void _showLanguageDialog(BuildContext context) {

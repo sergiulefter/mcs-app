@@ -13,6 +13,12 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() &&
+             request.auth.token.isAdmin == true;
+    }
+
     // Users collection - users can only read/write their own data
     match /users/{userId} {
       // Allow read if authenticated and accessing own document
@@ -26,6 +32,18 @@ service cloud.firestore {
 
       // Prevent deletion for now (can be enabled later if needed)
       allow delete: if false;
+    }
+
+    // Doctors collection - read for all authenticated users, write only for admins
+    match /doctors/{doctorId} {
+      // Any authenticated user can read doctor profiles (patients need to browse doctors)
+      allow read: if isAuthenticated();
+
+      // Only admins can create, update, or delete doctor profiles
+      // Doctors will be added by admin manually or via Firebase Console
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
 
     // Default rule: deny all access to any other collections

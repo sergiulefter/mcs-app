@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "Medical Correct Solution",
     "description": "A Doua Opinie Medicală Profesională"
@@ -90,7 +90,32 @@
   "doctors": {
     "title": "Explorează Medicii",
     "subtitle": "Găsește și conectează-te cu specialiști medicali",
-    "placeholder_info": "Caută medici după specialitate, vizualizează profilurile lor și solicită a doua opinie."
+    "placeholder_info": "Caută medici după specialitate, vizualizează profilurile lor și solicită a doua opinie.",
+    "search_hint": "Caută după nume sau specialitate",
+    "results_title": "Specialiști disponibili",
+    "results_count": "{count} medici",
+    "view_profile": "Vezi profilul",
+    "availability_badge": {
+      "available": "Disponibil acum",
+      "unavailable": "Indisponibil"
+    },
+    "availability_description": {
+      "available": "Acceptă cereri pentru a doua opinie",
+      "unavailable": "Evaluează consultațiile existente"
+    },
+    "filters": {
+      "title": "Filtre",
+      "clear": "Șterge filtrele",
+      "specialty": "Specialitate",
+      "all_specialties": "Toate specialitățile",
+      "availability": "Disponibilitate",
+      "available_now": "Afișează doar medicii disponibili"
+    },
+    "empty_state_title": "Niciun medic nu se potrivește cu filtrele",
+    "empty_state_subtitle": "Ajustează filtrele sau caută o altă specialitate.",
+    "error_loading_title": "Eroare la încărcarea medicilor",
+    "error_loading_subtitle": "Nu s-au putut încărca medicii. Te rog încearcă din nou.",
+    "retry_button": "Reîncearcă"
   },
   "consultations": {
     "title": "Consultațiile Mele",
