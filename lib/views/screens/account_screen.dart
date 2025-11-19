@@ -194,8 +194,6 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildAccountCard(BuildContext context, dynamic user) {
-    final notProvidedText = 'account.not_provided'.tr();
-
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.backgroundWhite,
@@ -208,29 +206,18 @@ class AccountScreen extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          ActionTile(
-            icon: Icons.lock_outline,
-            title: 'account.change_password'.tr(),
-            subtitle: 'account.change_password_desc'.tr(),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('account.change_password_coming_soon'.tr()),
-                  backgroundColor: AppTheme.infoBlue,
-                ),
-              );
-            },
-          ),
-          _buildDivider(),
-          ProfileDetailRow(
-            icon: Icons.fingerprint,
-            label: 'account.user_id'.tr(),
-            value: '${user.uid.substring(0, 12)}...',
-            notProvidedText: notProvidedText,
-          ),
-        ],
+      child: ActionTile(
+        icon: Icons.lock_outline,
+        title: 'account.change_password'.tr(),
+        subtitle: 'account.change_password_desc'.tr(),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('account.change_password_coming_soon'.tr()),
+              backgroundColor: AppTheme.infoBlue,
+            ),
+          );
+        },
       ),
     );
   }
@@ -380,15 +367,22 @@ class AccountScreen extends StatelessWidget {
               languageName: 'English',
               languageCode: 'en',
               isSelected: currentLocale == 'en',
-              onTap: () {
+              onTap: () async {
                 dialogContext.setLocale(const Locale('en'));
                 Navigator.of(dialogContext).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('account.language_changed'.tr()),
-                    backgroundColor: AppTheme.successGreen,
-                  ),
-                );
+
+                // Update Firebase
+                final authController = context.read<AuthController>();
+                await authController.updatePreferredLanguage('en');
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('account.language_changed'.tr()),
+                      backgroundColor: AppTheme.successGreen,
+                    ),
+                  );
+                }
               },
             ),
             const SizedBox(height: AppTheme.spacing12),
@@ -396,15 +390,22 @@ class AccountScreen extends StatelessWidget {
               languageName: 'Română',
               languageCode: 'ro',
               isSelected: currentLocale == 'ro',
-              onTap: () {
+              onTap: () async {
                 dialogContext.setLocale(const Locale('ro'));
                 Navigator.of(dialogContext).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('account.language_changed'.tr()),
-                    backgroundColor: AppTheme.successGreen,
-                  ),
-                );
+
+                // Update Firebase
+                final authController = context.read<AuthController>();
+                await authController.updatePreferredLanguage('ro');
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('account.language_changed'.tr()),
+                      backgroundColor: AppTheme.successGreen,
+                    ),
+                  );
+                }
               },
             ),
           ],

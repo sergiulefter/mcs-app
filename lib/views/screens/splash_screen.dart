@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/constants.dart';
@@ -10,7 +11,9 @@ import 'main_shell.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final Future<FirebaseApp> firebaseInitialization;
+
+  const SplashScreen({super.key, required this.firebaseInitialization});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -24,20 +27,54 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeApp() async {
-    // Minimum splash duration for professional appearance
-    await Future.delayed(const Duration(milliseconds: 2000));
+    try {
+      // Wait for Firebase to initialize (non-blocking from main)
+      await widget.firebaseInitialization;
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    // Check preferences for language selection and onboarding
-    final prefs = await SharedPreferences.getInstance();
-    final languageSelected = prefs.getBool('language_selected') ?? false;
-    final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+      // Wait for AuthController to receive initial auth state from Firebase
+      final authController = context.read<AuthController>();
 
-    if (!mounted) return;
+      // Wait for auth state to be initialized
+      // Shows loading UI while Firebase checks for existing session
+      await Future.any([
+        Future.delayed(const Duration(seconds: 3)), // Max 3 seconds timeout
+        _waitForAuthState(authController),
+      ]);
 
-    // Check authentication status and navigate
-    _navigateToNextScreen(languageSelected, onboardingCompleted);
+      if (!mounted) return;
+
+      // Check preferences for language selection and onboarding
+      final prefs = await SharedPreferences.getInstance();
+      final languageSelected = prefs.getBool('language_selected') ?? false;
+      final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+
+      if (!mounted) return;
+
+      // Navigate to appropriate screen based on auth state
+      _navigateToNextScreen(languageSelected, onboardingCompleted);
+    } catch (e) {
+      // If Firebase fails to initialize, still show the app
+      if (!mounted) return;
+      final prefs = await SharedPreferences.getInstance();
+      final languageSelected = prefs.getBool('language_selected') ?? false;
+      final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+      if (!mounted) return;
+      _navigateToNextScreen(languageSelected, onboardingCompleted);
+    }
+  }
+
+  // Wait for auth state to be initialized (checks if Firebase has determined auth status)
+  Future<void> _waitForAuthState(AuthController authController) async {
+    // If auth state has been initialized, return immediately
+    if (authController.authStateInitialized) {
+      return;
+    }
+
+    // Otherwise wait briefly and check again
+    await Future.delayed(const Duration(milliseconds: 100));
+    return _waitForAuthState(authController);
   }
 
   void _navigateToNextScreen(bool languageSelected, bool onboardingCompleted) {

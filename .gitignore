@@ -50,10 +50,5 @@ app.*.map.json
 **/GoogleService-Info.plist
 lib/firebase_options.dart
 
-# Environment variables
-.env
-.env.local
-.env.*.local
-
 # Internal development documentation (not for public repo)
 .project_docs/

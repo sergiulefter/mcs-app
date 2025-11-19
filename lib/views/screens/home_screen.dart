@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/navigation_controller.dart';
 import '../../utils/app_theme.dart';
 import '../widgets/quick_action_card.dart';
 import 'complete_profile_screen.dart';
@@ -300,13 +301,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _navigateToTab(BuildContext context, int tabIndex) {
-    // Find the MainShell ancestor and update its tab index
-    // This is a simple approach - in production, you might use a state management solution
-    final scaffoldState = Scaffold.maybeOf(context);
-    if (scaffoldState != null) {
-      // For now, we'll use a simple callback pattern
-      // The MainShell will need to expose a method to change tabs
-      // This is a placeholder - actual implementation depends on MainShell structure
-    }
+    final navigationController = NavigationController.of(context);
+    navigationController?.onTabChange(tabIndex);
   }
 }

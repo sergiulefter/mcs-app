@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../models/doctor_model.dart';
-import '../../models/medical_specialty.dart';
 import '../../services/doctor_service.dart';
 import '../../utils/app_theme.dart';
 import '../widgets/doctor_card.dart';
+import 'doctor_profile_screen.dart';
 
 class DoctorsScreen extends StatefulWidget {
   const DoctorsScreen({super.key});
@@ -52,7 +52,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   List<String> get _specialtyOptions {
     final specialties = _allDoctors
-        .map((d) => d.specialty.name)
+        .map((d) => d.specialty.toString().split('.').last)
         .toSet()
         .toList()
       ..sort();
@@ -62,11 +62,12 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   List<DoctorModel> get _filteredDoctors {
     final searchQuery = _searchController.text.toLowerCase();
     return _allDoctors.where((doctor) {
+      final specialtyKey = doctor.specialty.toString().split('.').last;
       final matchesSearch = searchQuery.isEmpty ||
           doctor.fullName.toLowerCase().contains(searchQuery) ||
-          doctor.specialty.name.toLowerCase().contains(searchQuery);
+          specialtyKey.toLowerCase().contains(searchQuery);
       final matchesSpecialty =
-          _selectedSpecialty == 'all' || doctor.specialty.name == _selectedSpecialty;
+          _selectedSpecialty == 'all' || specialtyKey == _selectedSpecialty;
       final matchesAvailability = !_availableOnly || doctor.isCurrentlyAvailable;
       return matchesSearch && matchesSpecialty && matchesAvailability;
     }).toList();
@@ -192,7 +193,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                       : AppTheme.textTertiary,
                   viewProfileLabel: 'doctors.view_profile'.tr(),
                   onTap: () {
-                    // TODO: Navigate to DoctorProfileScreen once implemented
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => DoctorProfileScreen(doctor: doctor),
+                      ),
+                    );
                   },
                 ),
               );
@@ -294,7 +299,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                 label: Text(
                   specialty == 'all'
                       ? 'doctors.filters.all_specialties'.tr()
-                      : specialty,
+                      : 'specialties.$specialty'.tr(),
                 ),
                 selected: isSelected,
                 onSelected: (_) {

@@ -11,11 +11,13 @@ class AuthController extends ChangeNotifier {
   UserModel? _currentUser;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _authStateInitialized = false;
 
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _currentUser != null;
+  bool get authStateInitialized => _authStateInitialized;
 
   AuthController() {
     _initAuthListener();
@@ -27,13 +29,16 @@ class AuthController extends ChangeNotifier {
       if (user != null) {
         try {
           _currentUser = await _authService.getUserData(user.uid);
+          _authStateInitialized = true;
           notifyListeners();
         } catch (e) {
           _errorMessage = e.toString();
+          _authStateInitialized = true;
           notifyListeners();
         }
       } else {
         _currentUser = null;
+        _authStateInitialized = true;
         notifyListeners();
       }
     });
@@ -213,6 +218,32 @@ class AuthController extends ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString();
       _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Update preferred language
+  Future<bool> updatePreferredLanguage(String languageCode) async {
+    if (_currentUser == null) {
+      _errorMessage = 'No user logged in';
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      await _firebaseService.updateDocument(
+        'users',
+        _currentUser!.uid,
+        {'preferredLanguage': languageCode},
+      );
+
+      // Refresh current user data
+      _currentUser = await _authService.getUserData(_currentUser!.uid);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
       notifyListeners();
       return false;
     }

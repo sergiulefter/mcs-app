@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../controllers/navigation_controller.dart';
 import 'home_screen.dart';
 import 'doctors_screen.dart';
 import 'consultations_screen.dart';
@@ -33,36 +34,44 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            activeIcon: const Icon(Icons.home),
-            label: 'navigation.home'.tr(),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.search_outlined),
-            activeIcon: const Icon(Icons.search),
-            label: 'navigation.doctors'.tr(),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.assignment_outlined),
-            activeIcon: const Icon(Icons.assignment),
-            label: 'navigation.consultations'.tr(),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outlined),
-            activeIcon: const Icon(Icons.person),
-            label: 'navigation.account'.tr(),
-          ),
-        ],
+    return NavigationController(
+      currentIndex: _currentIndex,
+      onTabChange: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: _screens,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_outlined),
+              activeIcon: const Icon(Icons.home),
+              label: 'navigation.home'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.search_outlined),
+              activeIcon: const Icon(Icons.search),
+              label: 'navigation.doctors'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.assignment_outlined),
+              activeIcon: const Icon(Icons.assignment),
+              label: 'navigation.consultations'.tr(),
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_outlined),
+              activeIcon: const Icon(Icons.person),
+              label: 'navigation.account'.tr(),
+            ),
+          ],
+        ),
       ),
     );
   }

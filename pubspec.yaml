@@ -63,6 +63,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
 
+  # Native Splash Screen
+  flutter_native_splash: ^2.4.3
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -103,3 +106,24 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Flutter Native Splash Configuration
+# Configured to show Flutter UI (SplashScreen) as quickly as possible
+flutter_native_splash:
+  # White background to match our SplashScreen
+  color: "#FFFFFF"
+
+  # No image - instant transition to Flutter UI
+  android: true
+  ios: true
+  web: false
+
+  # Android 12+ specific settings
+  android_12:
+    color: "#FFFFFF"
+    # No icon - just white background
+
+  # Remove native splash immediately when Flutter draws first frame
+  fullscreen: false
+  android_gravity: fill
+  ios_content_mode: scaleToFill

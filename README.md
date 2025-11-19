@@ -31,7 +31,6 @@ A modern Flutter mobile application built with clean architecture principles, fe
 ```
 lib/
 ├── main.dart                    # App entry point
-├── firebase_options.dart        # Firebase configuration (auto-generated)
 ├── models/                      # Data models
 │   └── user_model.dart
 ├── views/                       # UI layer
@@ -191,27 +190,6 @@ flutter test --coverage
   - `android/app/google-services.json`
   - `ios/Runner/GoogleService-Info.plist`
 - Run `flutterfire configure` to regenerate these files locally
-
-### Firebase API Keys
-- Firebase API keys are **public-safe** - they only identify your Firebase project
-- Real security comes from **Firebase Security Rules** (see `firestore.rules`)
-- Custom claims (`isAdmin`) control access to admin features
-
-### What's in .gitignore
-```
-# Firebase config files (regenerate with flutterfire configure)
-lib/firebase_options.dart
-**/google-services.json
-**/GoogleService-Info.plist
-
-# Service account keys (NEVER commit these!)
-serviceAccountKey.json
-
-# Environment files
-.env
-.env.local
-.env.*.local
-```
 
 ### Firestore Security Rules
 Security rules are defined in `firestore.rules`:

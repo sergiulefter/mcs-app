@@ -12,7 +12,7 @@ import 'utils/constants.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize EasyLocalization
+  // Initialize EasyLocalization (fast, required for app start)
   await EasyLocalization.ensureInitialized();
 
   // Set system UI overlay style for a professional appearance
@@ -25,8 +25,9 @@ void main() async {
     ),
   );
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
+  // Start Firebase initialization in background (non-blocking)
+  // The SplashScreen will wait for this to complete
+  final firebaseInitialization = Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
@@ -37,13 +38,15 @@ void main() async {
       fallbackLocale: const Locale('en'),
       saveLocale: true,
       useOnlyLangCode: true,
-      child: const MyApp(),
+      child: MyApp(firebaseInitialization: firebaseInitialization),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Future<FirebaseApp> firebaseInitialization;
+
+  const MyApp({super.key, required this.firebaseInitialization});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +58,7 @@ class MyApp extends StatelessWidget {
         title: AppConstants.appName,
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        home: const SplashScreen(),
+        home: SplashScreen(firebaseInitialization: firebaseInitialization),
         // Localization configuration
         localizationsDelegates: context.localizationDelegates,
         supportedLocales: context.supportedLocales,

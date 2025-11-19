@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../models/doctor_model.dart';
 import '../../utils/app_theme.dart';
 
@@ -60,7 +61,7 @@ class DoctorCard extends StatelessWidget {
                       ),
                       const SizedBox(height: AppTheme.spacing4),
                       Text(
-                        doctor.specialty.name,
+                        'specialties.${doctor.specialty.toString().split('.').last}'.tr(),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: AppTheme.textPrimary,
                             ),
