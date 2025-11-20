@@ -44,11 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Firebase
-.firebase/
-**/google-services.json
-**/GoogleService-Info.plist
-lib/firebase_options.dart
-
 # Internal development documentation (not for public repo)
 .project_docs/

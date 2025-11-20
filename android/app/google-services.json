@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "614932123871",
+    "project_id": "mcs-app-f1e37",
+    "storage_bucket": "mcs-app-f1e37.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614932123871:android:bae210e1781ec903ad196a",
+        "android_client_info": {
+          "package_name": "com.example.mcs_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgRyc0MpzaMXAYihFzQ9ZnmJjkjXbTMCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
