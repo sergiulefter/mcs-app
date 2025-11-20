@@ -2,7 +2,7 @@
 
 A modern Flutter mobile application built with clean architecture principles, featuring Firebase backend integration and Provider state management.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Framework**: Flutter 3.35.7
 - **Language**: Dart ^3.9.2
@@ -14,41 +14,7 @@ A modern Flutter mobile application built with clean architecture principles, fe
   - Firebase Storage
 - **UI**: Material Design 3
 
-## 📱 Features
-
-- ✅ User Authentication (Email/Password)
-  - Sign Up
-  - Sign In
-  - Sign Out
-  - Password Reset (UI ready)
-- ✅ Form Validation
-- ✅ Error Handling
-- ✅ Loading States
-- ✅ Persistent Authentication
-
-## 📂 Project Structure
-
-```
-lib/
-├── main.dart                    # App entry point
-├── models/                      # Data models
-│   └── user_model.dart
-├── views/                       # UI layer
-│   └── screens/
-│       ├── login_screen.dart
-│       ├── signup_screen.dart
-│       └── home_screen.dart
-├── controllers/                 # State management (Provider)
-│   └── auth_controller.dart
-├── services/                    # Business logic & Firebase services
-│   ├── auth_service.dart
-│   └── firebase_service.dart
-└── utils/                       # Utilities & helpers
-    ├── constants.dart
-    └── validators.dart
-```
-
-## 🛠️ Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 
@@ -97,7 +63,7 @@ lib/
    This will generate:
    - `lib/firebase_options.dart`
    - `android/app/google-services.json`
-   - `ios/Runner/GoogleService-Info.plist` (if iOS configured)
+   - `ios/Runner/GoogleService-Info.plist`
 
 4. **Run the app**
    ```bash
@@ -127,7 +93,7 @@ This project uses Firebase (`mcs-app-f1e37`) with the following services:
 **Important**: Firebase config files are **not committed to Git** for security.
 Run `flutterfire configure` to generate them locally.
 
-## 🏃 Running the App
+## Running the App
 
 ### Development
 
@@ -155,7 +121,7 @@ flutter build appbundle
 flutter build ios
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -165,7 +131,7 @@ flutter test
 flutter test --coverage
 ```
 
-## 📦 Dependencies
+## Dependencies
 
 ### Core Dependencies
 - `provider: ^6.1.2` - State management
@@ -182,7 +148,7 @@ flutter test --coverage
 - `flutter_lints: ^5.0.0` - Linting rules
 - `flutter_test` - Testing framework
 
-## 🔐 Security
+## Security
 
 ### Firebase Configuration
 - Firebase config files are **auto-generated** and **not committed to Git**:
