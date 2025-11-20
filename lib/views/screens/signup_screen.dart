@@ -54,7 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authController.errorMessage ?? 'errors.signup_failed'.tr()),
-            backgroundColor: AppTheme.errorRed,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -133,7 +133,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Icons.arrow_back,
         ),
         style: IconButton.styleFrom(
-          backgroundColor: AppTheme.backgroundWhite,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           padding: const EdgeInsets.all(AppTheme.spacing12),
         ),
       ),
@@ -149,13 +149,13 @@ class _SignupScreenState extends State<SignupScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.medical_services_outlined,
             size: AppTheme.iconXLarge,
-            color: AppTheme.primaryBlue,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppTheme.spacing24),
@@ -266,12 +266,12 @@ class _SignupScreenState extends State<SignupScreen> {
         return ElevatedButton(
           onPressed: authController.isLoading ? null : _handleSignup,
           child: authController.isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppTheme.textOnPrimary,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 )
               : Text('auth.sign_up'.tr()),

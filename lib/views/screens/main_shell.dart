@@ -34,6 +34,9 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Depend on locale so nav labels update immediately when language changes
+    final locale = context.locale;
+
     return NavigationController(
       currentIndex: _currentIndex,
       onTabChange: (index) {
@@ -47,6 +50,7 @@ class _MainShellState extends State<MainShell> {
           children: _screens,
         ),
         bottomNavigationBar: BottomNavigationBar(
+          key: ValueKey(locale.languageCode),
           currentIndex: _currentIndex,
           onTap: _onTabTapped,
           items: [

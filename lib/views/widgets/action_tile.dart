@@ -50,9 +50,10 @@ class ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveIconColor = iconColor ?? AppTheme.primaryBlue;
-    final effectiveIconBgColor = iconBackgroundColor ??
-        AppTheme.primaryBlue.withValues(alpha: 0.1);
+    final colorScheme = Theme.of(context).colorScheme;
+    final effectiveIconColor = iconColor ?? colorScheme.primary;
+    final effectiveIconBgColor =
+        iconBackgroundColor ?? colorScheme.primary.withValues(alpha: 0.1);
 
     return InkWell(
       onTap: onTap,
@@ -99,7 +100,7 @@ class ActionTile extends StatelessWidget {
             if (showChevron)
               Icon(
                 Icons.chevron_right,
-                color: AppTheme.textTertiary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
           ],
         ),

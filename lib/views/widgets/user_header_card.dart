@@ -58,7 +58,7 @@ class UserHeaderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
             blurRadius: AppTheme.elevationLow,
             offset: const Offset(0, 2),
           ),
@@ -103,7 +103,7 @@ class UserHeaderCard extends StatelessWidget {
       width: avatarSize,
       height: avatarSize,
       decoration: BoxDecoration(
-        color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: photoUrl != null
@@ -134,7 +134,7 @@ class UserHeaderCard extends StatelessWidget {
   }
 
   Widget _buildUserTypeBadge(BuildContext context) {
-    final badgeColor = _getBadgeColor();
+    final badgeColor = _getBadgeColor(context);
     final badgeText = _getBadgeText();
 
     return Container(
@@ -156,15 +156,15 @@ class UserHeaderCard extends StatelessWidget {
     );
   }
 
-  Color _getBadgeColor() {
+  Color _getBadgeColor(BuildContext context) {
     switch (userType.toLowerCase()) {
       case 'doctor':
-        return AppTheme.primaryBlue;
+        return Theme.of(context).colorScheme.primary;
       case 'admin':
-        return AppTheme.warningOrange;
+        return Theme.of(context).colorScheme.tertiary;
       case 'patient':
       default:
-        return AppTheme.secondaryGreen;
+        return Theme.of(context).colorScheme.secondary;
     }
   }
 

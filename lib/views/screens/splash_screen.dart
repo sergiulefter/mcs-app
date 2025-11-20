@@ -148,13 +148,13 @@ class _SplashScreenState extends State<SplashScreen> {
       width: 96,
       height: 96,
       decoration: BoxDecoration(
-        color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       ),
-      child: const Icon(
+      child: Icon(
         Icons.medical_services_outlined,
         size: 56,
-        color: AppTheme.primaryBlue,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -183,8 +183,8 @@ class _SplashScreenState extends State<SplashScreen> {
         SizedBox(
           width: 200,
           child: LinearProgressIndicator(
-            valueColor: const AlwaysStoppedAnimation<Color>(
-              AppTheme.primaryBlue,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Theme.of(context).colorScheme.primary,
             ),
             minHeight: 3,
           ),

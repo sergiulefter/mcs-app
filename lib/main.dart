@@ -21,7 +21,7 @@ void main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: AppTheme.backgroundWhite,
+      systemNavigationBarColor: Colors.transparent,
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
@@ -69,6 +69,23 @@ class MyApp extends StatelessWidget {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
+            builder: (context, child) {
+              final theme = Theme.of(context);
+              final brightness = theme.brightness;
+
+              SystemChrome.setSystemUIOverlayStyle(
+                SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness:
+                      brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                  systemNavigationBarColor: theme.colorScheme.surface,
+                  systemNavigationBarIconBrightness:
+                      brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                ),
+              );
+
+              return child ?? const SizedBox.shrink();
+            },
           );
         },
       ),

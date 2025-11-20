@@ -94,6 +94,7 @@ class AccountScreen extends StatelessWidget {
 
   Widget _buildProfileDetailsCard(BuildContext context, dynamic user) {
     final notProvidedText = 'account.not_provided'.tr();
+    final localeName = context.locale.toLanguageTag();
 
     return Container(
       decoration: BoxDecoration(
@@ -101,7 +102,7 @@ class AccountScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
             blurRadius: AppTheme.elevationLow,
             offset: const Offset(0, 2),
           ),
@@ -113,11 +114,11 @@ class AccountScreen extends StatelessWidget {
             icon: Icons.cake_outlined,
             label: 'account.date_of_birth'.tr(),
             value: user.dateOfBirth != null
-                ? DateFormat('dd MMMM yyyy').format(user.dateOfBirth!)
+                ? DateFormat('dd MMMM yyyy', localeName).format(user.dateOfBirth!)
                 : notProvidedText,
             notProvidedText: notProvidedText,
           ),
-          _buildDivider(),
+          _buildDivider(context),
           ProfileDetailRow(
             icon: Icons.wc_outlined,
             label: 'account.sex'.tr(),
@@ -126,24 +127,24 @@ class AccountScreen extends StatelessWidget {
                 : notProvidedText,
             notProvidedText: notProvidedText,
           ),
-          _buildDivider(),
+          _buildDivider(context),
           ProfileDetailRow(
             icon: Icons.phone_outlined,
             label: 'account.phone'.tr(),
             value: user.phone ?? notProvidedText,
             notProvidedText: notProvidedText,
           ),
-          _buildDivider(),
+          _buildDivider(context),
           ProfileDetailRow(
             icon: Icons.language_outlined,
             label: 'account.preferred_language'.tr(),
             value: _getLanguageName(user.preferredLanguage),
           ),
-          _buildDivider(),
+          _buildDivider(context),
           ProfileDetailRow(
             icon: Icons.calendar_today_outlined,
             label: 'account.member_since'.tr(),
-            value: DateFormat('dd MMMM yyyy').format(user.createdAt),
+            value: DateFormat('dd MMMM yyyy', localeName).format(user.createdAt),
           ),
         ],
       ),
@@ -157,7 +158,7 @@ class AccountScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
             blurRadius: AppTheme.elevationLow,
             offset: const Offset(0, 2),
           ),
@@ -177,20 +178,20 @@ class AccountScreen extends StatelessWidget {
               );
             },
           ),
-          _buildDivider(),
+          _buildDivider(context),
           ActionTile(
             icon: Icons.language_outlined,
             title: 'account.change_language'.tr(),
             subtitle: 'account.change_language_desc'.tr(),
             onTap: () => _showLanguageDialog(context),
           ),
-          _buildDivider(),
+          _buildDivider(context),
           Consumer<ThemeController>(
             builder: (context, themeController, _) {
               return ActionTile(
                 icon: Icons.palette_outlined,
                 title: 'account.appearance'.tr(),
-                subtitle: themeController.getThemeModeName(),
+                subtitle: themeController.getThemeModeName(context),
                 onTap: () => _showThemeDialog(context, themeController),
               );
             },
@@ -207,7 +208,7 @@ class AccountScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textPrimary.withValues(alpha: 0.08),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
             blurRadius: AppTheme.elevationLow,
             offset: const Offset(0, 2),
           ),
@@ -221,7 +222,7 @@ class AccountScreen extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('account.change_password_coming_soon'.tr()),
-              backgroundColor: AppTheme.infoBlue,
+              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
         },
@@ -230,14 +231,16 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildDebugSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: AppTheme.warningOrange, width: 2),
+        border: Border.all(color: colorScheme.error, width: 2),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.warningOrange.withValues(alpha: 0.15),
+            color: colorScheme.error.withValues(alpha: 0.15),
             blurRadius: AppTheme.elevationLow,
             offset: const Offset(0, 2),
           ),
@@ -248,7 +251,7 @@ class AccountScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(AppTheme.spacing16),
             decoration: BoxDecoration(
-              color: AppTheme.warningOrange.withValues(alpha: 0.1),
+              color: colorScheme.errorContainer,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppTheme.radiusMedium),
                 topRight: Radius.circular(AppTheme.radiusMedium),
@@ -256,14 +259,18 @@ class AccountScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.bug_report, color: AppTheme.warningOrange),
+                Icon(
+                  Icons.bug_report,
+                  color: colorScheme.onErrorContainer,
+                ),
                 const SizedBox(width: AppTheme.spacing12),
                 Text(
                   'Debug Tools',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppTheme.warningOrange,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style:
+                      Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onErrorContainer,
+                            fontWeight: FontWeight.w700,
+                          ),
                 ),
               ],
             ),
@@ -279,11 +286,11 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
       height: 1,
       thickness: 1,
-      color: AppTheme.dividerColor,
+      color: Theme.of(context).dividerColor,
       indent: AppTheme.spacing16,
       endIndent: AppTheme.spacing16,
     );
@@ -294,16 +301,16 @@ class AccountScreen extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         onPressed: () => _handleSignOut(context),
-        icon: const Icon(Icons.logout, color: AppTheme.errorRed),
+        icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
         label: Text(
           'auth.sign_out'.tr(),
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppTheme.errorRed,
+                color: Theme.of(context).colorScheme.error,
                 fontWeight: FontWeight.w600,
               ),
         ),
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AppTheme.errorRed),
+          side: BorderSide(color: Theme.of(context).colorScheme.error),
           padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
         ),
       ),
@@ -339,10 +346,10 @@ class AccountScreen extends StatelessWidget {
       if (context.mounted) {
         Navigator.of(context).pop(); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✓ Successfully seeded 7 doctors!'),
-            backgroundColor: AppTheme.successGreen,
-            duration: Duration(seconds: 3),
+          SnackBar(
+            content: const Text('✓ Successfully seeded 7 doctors!'),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
@@ -352,7 +359,7 @@ class AccountScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('✗ Error seeding doctors: $e'),
-            backgroundColor: AppTheme.errorRed,
+            backgroundColor: Theme.of(context).colorScheme.error,
             duration: const Duration(seconds: 5),
           ),
         );
@@ -386,7 +393,7 @@ class AccountScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('account.language_changed'.tr()),
-                      backgroundColor: AppTheme.successGreen,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
                     ),
                   );
                 }
@@ -409,7 +416,7 @@ class AccountScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('account.language_changed'.tr()),
-                      backgroundColor: AppTheme.successGreen,
+                      backgroundColor: Theme.of(context).colorScheme.secondary,
                     ),
                   );
                 }
@@ -447,7 +454,7 @@ class AccountScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('account.theme_changed'.tr()),
-                        backgroundColor: AppTheme.successGreen,
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
                       ),
                     );
                   }
@@ -466,7 +473,7 @@ class AccountScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('account.theme_changed'.tr()),
-                        backgroundColor: AppTheme.successGreen,
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
                       ),
                     );
                   }
@@ -485,7 +492,7 @@ class AccountScreen extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('account.theme_changed'.tr()),
-                        backgroundColor: AppTheme.successGreen,
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
                       ),
                     );
                   }

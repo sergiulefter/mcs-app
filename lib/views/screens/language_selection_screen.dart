@@ -104,13 +104,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           width: 96,
           height: 96,
           decoration: BoxDecoration(
-            color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.language_outlined,
             size: 56,
-            color: AppTheme.primaryBlue,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppTheme.sectionSpacing),

@@ -95,10 +95,10 @@ class HomeScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppTheme.sectionSpacing),
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.warningOrange.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         border: Border.all(
-          color: AppTheme.warningOrange.withValues(alpha: 0.3),
+          color: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.3),
         ),
       ),
       child: Column(
@@ -106,9 +106,9 @@ class HomeScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.person_outline,
-                color: AppTheme.warningOrange,
+                color: Theme.of(context).colorScheme.tertiary,
                 size: AppTheme.iconMedium,
               ),
               const SizedBox(width: AppTheme.spacing12),
@@ -130,21 +130,21 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: AppTheme.spacing12),
           SizedBox(
             width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CompleteProfileScreen(),
-                  ),
-                );
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppTheme.warningOrange),
-                foregroundColor: AppTheme.warningOrange,
-              ),
-              child: Text('home.complete_profile_button'.tr()),
+          child: OutlinedButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CompleteProfileScreen(),
+                ),
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: Theme.of(context).colorScheme.tertiary),
+              foregroundColor: Theme.of(context).colorScheme.tertiary,
             ),
+            child: Text('home.complete_profile_button'.tr()),
           ),
+        ),
         ],
       ),
     );
@@ -168,7 +168,7 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.medical_services_outlined,
                   title: 'home.request_opinion'.tr(),
                   description: 'home.request_opinion_desc'.tr(),
-                  color: AppTheme.primaryBlue,
+                  color: Theme.of(context).colorScheme.primary,
                   onTap: () {
                   // Navigate to Doctors tab (index 1) to start the flow
                   _navigateToTab(context, 1);
@@ -181,7 +181,7 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.search_outlined,
                   title: 'home.browse_doctors'.tr(),
                   description: 'home.browse_doctors_desc'.tr(),
-                  color: AppTheme.secondaryGreen,
+                  color: Theme.of(context).colorScheme.secondary,
                   onTap: () {
                   // Navigate to Doctors tab (index 1)
                   _navigateToTab(context, 1);
@@ -219,14 +219,14 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: AppTheme.spacing16),
         Container(
           width: double.infinity,
-          padding: AppTheme.cardPadding,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+        padding: AppTheme.cardPadding,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          border: Border.all(
+            color: Theme.of(context).dividerColor,
           ),
+        ),
           child: Column(
             children: [
               Container(

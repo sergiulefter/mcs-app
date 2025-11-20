@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Controller for managing app theme (light/dark/system)
@@ -102,14 +103,14 @@ class ThemeController extends ChangeNotifier {
   }
 
   /// Get user-friendly theme mode name
-  String getThemeModeName() {
+  String getThemeModeName(BuildContext context) {
     switch (_themeMode) {
       case ThemeMode.light:
-        return 'Light';
+        return 'account.light_mode'.tr(context: context);
       case ThemeMode.dark:
-        return 'Dark';
+        return 'account.dark_mode'.tr(context: context);
       case ThemeMode.system:
-        return 'System';
+        return 'account.system_mode'.tr(context: context);
     }
   }
 }

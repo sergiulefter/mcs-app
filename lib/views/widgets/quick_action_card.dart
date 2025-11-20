@@ -15,7 +15,7 @@ import '../../utils/app_theme.dart';
 ///         icon: Icons.medical_services_outlined,
 ///         title: 'Request Opinion',
 ///         description: 'Get a second opinion',
-///         color: AppTheme.primaryBlue,
+///         color: Theme.of(context).colorScheme.primary,
 ///         onTap: () => Navigator.push(...),
 ///       ),
 ///     ),
@@ -25,7 +25,7 @@ import '../../utils/app_theme.dart';
 ///         icon: Icons.search_outlined,
 ///         title: 'Browse Doctors',
 ///         description: 'Find specialists',
-///         color: AppTheme.secondaryGreen,
+///         color: Theme.of(context).colorScheme.secondary,
 ///         onTap: () => Navigator.push(...),
 ///       ),
 ///     ),
@@ -77,14 +77,20 @@ class QuickActionCard extends StatelessWidget {
         padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.textPrimary.withValues(alpha: 0.08),
-              blurRadius: AppTheme.elevationLow,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall * 1.5),
+          border: Border.all(
+            color: Theme.of(context).dividerColor,
+            width: 1,
+          ),
+          boxShadow: Theme.of(context).brightness == Brightness.light
+              ? [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                    blurRadius: AppTheme.elevationLow,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

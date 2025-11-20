@@ -47,9 +47,10 @@ class ProfileDetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isNotProvided = notProvidedText != null && value == notProvidedText;
-    final effectiveIconColor = iconColor ?? AppTheme.primaryBlue;
+    final colorScheme = Theme.of(context).colorScheme;
+    final effectiveIconColor = iconColor ?? colorScheme.primary;
     final effectiveIconBgColor = iconBackgroundColor ??
-        AppTheme.primaryBlue.withValues(alpha: 0.1);
+        colorScheme.primary.withValues(alpha: 0.1);
 
     return Padding(
       padding: AppTheme.cardPadding,

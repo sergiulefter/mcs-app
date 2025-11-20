@@ -52,7 +52,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('validation.select_date_of_birth'.tr()),
-            backgroundColor: AppTheme.errorRed,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
         return;
@@ -62,7 +62,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('validation.select_gender'.tr()),
-            backgroundColor: AppTheme.errorRed,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
         return;
@@ -92,7 +92,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           SnackBar(
             content:
                 Text(authController.errorMessage ?? 'errors.profile_save_failed'.tr()),
-            backgroundColor: AppTheme.errorRed,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -248,9 +248,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         const SizedBox(height: AppTheme.spacing8),
         LinearProgressIndicator(
           value: 1.0,
-          backgroundColor: AppTheme.dividerColor,
+          backgroundColor: Theme.of(context).dividerColor,
           valueColor:
-              const AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+              AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
           borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
         ),
       ],
@@ -265,13 +265,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.person_add_outlined,
             size: AppTheme.iconXLarge,
-            color: AppTheme.primaryBlue,
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppTheme.spacing24),
@@ -297,12 +297,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           onPressed:
               authController.isLoading ? null : _handleCompleteProfile,
           child: authController.isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppTheme.textOnPrimary,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 )
               : Text('profile.complete_button'.tr()),

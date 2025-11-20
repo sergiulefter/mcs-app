@@ -53,7 +53,8 @@ class AppTheme {
   static const Color backgroundDarkElevated = Color(0xFF1E1E1E); // Slightly elevated
   static const Color surfaceDark = Color(0xFF1E1E1E);
   static const Color surfaceDarkElevated = Color(0xFF2C2C2C);
-  static const Color dividerDark = Color(0xFF2C2C2C);
+  static const Color dividerDark = Color(0xFF3A3A3A); // More visible than 0xFF2C2C2C
+  static const Color borderDark = Color(0xFF3A3A3A); // Subtle borders for dark mode
 
   // Dark Text Colors
   static const Color textPrimaryDark = Color(0xFFE0E0E0);
@@ -103,10 +104,11 @@ class AppTheme {
   // BORDER RADIUS
   // ============================================================================
 
+  // Softer, less pronounced rounding to reduce visual strain
   static const double radiusSmall = 8.0;
-  static const double radiusMedium = 12.0;
-  static const double radiusLarge = 16.0;
-  static const double radiusXLarge = 24.0;
+  static const double radiusMedium = 10.0;
+  static const double radiusLarge = 12.0;
+  static const double radiusXLarge = 20.0;
   static const double radiusCircular = 100.0;
 
   // ============================================================================
@@ -135,6 +137,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      dividerColor: dividerColor,
 
       // Color Scheme
       colorScheme: const ColorScheme.light(
@@ -177,7 +180,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: surfaceColor,
         elevation: elevationLow,
-        shadowColor: textPrimary.withValues(alpha: 0.1),
+        shadowColor: textPrimary.withValues(alpha: 0.06),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
         ),
@@ -472,6 +475,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      dividerColor: dividerDark,
 
       // Color Scheme
       colorScheme: const ColorScheme.dark(
@@ -510,13 +514,17 @@ class AppTheme {
         ),
       ),
 
-      // Card Theme
+      // Card Theme - No shadows in dark mode, use borders for separation
       cardTheme: CardThemeData(
         color: surfaceDark,
-        elevation: elevationMedium,
-        shadowColor: Colors.black.withValues(alpha: 0.3),
+        elevation: elevationNone, // No shadows in dark mode
+        shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusMedium),
+          side: BorderSide(
+            color: dividerDark, // Theme divider to avoid harsh white edges
+            width: 1,
+          ),
         ),
         margin: const EdgeInsets.all(spacing8),
       ),

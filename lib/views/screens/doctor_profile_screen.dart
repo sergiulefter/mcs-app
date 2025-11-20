@@ -79,15 +79,19 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.dividerColor),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.textPrimary.withValues(alpha: 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(
+          color: Theme.of(context).dividerColor,
+        ),
+        boxShadow: Theme.of(context).brightness == Brightness.light
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         children: [
@@ -126,8 +130,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     ? Icons.check_circle_outline
                     : Icons.access_time,
                 iconColor: widget.doctor.isCurrentlyAvailable
-                    ? AppTheme.secondaryGreen
-                    : AppTheme.textTertiary,
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
                 label: widget.doctor.isCurrentlyAvailable
                     ? 'doctor_profile.available_now'.tr()
                     : 'doctor_profile.unavailable'.tr(),
@@ -135,7 +139,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               const SizedBox(width: AppTheme.spacing8),
               _Badge(
                 icon: Icons.work_outline,
-                iconColor: AppTheme.primaryBlue,
+                iconColor: Theme.of(context).colorScheme.primary,
                 label: 'doctor_profile.years_experience'.tr(
                   namedArgs: {'years': widget.doctor.experienceYears.toString()},
                 ),
@@ -154,8 +158,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.dividerColor),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -169,7 +173,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           Container(
             width: 1,
             height: 48,
-            color: AppTheme.dividerColor,
+            color: Theme.of(context).dividerColor,
           ),
           Expanded(
             child: _InfoColumn(
@@ -181,7 +185,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           Container(
             width: 1,
             height: 48,
-            color: AppTheme.dividerColor,
+            color: Theme.of(context).dividerColor,
           ),
           Expanded(
             child: _InfoColumn(
@@ -206,11 +210,11 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         const SizedBox(height: AppTheme.spacing16),
         Container(
           padding: AppTheme.cardPadding,
-          decoration: BoxDecoration(
-            color: AppTheme.backgroundWhite,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(color: AppTheme.dividerColor),
-          ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -238,7 +242,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             ? 'doctor_profile.read_less'.tr()
                             : 'doctor_profile.read_more'.tr(),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.primaryBlue,
+                              color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -248,7 +252,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             ? Icons.keyboard_arrow_up
                             : Icons.keyboard_arrow_down,
                         size: AppTheme.iconSmall,
-                        color: AppTheme.primaryBlue,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ],
                   ),
@@ -275,9 +279,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               child: Container(
                 padding: AppTheme.cardPadding,
                 decoration: BoxDecoration(
-                  color: AppTheme.backgroundWhite,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                  border: Border.all(color: AppTheme.dividerColor),
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,13 +291,14 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                         Container(
                           padding: const EdgeInsets.all(AppTheme.spacing8),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                            color: Theme.of(context).colorScheme.primary
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.school,
                             size: AppTheme.iconMedium,
-                            color: AppTheme.primaryBlue,
+                            color: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                         const SizedBox(width: AppTheme.spacing12),
@@ -356,9 +361,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         Container(
           padding: AppTheme.cardPadding,
           decoration: BoxDecoration(
-            color: AppTheme.backgroundWhite,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(color: AppTheme.dividerColor),
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
           child: Wrap(
             spacing: AppTheme.spacing8,
@@ -367,7 +372,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               return _Badge(
                 label: subspecialty,
                 icon: Icons.medical_services_outlined,
-                iconColor: AppTheme.primaryBlue,
+                iconColor: Theme.of(context).colorScheme.primary,
               );
             }).toList(),
           ),
@@ -388,11 +393,11 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         const SizedBox(height: AppTheme.spacing16),
         Container(
           padding: AppTheme.cardPadding,
-          decoration: BoxDecoration(
-            color: AppTheme.backgroundWhite,
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-            border: Border.all(color: AppTheme.dividerColor),
-          ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -403,8 +408,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     height: 12,
                     decoration: BoxDecoration(
                       color: widget.doctor.isCurrentlyAvailable
-                          ? AppTheme.secondaryGreen
-                          : AppTheme.textTertiary,
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -428,7 +433,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               ),
               if (activeVacations.isNotEmpty) ...[
                 const SizedBox(height: AppTheme.spacing16),
-                const Divider(color: AppTheme.dividerColor),
+                const Divider(),
                 const SizedBox(height: AppTheme.spacing16),
                 ...activeVacations.map((vacation) {
                   final dateFormat = DateFormat('dd MMM yyyy');
@@ -436,10 +441,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     padding: const EdgeInsets.only(bottom: AppTheme.spacing8),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.event_busy,
                           size: AppTheme.iconSmall,
-                          color: AppTheme.textTertiary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: AppTheme.spacing8),
                         Expanded(
@@ -468,14 +473,22 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(AppTheme.spacing32),
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.textPrimary.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).dividerColor,
+            width: 1,
           ),
-        ],
+        ),
+        boxShadow: Theme.of(context).brightness == Brightness.light
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 16,
+                  offset: const Offset(0, -4),
+                ),
+              ]
+            : null,
       ),
       child: ElevatedButton.icon(
         onPressed: widget.doctor.isCurrentlyAvailable
@@ -483,7 +496,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('doctor_profile.request_submitted'.tr()),
-                    backgroundColor: AppTheme.successGreen,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
                   ),
                 );
               }
@@ -495,10 +508,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               : 'doctor_profile.unavailable_button'.tr(),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primaryBlue,
-          foregroundColor: AppTheme.textOnPrimary,
-          disabledBackgroundColor: AppTheme.dividerColor,
-          disabledForegroundColor: AppTheme.textTertiary,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          disabledBackgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          disabledForegroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
           minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
@@ -535,14 +548,14 @@ class _Avatar extends StatelessWidget {
       width: 72,
       height: 72,
       decoration: BoxDecoration(
-        color: AppTheme.primaryBlue.withValues(alpha: 0.08),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: Center(
         child: Text(
           initials,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppTheme.primaryBlue,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w700,
               ),
         ),
@@ -570,7 +583,7 @@ class _Badge extends StatelessWidget {
         vertical: AppTheme.spacing8,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.backgroundLight,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: Row(
@@ -580,7 +593,7 @@ class _Badge extends StatelessWidget {
             Icon(
               icon,
               size: AppTheme.iconSmall,
-              color: iconColor ?? AppTheme.textSecondary,
+              color: iconColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           if (icon != null) const SizedBox(width: AppTheme.spacing4),
           Text(
@@ -630,13 +643,13 @@ class _InfoColumn extends StatelessWidget {
         Icon(
           icon,
           size: AppTheme.iconMedium,
-          color: AppTheme.primaryBlue,
+          color: Theme.of(context).colorScheme.primary,
         ),
         const SizedBox(height: AppTheme.spacing8),
         Text(
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
           textAlign: TextAlign.center,
         ),

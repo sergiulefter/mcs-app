@@ -108,7 +108,8 @@
       "specialty": "Specialty",
       "all_specialties": "All specialties",
       "availability": "Availability",
-      "available_now": "Only show available doctors"
+      "available_now": "Only show available doctors",
+      "active_count": "{count} active"
     },
     "empty_state_title": "No doctors match your filters",
     "empty_state_subtitle": "Adjust your filters or try searching for another specialty.",
@@ -224,6 +225,7 @@
     "done": "Done",
     "edit": "Edit",
     "delete": "Delete",
+    "apply": "Apply",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",

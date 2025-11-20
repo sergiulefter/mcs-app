@@ -3,6 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../models/doctor_model.dart';
 import '../../services/doctor_service.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/app_empty_state.dart';
+import '../widgets/app_search_bar.dart';
 import '../widgets/doctor_card.dart';
 import 'doctor_profile_screen.dart';
 
@@ -23,6 +25,9 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   String _selectedSpecialty = 'all';
   bool _availableOnly = false;
+
+  bool get _hasActiveFilters =>
+      _selectedSpecialty != 'all' || _availableOnly;
 
   @override
   void initState() {
@@ -109,13 +114,13 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppTheme.errorRed.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.error_outline,
                 size: 36,
-                color: AppTheme.errorRed,
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
             const SizedBox(height: AppTheme.spacing16),
@@ -157,8 +162,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           _buildHeader(context),
           const SizedBox(height: AppTheme.sectionSpacing),
           _buildSearchField(context),
-          const SizedBox(height: AppTheme.sectionSpacing),
-          _buildFilters(context),
+          const SizedBox(height: AppTheme.spacing16),
+          _buildFilterActions(context),
           const SizedBox(height: AppTheme.sectionSpacing),
           _buildResultsHeader(context, filteredDoctors.length),
           const SizedBox(height: AppTheme.spacing16),
@@ -180,8 +185,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                   availabilityLabel: availabilityLabel,
                   availabilityDescription: availabilityDescription,
                   availabilityColor: doctor.isCurrentlyAvailable
-                      ? AppTheme.secondaryGreen
-                      : AppTheme.textTertiary,
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
                   viewProfileLabel: 'doctors.view_profile'.tr(),
                   onTap: () {
                     Navigator.of(context).push(
@@ -218,113 +223,175 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
   Widget _buildSearchField(BuildContext context) {
-    return TextField(
+    return AppSearchBar(
       controller: _searchController,
+      hintText: 'doctors.search_hint'.tr(),
       onChanged: (_) => setState(() {}),
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search_outlined),
-        hintText: 'doctors.search_hint'.tr(),
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.surface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-          borderSide: BorderSide(color: AppTheme.dividerColor),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-          borderSide: BorderSide(color: AppTheme.dividerColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 2),
-        ),
-      ),
     );
   }
 
-  Widget _buildFilters(BuildContext context) {
-    return Container(
-      padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.dividerColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'doctors.filters.title'.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(  
-                      fontWeight: FontWeight.w600,
-                    ),
+  Widget _buildFilterActions(BuildContext context) {
+    final activeCount = [
+      if (_selectedSpecialty != 'all') 1,
+      if (_availableOnly) 1,
+    ].length;
+
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => _openFiltersSheet(context),
+            icon: const Icon(Icons.filter_alt_outlined),
+            label: Text(
+              activeCount > 0
+                  ? 'doctors.filters.active_count'
+                      .tr(namedArgs: {'count': activeCount.toString()})
+                  : 'doctors.filters.title'.tr(),
+            ),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                vertical: AppTheme.spacing16,
+                horizontal: AppTheme.spacing16,
               ),
-              TextButton(
-                onPressed: _resetFilters,
-                child: Text('doctors.filters.clear'.tr()),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTheme.spacing16),
-          Text(
-            'doctors.filters.specialty'.tr(),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          const SizedBox(height: AppTheme.spacing12),
-          Wrap(
-            spacing: AppTheme.spacing12,
-            runSpacing: AppTheme.spacing12,
-            children: _specialtyOptions.map((specialty) {
-              final isSelected = specialty == _selectedSpecialty;
-              return ChoiceChip(
-                label: Text(
-                  specialty == 'all'
-                      ? 'doctors.filters.all_specialties'.tr()
-                      : 'specialties.$specialty'.tr(),
-                ),
-                selected: isSelected,
-                onSelected: (_) {
-                  setState(() => _selectedSpecialty = specialty);
-                },
-                labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                selectedColor: AppTheme.primaryBlue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: AppTheme.spacing24),
-          const SizedBox(height: AppTheme.spacing12),
-          const SizedBox(height: AppTheme.spacing24),
-          Text(
-            'doctors.filters.availability'.tr(),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          const SizedBox(height: AppTheme.spacing12),
-          FilterChip(
-            selected: _availableOnly,
-            label: Text('doctors.filters.available_now'.tr()),
-            onSelected: (_) => setState(() => _availableOnly = !_availableOnly),
-            labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-            selectedColor: AppTheme.secondaryGreen,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
             ),
           ),
+        ),
+        if (_hasActiveFilters) ...[
+          const SizedBox(width: AppTheme.spacing12),
+          TextButton(
+            onPressed: _resetFilters,
+            child: Text('doctors.filters.clear'.tr()),
+          ),
         ],
+      ],
+    );
+  }
+
+  Future<void> _openFiltersSheet(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusLarge),
+        ),
       ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: FractionallySizedBox(
+            heightFactor: 0.8,
+            child: SingleChildScrollView(
+              padding: AppTheme.cardPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'doctors.filters.title'.tr(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(sheetContext).pop(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppTheme.spacing16),
+                  _buildFiltersContent(context),
+                  const SizedBox(height: AppTheme.spacing16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _resetFilters();
+                            Navigator.of(sheetContext).pop();
+                          },
+                          child: Text('doctors.filters.clear'.tr()),
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.spacing12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                          child: Text('common.apply'.tr()),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: MediaQuery.paddingOf(context).bottom),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFiltersContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'doctors.filters.specialty'.tr(),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: AppTheme.spacing12),
+        Wrap(
+          spacing: AppTheme.spacing12,
+          runSpacing: AppTheme.spacing12,
+          children: _specialtyOptions.map((specialty) {
+            final isSelected = specialty == _selectedSpecialty;
+            return ChoiceChip(
+              label: Text(
+                specialty == 'all'
+                    ? 'doctors.filters.all_specialties'.tr()
+                    : 'specialties.$specialty'.tr(),
+              ),
+              selected: isSelected,
+              onSelected: (_) {
+                setState(() => _selectedSpecialty = specialty);
+              },
+              labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                selectedColor: Theme.of(context).colorScheme.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                side: BorderSide(color: Theme.of(context).dividerColor),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: AppTheme.spacing24),
+        Text(
+          'doctors.filters.availability'.tr(),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: AppTheme.spacing12),
+        FilterChip(
+          selected: _availableOnly,
+          label: Text('doctors.filters.available_now'.tr()),
+          onSelected: (_) => setState(() => _availableOnly = !_availableOnly),
+          labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            selectedColor: Theme.of(context).colorScheme.secondary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            side: BorderSide(color: Theme.of(context).dividerColor),
+          ),
+        ),
+      ],
     );
   }
 
@@ -347,44 +414,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Container(
-      padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-        border: Border.all(color: AppTheme.dividerColor),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-            ),
-            child: const Icon(
-              Icons.search_off_outlined,
-              size: 36,
-              color: AppTheme.primaryBlue,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacing16),
-          Text(
-            'doctors.empty_state_title'.tr(),
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: AppTheme.spacing8),
-          Text(
-            'doctors.empty_state_subtitle'.tr(),
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+    return AppEmptyState(
+      icon: Icons.search_off_outlined,
+      title: 'doctors.empty_state_title'.tr(),
+      subtitle: 'doctors.empty_state_subtitle'.tr(),
+              iconColor: Theme.of(context).colorScheme.primary,
     );
   }
 

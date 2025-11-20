@@ -30,15 +30,19 @@ class DoctorCard extends StatelessWidget {
         padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-          border: Border.all(color: AppTheme.dividerColor),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.textPrimary.withValues(alpha: 0.04),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          border: Border.all(
+            color: Theme.of(context).dividerColor,
+          ),
+          boxShadow: Theme.of(context).brightness == Brightness.light
+              ? [
+                  BoxShadow(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +82,7 @@ class DoctorCard extends StatelessWidget {
                   _Badge(
                     icon: Icons.circle,
                     iconSize: 12,
-                    iconColor: availabilityColor ?? AppTheme.secondaryGreen,
+                    iconColor: availabilityColor ?? Theme.of(context).colorScheme.secondary,
                     label: availabilityLabel!,
                   ),
                 _Badge(
@@ -136,7 +140,7 @@ class _Avatar extends StatelessWidget {
       width: 72,
       height: 72,
       decoration: BoxDecoration(
-        color: AppTheme.primaryBlue.withValues(alpha: 0.08),
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: Center(
@@ -166,13 +170,15 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacing12,
         vertical: AppTheme.spacing8,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: Row(
@@ -182,7 +188,7 @@ class _Badge extends StatelessWidget {
             Icon(
               icon,
               size: iconSize,
-              color: iconColor,
+              color: iconColor ?? colorScheme.primary,
             ),
           if (icon != null) const SizedBox(width: AppTheme.spacing4),
           Text(

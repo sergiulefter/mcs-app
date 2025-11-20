@@ -21,13 +21,13 @@ class ConsultationsScreen extends StatelessWidget {
                 width: 96,
                 height: 96,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.assignment_outlined,
                   size: 56,
-                  color: AppTheme.primaryBlue,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: AppTheme.spacing24),
@@ -47,17 +47,17 @@ class ConsultationsScreen extends StatelessWidget {
               Container(
                 padding: AppTheme.cardPadding,
                 decoration: BoxDecoration(
-                  color: AppTheme.infoBlue.withValues(alpha: 0.1),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                   border: Border.all(
-                    color: AppTheme.infoBlue.withValues(alpha: 0.3),
+                    color: Theme.of(context).dividerColor,
                   ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.info_outline,
-                      color: AppTheme.infoBlue,
+                      color: Theme.of(context).colorScheme.primary,
                       size: AppTheme.iconMedium,
                     ),
                     const SizedBox(width: AppTheme.spacing12),

@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authController.errorMessage ?? 'Login failed'),
-            backgroundColor: AppTheme.errorRed,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           ),
           child: const Icon(
@@ -192,12 +192,12 @@ class _LoginScreenState extends State<LoginScreen> {
         return ElevatedButton(
           onPressed: authController.isLoading ? null : _handleLogin,
           child: authController.isLoading
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppTheme.textOnPrimary,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 )
               : Text('auth.sign_in'.tr()),

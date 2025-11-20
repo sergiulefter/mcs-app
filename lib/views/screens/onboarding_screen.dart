@@ -72,7 +72,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundWhite,
       body: SafeArea(
         child: Column(
           children: [
@@ -116,7 +115,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: Text(
             'onboarding.skip'.tr(),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -136,13 +134,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
             ),
             child: Icon(
               slide.icon,
               size: 64,
-              color: AppTheme.primaryBlue,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           const SizedBox(height: AppTheme.spacing48),
@@ -151,7 +149,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             slide.titleKey.tr(),
             style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w700,
                 ),
             textAlign: TextAlign.center,
@@ -162,7 +159,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             slide.descriptionKey.tr(),
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textSecondary,
                   height: 1.6,
                 ),
             textAlign: TextAlign.center,
@@ -212,8 +208,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: 8,
       decoration: BoxDecoration(
         color: _currentPage == index
-            ? AppTheme.primaryBlue
-            : AppTheme.dividerColor,
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).dividerColor,
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
     );

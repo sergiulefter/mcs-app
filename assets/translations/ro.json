@@ -77,7 +77,7 @@
     "request_opinion": "Solicită A Doua Opinie",
     "request_opinion_desc": "Obține perspective medicale de expert",
     "browse_doctors": "Explorează Medicii",
-    "browse_doctors_desc": "Găsește specialiști",
+    "browse_doctors_desc": "Găsește specialiști pentru tine",
     "active_consultations": "Consultații Active",
     "no_active_consultations": "Nicio consultație activă",
     "no_active_consultations_desc": "Cererile tale de consultație vor apărea aici după ce le trimiți.",
@@ -109,7 +109,8 @@
       "specialty": "Specialitate",
       "all_specialties": "Toate specialitățile",
       "availability": "Disponibilitate",
-      "available_now": "Afișează doar medicii disponibili"
+      "available_now": "Afișează doar medicii disponibili",
+      "active_count": "{count} active"
     },
     "empty_state_title": "Niciun medic nu se potrivește cu filtrele",
     "empty_state_subtitle": "Ajustează filtrele sau caută o altă specialitate.",
@@ -225,6 +226,7 @@
     "done": "Gata",
     "edit": "Editează",
     "delete": "Șterge",
+    "apply": "Aplică",
     "loading": "Se încarcă...",
     "error": "Eroare",
     "success": "Succes",

@@ -111,13 +111,7 @@ class AppDatePickerField extends StatelessWidget {
                 Icons.arrow_drop_down,
               ),
               errorText: errorText,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                borderSide: const BorderSide(
-                  color: AppTheme.dividerColor,
-                  width: 1,
-                ),
-              ),
+              // Border handled by theme's InputDecorationTheme (theme-aware)
             ),
             child: Text(
               selectedDate != null
@@ -125,8 +119,8 @@ class AppDatePickerField extends StatelessWidget {
                   : hintText,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: selectedDate != null
-                        ? AppTheme.textPrimary
-                        : AppTheme.textTertiary,
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
             ),
           ),
@@ -152,8 +146,8 @@ class AppDatePickerField extends StatelessWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: AppTheme.primaryBlue,
-                  onPrimary: AppTheme.textOnPrimary,
+                  primary: Theme.of(context).colorScheme.primary,
+                  onPrimary: Theme.of(context).colorScheme.onPrimary,
                 ),
           ),
           child: child!,

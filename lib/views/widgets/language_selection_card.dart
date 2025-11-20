@@ -53,7 +53,8 @@ class LanguageSelectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveSelectedColor = selectedColor ?? AppTheme.primaryBlue;
+    final colorScheme = Theme.of(context).colorScheme;
+    final effectiveSelectedColor = selectedColor ?? colorScheme.primary;
 
     return InkWell(
       onTap: onTap,
@@ -65,7 +66,7 @@ class LanguageSelectionCard extends StatelessWidget {
               ? effectiveSelectedColor.withValues(alpha: 0.1)
               : Theme.of(context).colorScheme.surface,
           border: Border.all(
-            color: isSelected ? effectiveSelectedColor : Theme.of(context).colorScheme.outline,
+            color: isSelected ? effectiveSelectedColor : Theme.of(context).dividerColor,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
