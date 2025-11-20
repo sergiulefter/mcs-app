@@ -45,6 +45,31 @@ class AppTheme {
   static const Color statusExpired = Color(0xFFDC3545); // Red
 
   // ============================================================================
+  // DARK MODE COLORS
+  // ============================================================================
+
+  // Dark Backgrounds
+  static const Color backgroundDark = Color(0xFF121212); // Material Design dark
+  static const Color backgroundDarkElevated = Color(0xFF1E1E1E); // Slightly elevated
+  static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color surfaceDarkElevated = Color(0xFF2C2C2C);
+  static const Color dividerDark = Color(0xFF2C2C2C);
+
+  // Dark Text Colors
+  static const Color textPrimaryDark = Color(0xFFE0E0E0);
+  static const Color textSecondaryDark = Color(0xFFB0B0B0);
+  static const Color textTertiaryDark = Color(0xFF808080);
+  static const Color textOnPrimaryDark = Color(0xFF000000);
+
+  // Adjusted semantic colors for dark mode (slightly lighter for visibility)
+  static const Color primaryBlueDarkMode = Color(0xFF4D94FF); // Lighter blue
+  static const Color secondaryGreenDarkMode = Color(0xFF33C699); // Lighter green
+  static const Color errorRedDark = Color(0xFFFF6B6B); // Lighter red
+  static const Color successGreenDark = Color(0xFF51CF66); // Lighter green
+  static const Color warningOrangeDark = Color(0xFFFFB84D); // Lighter orange
+  static const Color infoBlueDark = Color(0xFF4DABF7); // Lighter info blue
+
+  // ============================================================================
   // SPACING - 8px Grid System
   // ============================================================================
 
@@ -433,6 +458,343 @@ class AppTheme {
           fontSize: 10,
           fontWeight: FontWeight.w500,
           color: textTertiary,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  // ============================================================================
+  // DARK THEME
+  // ============================================================================
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+
+      // Color Scheme
+      colorScheme: const ColorScheme.dark(
+        primary: primaryBlueDarkMode,
+        onPrimary: textOnPrimaryDark,
+        primaryContainer: primaryBlueDark,
+        onPrimaryContainer: primaryBlueLight,
+        secondary: secondaryGreenDarkMode,
+        onSecondary: textOnPrimaryDark,
+        secondaryContainer: secondaryGreenDark,
+        onSecondaryContainer: secondaryGreenLight,
+        surface: surfaceDark,
+        onSurface: textPrimaryDark,
+        error: errorRedDark,
+        onError: textOnPrimaryDark,
+      ),
+
+      // Scaffold
+      scaffoldBackgroundColor: backgroundDark,
+
+      // AppBar Theme
+      appBarTheme: const AppBarTheme(
+        backgroundColor: surfaceDark,
+        foregroundColor: textPrimaryDark,
+        elevation: elevationNone,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: textPrimaryDark,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.5,
+        ),
+        iconTheme: IconThemeData(
+          color: textPrimaryDark,
+          size: iconMedium,
+        ),
+      ),
+
+      // Card Theme
+      cardTheme: CardThemeData(
+        color: surfaceDark,
+        elevation: elevationMedium,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusMedium),
+        ),
+        margin: const EdgeInsets.all(spacing8),
+      ),
+
+      // Elevated Button Theme
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryBlueDarkMode,
+          foregroundColor: textOnPrimaryDark,
+          elevation: elevationNone,
+          shadowColor: Colors.transparent,
+          padding: buttonPadding,
+          minimumSize: const Size(double.infinity, buttonHeight),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMedium),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+
+      // Outlined Button Theme
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryBlueDarkMode,
+          side: const BorderSide(color: primaryBlueDarkMode, width: 1.5),
+          padding: buttonPadding,
+          minimumSize: const Size(double.infinity, buttonHeight),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusMedium),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+
+      // Text Button Theme
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: primaryBlueDarkMode,
+          padding: const EdgeInsets.symmetric(
+            horizontal: spacing16,
+            vertical: spacing12,
+          ),
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.25,
+          ),
+        ),
+      ),
+
+      // Input Decoration Theme
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceDarkElevated,
+        contentPadding: cardPadding,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: dividerDark, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: dividerDark, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: primaryBlueDarkMode, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: errorRedDark, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radiusMedium),
+          borderSide: const BorderSide(color: errorRedDark, width: 2),
+        ),
+        labelStyle: const TextStyle(
+          color: textSecondaryDark,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        hintStyle: const TextStyle(
+          color: textTertiaryDark,
+          fontSize: 14,
+        ),
+        errorStyle: const TextStyle(
+          color: errorRedDark,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // Bottom Navigation Bar Theme
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: surfaceDark,
+        selectedItemColor: primaryBlueDarkMode,
+        unselectedItemColor: textSecondaryDark,
+        type: BottomNavigationBarType.fixed,
+        elevation: elevationLow,
+        selectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // Floating Action Button Theme
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: primaryBlueDarkMode,
+        foregroundColor: textOnPrimaryDark,
+        elevation: elevationMedium,
+        shape: CircleBorder(),
+      ),
+
+      // Divider Theme
+      dividerTheme: const DividerThemeData(
+        color: dividerDark,
+        thickness: 1,
+        space: spacing16,
+      ),
+
+      // Chip Theme
+      chipTheme: ChipThemeData(
+        backgroundColor: surfaceDarkElevated,
+        labelStyle: const TextStyle(
+          color: textPrimaryDark,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: spacing12,
+          vertical: spacing8,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSmall),
+        ),
+      ),
+
+      // Snackbar Theme
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: surfaceDarkElevated,
+        contentTextStyle: const TextStyle(
+          color: textPrimaryDark,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusSmall),
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+
+      // Dialog Theme
+      dialogTheme: DialogThemeData(
+        backgroundColor: surfaceDark,
+        elevation: elevationHigh,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLarge),
+        ),
+        titleTextStyle: const TextStyle(
+          color: textPrimaryDark,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        contentTextStyle: const TextStyle(
+          color: textSecondaryDark,
+          fontSize: 14,
+          height: 1.5,
+        ),
+      ),
+
+      // Text Theme
+      textTheme: const TextTheme(
+        // Display
+        displayLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.w700,
+          color: textPrimaryDark,
+          letterSpacing: -1.0,
+        ),
+        displayMedium: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          color: textPrimaryDark,
+          letterSpacing: -0.5,
+        ),
+        displaySmall: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+          letterSpacing: -0.25,
+        ),
+
+        // Headlines
+        headlineLarge: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+          letterSpacing: -0.25,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+          letterSpacing: -0.25,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+        ),
+
+        // Titles
+        titleLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+          letterSpacing: 0.1,
+        ),
+        titleSmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryDark,
+          letterSpacing: 0.1,
+        ),
+
+        // Body
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: textPrimaryDark,
+          height: 1.5,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: textPrimaryDark,
+          height: 1.5,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+          color: textSecondaryDark,
+          height: 1.4,
+        ),
+
+        // Labels
+        labelLarge: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: textPrimaryDark,
+          letterSpacing: 0.1,
+        ),
+        labelMedium: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: textSecondaryDark,
+          letterSpacing: 0.5,
+        ),
+        labelSmall: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: textTertiaryDark,
           letterSpacing: 0.5,
         ),
       ),

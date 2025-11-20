@@ -64,7 +64,6 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
             padding: AppTheme.screenPadding,
@@ -132,7 +131,6 @@ class _SignupScreenState extends State<SignupScreen> {
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(
           Icons.arrow_back,
-          color: AppTheme.textPrimary,
         ),
         style: IconButton.styleFrom(
           backgroundColor: AppTheme.backgroundWhite,
@@ -166,7 +164,6 @@ class _SignupScreenState extends State<SignupScreen> {
         Text(
           'auth.sign_up'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
         ),
@@ -175,9 +172,7 @@ class _SignupScreenState extends State<SignupScreen> {
         // Subtitle
         Text(
           'auth.sign_up_subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
         ),
       ],
     );
@@ -190,7 +185,6 @@ class _SignupScreenState extends State<SignupScreen> {
         Text(
           'auth.password'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -203,14 +197,12 @@ class _SignupScreenState extends State<SignupScreen> {
             hintText: 'auth.create_password_hint'.tr(),
             prefixIcon: const Icon(
               Icons.lock_outlined,
-              color: AppTheme.textSecondary,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: AppTheme.textSecondary,
               ),
               onPressed: () {
                 setState(() {
@@ -232,7 +224,6 @@ class _SignupScreenState extends State<SignupScreen> {
         Text(
           'auth.confirm_password'.tr(),
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -246,14 +237,12 @@ class _SignupScreenState extends State<SignupScreen> {
             hintText: 'auth.confirm_password_hint'.tr(),
             prefixIcon: const Icon(
               Icons.lock_outlined,
-              color: AppTheme.textSecondary,
             ),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureConfirmPassword
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: AppTheme.textSecondary,
               ),
               onPressed: () {
                 setState(() {
@@ -297,9 +286,7 @@ class _SignupScreenState extends State<SignupScreen> {
       children: [
         Text(
           'auth.have_account'.tr(),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),

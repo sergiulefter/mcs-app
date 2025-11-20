@@ -29,7 +29,7 @@ class DoctorCard extends StatelessWidget {
       child: Container(
         padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
-          color: AppTheme.backgroundWhite,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
           border: Border.all(color: AppTheme.dividerColor),
           boxShadow: [
@@ -55,7 +55,6 @@ class DoctorCard extends StatelessWidget {
                       Text(
                         doctor.fullName,
                         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: AppTheme.textPrimary,
                               fontWeight: FontWeight.w700,
                             ),
                       ),
@@ -63,7 +62,6 @@ class DoctorCard extends StatelessWidget {
                       Text(
                         'specialties.${doctor.specialty.toString().split('.').last}'.tr(),
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppTheme.textPrimary,
                             ),
                       ),
                     ],
@@ -92,9 +90,7 @@ class DoctorCard extends StatelessWidget {
             const SizedBox(height: AppTheme.spacing12),
             Text(
               doctor.languagesLabel,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(),
             ),
             const SizedBox(height: AppTheme.spacing16),
             Row(
@@ -103,9 +99,7 @@ class DoctorCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     availabilityDescription ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
                   ),
                 ),
                 TextButton.icon(
@@ -149,7 +143,6 @@ class _Avatar extends StatelessWidget {
         child: Text(
           initials,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppTheme.primaryBlue,
                 fontWeight: FontWeight.w700,
               ),
         ),
@@ -179,7 +172,7 @@ class _Badge extends StatelessWidget {
         vertical: AppTheme.spacing8,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.backgroundLight,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: Row(
@@ -189,13 +182,12 @@ class _Badge extends StatelessWidget {
             Icon(
               icon,
               size: iconSize,
-              color: iconColor ?? AppTheme.textSecondary,
+              color: iconColor,
             ),
           if (icon != null) const SizedBox(width: AppTheme.spacing4),
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
           ),

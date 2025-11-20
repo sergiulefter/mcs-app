@@ -68,7 +68,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundWhite,
       body: SafeArea(
         child: Padding(
           padding: AppTheme.screenPadding,
@@ -120,7 +119,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         Text(
           'language_selection.title'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
           textAlign: TextAlign.center,
@@ -131,7 +129,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         Text(
           'language_selection.subtitle'.tr(),
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
                 height: 1.5,
               ),
           textAlign: TextAlign.center,

@@ -77,17 +77,12 @@ class ProfileDetailRow extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppTheme.textTertiary,
-                      ),
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
                 const SizedBox(height: AppTheme.spacing4),
                 Text(
                   value,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: isNotProvided
-                            ? AppTheme.textTertiary
-                            : AppTheme.textPrimary,
                         fontStyle: isNotProvided
                             ? FontStyle.italic
                             : FontStyle.normal,

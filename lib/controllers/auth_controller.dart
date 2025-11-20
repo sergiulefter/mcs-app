@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/auth_service.dart';
-import '../services/firebase_service.dart';
 import '../models/user_model.dart';
 
 class AuthController extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   UserModel? _currentUser;
   bool _isLoading = false;
@@ -65,8 +65,13 @@ class AuthController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = _handleAuthException(e);
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'An unexpected error occurred: $e';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -90,8 +95,13 @@ class AuthController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = _handleAuthException(e);
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'An unexpected error occurred: $e';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -126,8 +136,13 @@ class AuthController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = _handleAuthException(e);
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = 'An unexpected error occurred: $e';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -195,11 +210,10 @@ class AuthController extends ChangeNotifier {
         'profileCompleted': true,
       };
 
-      await _firebaseService.updateDocument(
-        'users',
-        _currentUser!.uid,
-        profileData,
-      );
+      await _firestore
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update(profileData);
 
       // Update Firebase Auth display name if changed
       if (displayName != _currentUser!.displayName) {
@@ -232,11 +246,10 @@ class AuthController extends ChangeNotifier {
     }
 
     try {
-      await _firebaseService.updateDocument(
-        'users',
-        _currentUser!.uid,
-        {'preferredLanguage': languageCode},
-      );
+      await _firestore
+          .collection('users')
+          .doc(_currentUser!.uid)
+          .update({'preferredLanguage': languageCode});
 
       // Refresh current user data
       _currentUser = await _authService.getUserData(_currentUser!.uid);
@@ -253,5 +266,29 @@ class AuthController extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  // Handle Firebase Auth exceptions and convert to user-friendly messages
+  String _handleAuthException(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'weak-password':
+        return 'The password provided is too weak.';
+      case 'email-already-in-use':
+        return 'An account already exists for this email.';
+      case 'user-not-found':
+        return 'No user found for this email.';
+      case 'wrong-password':
+        return 'Wrong password provided.';
+      case 'invalid-email':
+        return 'The email address is not valid.';
+      case 'user-disabled':
+        return 'This user account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many requests. Please try again later.';
+      case 'operation-not-allowed':
+        return 'This operation is not allowed.';
+      default:
+        return 'An error occurred: ${e.message}';
+    }
   }
 }

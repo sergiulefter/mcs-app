@@ -110,8 +110,11 @@ flutter:
 # Flutter Native Splash Configuration
 # Configured to show Flutter UI (SplashScreen) as quickly as possible
 flutter_native_splash:
-  # White background to match our SplashScreen
+  # Light mode background (white)
   color: "#FFFFFF"
+
+  # Dark mode background (matches dark theme)
+  color_dark: "#121212"
 
   # No image - instant transition to Flutter UI
   android: true
@@ -121,7 +124,8 @@ flutter_native_splash:
   # Android 12+ specific settings
   android_12:
     color: "#FFFFFF"
-    # No icon - just white background
+    color_dark: "#121212"
+    # No icon - just background color
 
   # Remove native splash immediately when Flutter draws first frame
   fullscreen: false

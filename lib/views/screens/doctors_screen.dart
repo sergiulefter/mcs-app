@@ -82,7 +82,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: _isLoading
             ? _buildLoadingState(context)
@@ -95,9 +94,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   Widget _buildLoadingState(BuildContext context) {
     return const Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
-      ),
+      child: CircularProgressIndicator(),
     );
   }
 
@@ -125,16 +122,13 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             Text(
               'doctors.error_loading_title'.tr(),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
             ),
             const SizedBox(height: AppTheme.spacing8),
             Text(
               'doctors.error_loading_subtitle'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppTheme.spacing24),
@@ -143,8 +137,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               icon: const Icon(Icons.refresh),
               label: Text('doctors.retry_button'.tr()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
-                foregroundColor: AppTheme.textOnPrimary,
                 minimumSize: const Size(200, 56),
               ),
             ),
@@ -159,7 +151,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
     return RefreshIndicator(
       onRefresh: _loadDoctors,
-      color: AppTheme.primaryBlue,
       child: ListView(
         padding: AppTheme.screenPadding,
         children: [
@@ -213,17 +204,14 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       children: [
         Text(
           'doctors.title'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppTheme.textPrimary,
+          style: Theme.of(context).textTheme.displaySmall?.copyWith( 
                 fontWeight: FontWeight.w700,
               ),
         ),
         const SizedBox(height: AppTheme.spacing12),
         Text(
           'doctors.subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
       ],
     );
@@ -237,7 +225,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         prefixIcon: const Icon(Icons.search_outlined),
         hintText: 'doctors.search_hint'.tr(),
         filled: true,
-        fillColor: AppTheme.backgroundWhite,
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
           borderSide: BorderSide(color: AppTheme.dividerColor),
@@ -258,7 +246,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     return Container(
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(color: AppTheme.dividerColor),
       ),
@@ -270,8 +258,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             children: [
               Text(
                 'doctors.filters.title'.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppTheme.textPrimary,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(  
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -285,7 +272,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           Text(
             'doctors.filters.specialty'.tr(),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -306,11 +292,9 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                   setState(() => _selectedSpecialty = specialty);
                 },
                 labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: isSelected ? AppTheme.textOnPrimary : AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                 selectedColor: AppTheme.primaryBlue,
-                backgroundColor: AppTheme.backgroundLight,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                 ),
@@ -323,7 +307,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           Text(
             'doctors.filters.availability'.tr(),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -333,10 +316,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             label: Text('doctors.filters.available_now'.tr()),
             onSelected: (_) => setState(() => _availableOnly = !_availableOnly),
             labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: _availableOnly ? AppTheme.textOnPrimary : AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
-            backgroundColor: AppTheme.backgroundLight,
             selectedColor: AppTheme.secondaryGreen,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
@@ -354,15 +335,12 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         Text(
           'doctors.results_title'.tr(),
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
         ),
         Text(
           'doctors.results_count'.tr(namedArgs: {'count': count.toString()}),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       ],
     );
@@ -372,7 +350,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     return Container(
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(color: AppTheme.dividerColor),
       ),
@@ -395,7 +373,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           Text(
             'doctors.empty_state_title'.tr(),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppTheme.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
             textAlign: TextAlign.center,
@@ -403,9 +380,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           const SizedBox(height: AppTheme.spacing8),
           Text(
             'doctors.empty_state_subtitle'.tr(),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+            style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
         ],

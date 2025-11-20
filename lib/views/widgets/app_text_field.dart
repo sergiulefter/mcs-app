@@ -110,7 +110,6 @@ class AppTextField extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -118,9 +117,7 @@ class AppTextField extends StatelessWidget {
               const SizedBox(width: AppTheme.spacing8),
               Text(
                 optionalText ?? '(Optional)',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textTertiary,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
           ],
@@ -143,14 +140,12 @@ class AppTextField extends StatelessWidget {
             prefixIcon: prefixIcon != null
                 ? Icon(
                     prefixIcon,
-                    color: AppTheme.textSecondary,
                   )
                 : null,
             suffixIcon: suffixIcon != null
                 ? IconButton(
                     icon: Icon(
                       suffixIcon,
-                      color: AppTheme.textSecondary,
                     ),
                     onPressed: onSuffixIconTap,
                   )

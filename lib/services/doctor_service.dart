@@ -1,47 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/doctor_model.dart';
 import '../models/medical_specialty.dart';
-import 'firebase_service.dart';
 
 class DoctorService {
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String _collection = 'doctors';
 
   /// Fetch all doctors from Firestore
   Future<List<DoctorModel>> fetchAllDoctors() async {
-    try {
-      final querySnapshot = await _firebaseService.getAllDocuments(_collection);
-      return querySnapshot.docs
-          .map((doc) => DoctorModel.fromMap(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
-          .toList();
-    } catch (e) {
-      throw 'Error fetching doctors: $e';
-    }
+    final querySnapshot = await _firestore.collection(_collection).get();
+    return querySnapshot.docs
+        .map((doc) => DoctorModel.fromMap(
+              doc.data(),
+              doc.id,
+            ))
+        .toList();
   }
 
   /// Fetch a single doctor by UID
   Future<DoctorModel?> fetchDoctorById(String uid) async {
-    try {
-      final docSnapshot = await _firebaseService.getDocumentById(_collection, uid);
-      if (!docSnapshot.exists) return null;
+    final docSnapshot = await _firestore.collection(_collection).doc(uid).get();
+    if (!docSnapshot.exists) return null;
 
-      return DoctorModel.fromMap(
-        docSnapshot.data() as Map<String, dynamic>,
-        docSnapshot.id,
-      );
-    } catch (e) {
-      throw 'Error fetching doctor: $e';
-    }
+    return DoctorModel.fromMap(
+      docSnapshot.data() as Map<String, dynamic>,
+      docSnapshot.id,
+    );
   }
 
   /// Stream all doctors (real-time updates)
   Stream<List<DoctorModel>> streamAllDoctors() {
-    return _firebaseService.streamCollection(_collection).map(
+    return _firestore.collection(_collection).snapshots().map(
           (snapshot) => snapshot.docs
               .map((doc) => DoctorModel.fromMap(
-                    doc.data() as Map<String, dynamic>,
+                    doc.data(),
                     doc.id,
                   ))
               .toList(),
@@ -50,7 +42,7 @@ class DoctorService {
 
   /// Stream a single doctor (real-time updates)
   Stream<DoctorModel?> streamDoctor(String uid) {
-    return _firebaseService.streamDocument(_collection, uid).map((snapshot) {
+    return _firestore.collection(_collection).doc(uid).snapshots().map((snapshot) {
       if (!snapshot.exists) return null;
       return DoctorModel.fromMap(
         snapshot.data() as Map<String, dynamic>,
@@ -62,60 +54,46 @@ class DoctorService {
   /// Fetch doctors by specialty
   Future<List<DoctorModel>> fetchDoctorsBySpecialty(
       MedicalSpecialty specialty) async {
-    try {
-      final querySnapshot = await _firebaseService.queryDocuments(
-        _collection,
-        field: 'specialty',
-        isEqualTo: specialty.name,
-      );
+    final querySnapshot = await _firestore
+        .collection(_collection)
+        .where('specialty', isEqualTo: specialty.name)
+        .get();
 
-      return querySnapshot.docs
-          .map((doc) => DoctorModel.fromMap(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
-          .toList();
-    } catch (e) {
-      throw 'Error fetching doctors by specialty: $e';
-    }
+    return querySnapshot.docs
+        .map((doc) => DoctorModel.fromMap(
+              doc.data(),
+              doc.id,
+            ))
+        .toList();
   }
 
   /// Fetch only available doctors
   Future<List<DoctorModel>> fetchAvailableDoctors() async {
-    try {
-      final querySnapshot = await _firebaseService.queryDocuments(
-        _collection,
-        field: 'isAvailable',
-        isEqualTo: true,
-      );
+    final querySnapshot = await _firestore
+        .collection(_collection)
+        .where('isAvailable', isEqualTo: true)
+        .get();
 
-      final doctors = querySnapshot.docs
-          .map((doc) => DoctorModel.fromMap(
-                doc.data() as Map<String, dynamic>,
-                doc.id,
-              ))
-          .toList();
+    final doctors = querySnapshot.docs
+        .map((doc) => DoctorModel.fromMap(
+              doc.data(),
+              doc.id,
+            ))
+        .toList();
 
-      // Filter out doctors on vacation
-      return doctors.where((doctor) => doctor.isCurrentlyAvailable).toList();
-    } catch (e) {
-      throw 'Error fetching available doctors: $e';
-    }
+    // Filter out doctors on vacation
+    return doctors.where((doctor) => doctor.isCurrentlyAvailable).toList();
   }
 
   /// Search doctors by name or specialty
   Future<List<DoctorModel>> searchDoctors(String query) async {
-    try {
-      final allDoctors = await fetchAllDoctors();
-      final lowerQuery = query.toLowerCase();
+    final allDoctors = await fetchAllDoctors();
+    final lowerQuery = query.toLowerCase();
 
-      return allDoctors.where((doctor) {
-        return doctor.fullName.toLowerCase().contains(lowerQuery) ||
-            doctor.specialty.name.toLowerCase().contains(lowerQuery);
-      }).toList();
-    } catch (e) {
-      throw 'Error searching doctors: $e';
-    }
+    return allDoctors.where((doctor) {
+      return doctor.fullName.toLowerCase().contains(lowerQuery) ||
+          doctor.specialty.name.toLowerCase().contains(lowerQuery);
+    }).toList();
   }
 
   /// Filter doctors by multiple criteria
@@ -146,23 +124,15 @@ class DoctorService {
 
   /// Update doctor profile (for doctor self-editing)
   Future<void> updateDoctorProfile(String uid, Map<String, dynamic> data) async {
-    try {
-      await _firebaseService.updateDocument(_collection, uid, data);
-    } catch (e) {
-      throw 'Error updating doctor profile: $e';
-    }
+    await _firestore.collection(_collection).doc(uid).update(data);
   }
 
   /// Update doctor availability status
   Future<void> updateAvailability(String uid, bool isAvailable) async {
-    try {
-      await _firebaseService.updateDocument(_collection, uid, {
-        'isAvailable': isAvailable,
-        'lastActive': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      throw 'Error updating availability: $e';
-    }
+    await _firestore.collection(_collection).doc(uid).update({
+      'isAvailable': isAvailable,
+      'lastActive': DateTime.now().toIso8601String(),
+    });
   }
 
   /// Add vacation period for a doctor
@@ -170,18 +140,14 @@ class DoctorService {
     String uid,
     DateRange vacationPeriod,
   ) async {
-    try {
-      final doctor = await fetchDoctorById(uid);
-      if (doctor == null) throw 'Doctor not found';
+    final doctor = await fetchDoctorById(uid);
+    if (doctor == null) throw Exception('Doctor not found');
 
-      final updatedVacations = [...doctor.vacationPeriods, vacationPeriod];
+    final updatedVacations = [...doctor.vacationPeriods, vacationPeriod];
 
-      await _firebaseService.updateDocument(_collection, uid, {
-        'vacationPeriods': updatedVacations.map((e) => e.toMap()).toList(),
-      });
-    } catch (e) {
-      throw 'Error adding vacation period: $e';
-    }
+    await _firestore.collection(_collection).doc(uid).update({
+      'vacationPeriods': updatedVacations.map((e) => e.toMap()).toList(),
+    });
   }
 
   /// Remove vacation period for a doctor
@@ -189,43 +155,27 @@ class DoctorService {
     String uid,
     int vacationIndex,
   ) async {
-    try {
-      final doctor = await fetchDoctorById(uid);
-      if (doctor == null) throw 'Doctor not found';
+    final doctor = await fetchDoctorById(uid);
+    if (doctor == null) throw Exception('Doctor not found');
 
-      final updatedVacations = List<DateRange>.from(doctor.vacationPeriods);
-      if (vacationIndex >= 0 && vacationIndex < updatedVacations.length) {
-        updatedVacations.removeAt(vacationIndex);
-      }
-
-      await _firebaseService.updateDocument(_collection, uid, {
-        'vacationPeriods': updatedVacations.map((e) => e.toMap()).toList(),
-      });
-    } catch (e) {
-      throw 'Error removing vacation period: $e';
+    final updatedVacations = List<DateRange>.from(doctor.vacationPeriods);
+    if (vacationIndex >= 0 && vacationIndex < updatedVacations.length) {
+      updatedVacations.removeAt(vacationIndex);
     }
+
+    await _firestore.collection(_collection).doc(uid).update({
+      'vacationPeriods': updatedVacations.map((e) => e.toMap()).toList(),
+    });
   }
 
   /// Create a new doctor profile (admin function)
   Future<void> createDoctorProfile(DoctorModel doctor) async {
-    try {
-      await _firebaseService.setDocument(
-        _collection,
-        doctor.uid,
-        doctor.toMap(),
-      );
-    } catch (e) {
-      throw 'Error creating doctor profile: $e';
-    }
+    await _firestore.collection(_collection).doc(doctor.uid).set(doctor.toMap());
   }
 
   /// Delete doctor profile (admin function)
   Future<void> deleteDoctorProfile(String uid) async {
-    try {
-      await _firebaseService.deleteDocument(_collection, uid);
-    } catch (e) {
-      throw 'Error deleting doctor profile: $e';
-    }
+    await _firestore.collection(_collection).doc(uid).delete();
   }
 
   /// Get doctors sorted by experience

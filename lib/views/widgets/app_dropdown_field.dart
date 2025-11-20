@@ -85,7 +85,6 @@ class AppDropdownField extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -93,9 +92,7 @@ class AppDropdownField extends StatelessWidget {
               const SizedBox(width: AppTheme.spacing8),
               Text(
                 optionalText ?? '(Optional)',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textTertiary,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(),
               ),
             ],
           ],
@@ -109,7 +106,6 @@ class AppDropdownField extends StatelessWidget {
             prefixIcon: prefixIcon != null
                 ? Icon(
                     prefixIcon,
-                    color: AppTheme.textSecondary,
                   )
                 : null,
           ),

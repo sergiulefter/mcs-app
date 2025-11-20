@@ -8,7 +8,6 @@ class ConsultationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: Text('consultations.title'.tr()),
       ),
@@ -35,16 +34,13 @@ class ConsultationsScreen extends StatelessWidget {
               Text(
                 'consultations.title'.tr(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
               ),
               const SizedBox(height: AppTheme.spacing12),
               Text(
                 'consultations.subtitle'.tr(),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppTheme.sectionSpacing),
@@ -68,9 +64,7 @@ class ConsultationsScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         'consultations.placeholder_info'.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.textPrimary,
-                            ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
                       ),
                     ),
                   ],

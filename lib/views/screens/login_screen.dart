@@ -55,7 +55,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -109,7 +108,6 @@ class _LoginScreenState extends State<LoginScreen> {
           child: const Icon(
             Icons.medical_services_outlined,
             size: AppTheme.iconXLarge,
-            color: AppTheme.primaryBlue,
           ),
         ),
         const SizedBox(height: AppTheme.spacing24),
@@ -118,7 +116,6 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           'auth.sign_in'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
         ),
@@ -127,9 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Subtitle
         Text(
           'auth.sign_in_subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
         ),
       ],
     );
@@ -184,7 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Text(
           'auth.forgot_password'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.primaryBlue,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -218,9 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           'auth.no_account'.tr(),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
         ),
         TextButton(
           onPressed: () {

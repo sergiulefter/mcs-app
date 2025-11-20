@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'firebase_options.dart';
 import 'controllers/auth_controller.dart';
+import 'controllers/theme_controller.dart';
 import 'views/screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
@@ -53,16 +54,23 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(create: (_) => ThemeController()),
       ],
-      child: MaterialApp(
-        title: AppConstants.appName,
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: SplashScreen(firebaseInitialization: firebaseInitialization),
-        // Localization configuration
-        localizationsDelegates: context.localizationDelegates,
-        supportedLocales: context.supportedLocales,
-        locale: context.locale,
+      child: Consumer<ThemeController>(
+        builder: (context, themeController, child) {
+          return MaterialApp(
+            title: AppConstants.appName,
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeController.themeMode,
+            home: SplashScreen(firebaseInitialization: firebaseInitialization),
+            // Localization configuration
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+          );
+        },
       ),
     );
   }

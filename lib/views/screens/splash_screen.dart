@@ -115,7 +115,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundWhite,
       body: SafeArea(
         child: Column(
           children: [
@@ -164,7 +163,6 @@ class _SplashScreenState extends State<SplashScreen> {
     return Text(
       AppConstants.appName,
       style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            color: AppTheme.textPrimary,
             fontWeight: FontWeight.w700,
             letterSpacing: -1.0,
           ),
@@ -174,9 +172,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget _buildAppDescription() {
     return Text(
       AppConstants.appDescription,
-      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppTheme.textSecondary,
-          ),
+      style: Theme.of(context).textTheme.bodyLarge,
       textAlign: TextAlign.center,
     );
   }
@@ -187,7 +183,6 @@ class _SplashScreenState extends State<SplashScreen> {
         SizedBox(
           width: 200,
           child: LinearProgressIndicator(
-            backgroundColor: AppTheme.dividerColor,
             valueColor: const AlwaysStoppedAnimation<Color>(
               AppTheme.primaryBlue,
             ),
@@ -197,9 +192,7 @@ class _SplashScreenState extends State<SplashScreen> {
         const SizedBox(height: AppTheme.spacing16),
         Text(
           'Loading...',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppTheme.textTertiary,
-              ),
+          style: Theme.of(context).textTheme.bodySmall,
         ),
       ],
     );

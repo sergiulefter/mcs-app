@@ -44,6 +44,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_completed', true);
 
+    // Auto-detect and set system theme as default on first launch
+    // User can override this in Account settings later
+    if (!prefs.containsKey('theme_mode')) {
+      await prefs.setString('theme_mode', 'system');
+    }
+
     if (!mounted) return;
 
     // Navigate to Login screen

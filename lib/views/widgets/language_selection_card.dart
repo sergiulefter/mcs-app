@@ -63,9 +63,9 @@ class LanguageSelectionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? effectiveSelectedColor.withValues(alpha: 0.1)
-              : AppTheme.backgroundWhite,
+              : Theme.of(context).colorScheme.surface,
           border: Border.all(
-            color: isSelected ? effectiveSelectedColor : AppTheme.dividerColor,
+            color: isSelected ? effectiveSelectedColor : Theme.of(context).colorScheme.outline,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
@@ -85,7 +85,6 @@ class LanguageSelectionCard extends StatelessWidget {
               child: Text(
                 languageName,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppTheme.textPrimary,
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.w500,
                     ),

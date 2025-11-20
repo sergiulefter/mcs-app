@@ -84,16 +84,13 @@ class ActionTile extends StatelessWidget {
                   Text(
                     title,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
                   const SizedBox(height: AppTheme.spacing4),
                   Text(
                     subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(),
                   ),
                 ],
               ),

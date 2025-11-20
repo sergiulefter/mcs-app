@@ -22,7 +22,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       appBar: _buildAppBar(context),
       body: SafeArea(
         child: Column(
@@ -61,16 +60,14 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: AppTheme.backgroundWhite,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppTheme.textPrimary),
+        icon: const Icon(Icons.arrow_back),
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: Text(
         widget.doctor.fullName,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
       ),
@@ -81,7 +78,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Container(
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(color: AppTheme.dividerColor),
         boxShadow: [
@@ -106,7 +103,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                       widget.doctor.fullName,
                       style:
                           Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: AppTheme.textPrimary,
                                 fontWeight: FontWeight.w700,
                               ),
                     ),
@@ -114,7 +110,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     Text(
                       _getSpecialtyName(widget.doctor.specialty),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                     ),
@@ -158,7 +153,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Container(
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         border: Border.all(color: AppTheme.dividerColor),
       ),
@@ -222,7 +217,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               Text(
                 widget.doctor.bio,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textPrimary,
                       height: 1.6,
                     ),
                 maxLines: _isBioExpanded ? null : 5,
@@ -313,7 +307,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                     .textTheme
                                     .titleMedium
                                     ?.copyWith(
-                                      color: AppTheme.textPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -322,10 +315,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                                 education.institution,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                      color: AppTheme.textSecondary,
-                                    ),
+                                    .bodyMedium,
                               ),
                             ],
                           ),
@@ -339,13 +329,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                         vertical: AppTheme.spacing4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.backgroundLight,
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                       ),
                       child: Text(
                         education.year.toString(),
                         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: AppTheme.textSecondary,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -425,7 +414,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                         ? 'doctor_profile.available_now'.tr()
                         : 'doctor_profile.unavailable'.tr(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: AppTheme.textPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
@@ -436,9 +424,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                 widget.doctor.isCurrentlyAvailable
                     ? 'doctor_profile.accepting_consultations'.tr()
                     : 'doctor_profile.not_accepting_consultations'.tr(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               if (activeVacations.isNotEmpty) ...[
                 const SizedBox(height: AppTheme.spacing16),
@@ -463,9 +449,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                               'end': dateFormat.format(vacation.endDate),
                             }),
                             style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppTheme.textSecondary,
-                                    ),
+                                Theme.of(context).textTheme.bodySmall,
                           ),
                         ),
                       ],
@@ -602,7 +586,6 @@ class _Badge extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppTheme.textSecondary,
                   fontWeight: FontWeight.w600,
                 ),
           ),
@@ -622,7 +605,6 @@ class _SectionHeader extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            color: AppTheme.textPrimary,
             fontWeight: FontWeight.w600,
           ),
     );
@@ -662,7 +644,6 @@ class _InfoColumn extends StatelessWidget {
         Text(
           value,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
           textAlign: TextAlign.center,

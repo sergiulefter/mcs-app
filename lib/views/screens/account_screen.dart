@@ -9,6 +9,7 @@ import '../widgets/user_header_card.dart';
 import '../widgets/profile_detail_row.dart';
 import '../widgets/action_tile.dart';
 import '../widgets/language_selection_card.dart';
+import '../../controllers/theme_controller.dart';
 import 'login_screen.dart';
 import 'complete_profile_screen.dart';
 
@@ -22,20 +23,16 @@ class AccountScreen extends StatelessWidget {
 
     if (user == null) {
       return Scaffold(
-        backgroundColor: AppTheme.backgroundLight,
         body: Center(
           child: Text(
             'account.no_user_logged_in'.tr(),
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
             padding: AppTheme.screenPadding,
@@ -90,7 +87,6 @@ class AccountScreen extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppTheme.textPrimary,
             fontWeight: FontWeight.w600,
           ),
     );
@@ -101,7 +97,7 @@ class AccountScreen extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -157,7 +153,7 @@ class AccountScreen extends StatelessWidget {
   Widget _buildQuickActionsCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -188,6 +184,17 @@ class AccountScreen extends StatelessWidget {
             subtitle: 'account.change_language_desc'.tr(),
             onTap: () => _showLanguageDialog(context),
           ),
+          _buildDivider(),
+          Consumer<ThemeController>(
+            builder: (context, themeController, _) {
+              return ActionTile(
+                icon: Icons.palette_outlined,
+                title: 'account.appearance'.tr(),
+                subtitle: themeController.getThemeModeName(),
+                onTap: () => _showThemeDialog(context, themeController),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -196,7 +203,7 @@ class AccountScreen extends StatelessWidget {
   Widget _buildAccountCard(BuildContext context, dynamic user) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -405,6 +412,83 @@ class AccountScreen extends StatelessWidget {
                       backgroundColor: AppTheme.successGreen,
                     ),
                   );
+                }
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text('common.cancel'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context, ThemeController themeController) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('account.select_theme'.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RadioListTile<ThemeMode>(
+              title: Text('account.light_mode'.tr()),
+              value: ThemeMode.light,
+              groupValue: themeController.themeMode,
+              onChanged: (value) async {
+                if (value != null) {
+                  await themeController.setThemeMode(value);
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('account.theme_changed'.tr()),
+                        backgroundColor: AppTheme.successGreen,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: Text('account.dark_mode'.tr()),
+              value: ThemeMode.dark,
+              groupValue: themeController.themeMode,
+              onChanged: (value) async {
+                if (value != null) {
+                  await themeController.setThemeMode(value);
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('account.theme_changed'.tr()),
+                        backgroundColor: AppTheme.successGreen,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+            RadioListTile<ThemeMode>(
+              title: Text('account.system_mode'.tr()),
+              value: ThemeMode.system,
+              groupValue: themeController.themeMode,
+              onChanged: (value) async {
+                if (value != null) {
+                  await themeController.setThemeMode(value);
+                  if (dialogContext.mounted) {
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('account.theme_changed'.tr()),
+                        backgroundColor: AppTheme.successGreen,
+                      ),
+                    );
+                  }
                 }
               },
             ),

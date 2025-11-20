@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
     final user = authController.currentUser;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: AppTheme.screenPadding,
@@ -69,7 +68,7 @@ class HomeScreen extends StatelessWidget {
         Text(
           greeting,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppTheme.textSecondary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
         ),
@@ -77,7 +76,6 @@ class HomeScreen extends StatelessWidget {
         Text(
           displayName ?? 'home.welcome'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
         ),
@@ -85,7 +83,7 @@ class HomeScreen extends StatelessWidget {
         Text(
           today,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textTertiary,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
         ),
       ],
@@ -117,7 +115,6 @@ class HomeScreen extends StatelessWidget {
               Text(
                 'home.profile_incomplete'.tr(),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -127,7 +124,7 @@ class HomeScreen extends StatelessWidget {
           Text(
             'home.profile_incomplete_desc'.tr(),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: AppTheme.spacing12),
@@ -160,7 +157,6 @@ class HomeScreen extends StatelessWidget {
         Text(
           'home.quick_actions'.tr(),
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
         ),
@@ -208,7 +204,6 @@ class HomeScreen extends StatelessWidget {
             Text(
               'home.active_consultations'.tr(),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -226,10 +221,10 @@ class HomeScreen extends StatelessWidget {
           width: double.infinity,
           padding: AppTheme.cardPadding,
           decoration: BoxDecoration(
-            color: AppTheme.backgroundWhite,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
             border: Border.all(
-              color: AppTheme.dividerColor,
+              color: Theme.of(context).colorScheme.outline,
             ),
           ),
           child: Column(
@@ -238,20 +233,19 @@ class HomeScreen extends StatelessWidget {
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
-                  color: AppTheme.dividerColor.withValues(alpha: 0.5),
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.assignment_outlined,
                   size: 32,
-                  color: AppTheme.textTertiary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: AppTheme.spacing16),
               Text(
                 'home.no_active_consultations'.tr(),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -259,7 +253,7 @@ class HomeScreen extends StatelessWidget {
               Text(
                 'home.no_active_consultations_desc'.tr(),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                 textAlign: TextAlign.center,
               ),
@@ -274,15 +268,15 @@ class HomeScreen extends StatelessWidget {
     return Container(
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.textTertiary.withValues(alpha: 0.1),
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline,
-            color: AppTheme.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             size: AppTheme.iconSmall,
           ),
           const SizedBox(width: AppTheme.spacing12),
@@ -290,7 +284,7 @@ class HomeScreen extends StatelessWidget {
             child: Text(
               'home.medical_disclaimer'.tr(),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     height: 1.5,
                   ),
             ),

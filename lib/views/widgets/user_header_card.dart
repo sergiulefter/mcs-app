@@ -54,7 +54,7 @@ class UserHeaderCard extends StatelessWidget {
     return Container(
       padding: AppTheme.cardPadding,
       decoration: BoxDecoration(
-        color: AppTheme.backgroundWhite,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         boxShadow: [
           BoxShadow(
@@ -78,7 +78,6 @@ class UserHeaderCard extends StatelessWidget {
                 Text(
                   effectiveName,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppTheme.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
@@ -86,9 +85,7 @@ class UserHeaderCard extends StatelessWidget {
                 // Email
                 Text(
                   email,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.textSecondary,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
                 ),
                 const SizedBox(height: AppTheme.spacing8),
                 // Account Type Badge
@@ -130,7 +127,6 @@ class UserHeaderCard extends StatelessWidget {
       child: Text(
         initials,
         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: AppTheme.primaryBlue,
               fontWeight: FontWeight.w600,
             ),
       ),

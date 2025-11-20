@@ -84,7 +84,6 @@ class AppDatePickerField extends StatelessWidget {
             Text(
               label,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -92,9 +91,7 @@ class AppDatePickerField extends StatelessWidget {
               const SizedBox(width: AppTheme.spacing8),
               Text(
                 optionalText ?? '(Optional)',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textTertiary,
-                    ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(),
               ),
             ],
           ],
@@ -109,11 +106,9 @@ class AppDatePickerField extends StatelessWidget {
               hintText: hintText,
               prefixIcon: Icon(
                 prefixIcon ?? Icons.calendar_today_outlined,
-                color: AppTheme.textSecondary,
               ),
               suffixIcon: const Icon(
                 Icons.arrow_drop_down,
-                color: AppTheme.textSecondary,
               ),
               errorText: errorText,
               border: OutlineInputBorder(

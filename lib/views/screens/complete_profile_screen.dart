@@ -110,7 +110,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final now = DateTime.now();
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text('profile.complete_title'.tr()),
@@ -238,15 +237,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           children: [
             Text(
               'profile.profile_setup'.tr(),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(),
             ),
             Text(
               'profile.step_of'.tr(namedArgs: {'current': '1', 'total': '1'}),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(),
             ),
           ],
         ),
@@ -283,16 +278,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         Text(
           'profile.complete_title'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: AppTheme.textPrimary,
                 fontWeight: FontWeight.w700,
               ),
         ),
         const SizedBox(height: AppTheme.spacing8),
         Text(
           'profile.complete_subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
         ),
       ],
     );
@@ -322,9 +314,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Widget _buildInfoText() {
     return Text(
       'profile.skip_info'.tr(),
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.textTertiary,
-          ),
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(),
       textAlign: TextAlign.center,
     );
   }
