@@ -210,8 +210,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         ),
         const SizedBox(height: AppTheme.spacing16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: AppTheme.spacing16,
+          runSpacing: AppTheme.spacing16,
           children: [
             SizedBox(
               width: 100,
@@ -222,7 +224,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
-            const SizedBox(width: AppTheme.spacing16),
             SizedBox(
               width: 100,
               child: StatCard(
@@ -232,7 +233,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Theme.of(context).extension<AppSemanticColors>()!.warning,
               ),
             ),
-            const SizedBox(width: AppTheme.spacing16),
             SizedBox(
               width: 100,
               child: StatCard(
