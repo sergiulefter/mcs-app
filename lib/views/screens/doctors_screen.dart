@@ -268,8 +268,12 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
   Future<void> _openFiltersSheet(BuildContext context) async {
+    var tempSelectedSpecialty = _selectedSpecialty;
+    var tempAvailableOnly = _availableOnly;
+
     await showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
@@ -277,63 +281,109 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         ),
       ),
       builder: (sheetContext) {
-        return SafeArea(
-          child: FractionallySizedBox(
-            heightFactor: 0.8,
-            child: SingleChildScrollView(
-              padding: AppTheme.cardPadding,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'doctors.filters.title'.tr(),
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
+        final bottomInset = MediaQuery.of(sheetContext).viewInsets.bottom;
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.65,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return StatefulBuilder(
+              builder: (context, setModalState) {
+                return SafeArea(
+                  child: Padding(
+                    padding: AppTheme.cardPadding.add(
+                      EdgeInsets.only(bottom: bottomInset),
+                    ),
+                    child: ListView(
+                      controller: scrollController,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'doctors.filters.title'.tr(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(sheetContext).pop(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTheme.spacing16),
-                  _buildFiltersContent(context),
-                  const SizedBox(height: AppTheme.spacing16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            _resetFilters();
-                            Navigator.of(sheetContext).pop();
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () => Navigator.of(sheetContext).pop(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppTheme.spacing16),
+                        _buildFiltersContent(
+                          context,
+                          selectedSpecialty: tempSelectedSpecialty,
+                          availableOnly: tempAvailableOnly,
+                          onSpecialtyChanged: (value) {
+                            setModalState(() {
+                              tempSelectedSpecialty = value;
+                            });
                           },
-                          child: Text('doctors.filters.clear'.tr()),
+                          onAvailabilityChanged: (value) {
+                            setModalState(() {
+                              tempAvailableOnly = value;
+                            });
+                          },
                         ),
-                      ),
-                      const SizedBox(width: AppTheme.spacing12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => Navigator.of(sheetContext).pop(),
-                          child: Text('common.apply'.tr()),
+                        const SizedBox(height: AppTheme.spacing16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  setModalState(() {
+                                    tempSelectedSpecialty = 'all';
+                                    tempAvailableOnly = false;
+                                  });
+                                  setState(() {
+                                    _selectedSpecialty = 'all';
+                                    _availableOnly = false;
+                                  });
+                                  Navigator.of(sheetContext).pop();
+                                },
+                                child: Text('doctors.filters.clear'.tr()),
+                              ),
+                            ),
+                            const SizedBox(width: AppTheme.spacing12),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedSpecialty = tempSelectedSpecialty;
+                                    _availableOnly = tempAvailableOnly;
+                                  });
+                                  Navigator.of(sheetContext).pop();
+                                },
+                                child: Text('common.apply'.tr()),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  SizedBox(height: MediaQuery.paddingOf(context).bottom),
-                ],
-              ),
-            ),
-          ),
+                );
+              },
+            );
+          },
         );
       },
     );
   }
 
-  Widget _buildFiltersContent(BuildContext context) {
+  Widget _buildFiltersContent(
+    BuildContext context, {
+    required String selectedSpecialty,
+    required bool availableOnly,
+    required ValueChanged<String> onSpecialtyChanged,
+    required ValueChanged<bool> onAvailabilityChanged,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -348,7 +398,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           spacing: AppTheme.spacing12,
           runSpacing: AppTheme.spacing12,
           children: _specialtyOptions.map((specialty) {
-            final isSelected = specialty == _selectedSpecialty;
+            final isSelected = specialty == selectedSpecialty;
             return ChoiceChip(
               label: Text(
                 specialty == 'all'
@@ -356,21 +406,28 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                     : 'specialties.$specialty'.tr(),
               ),
               selected: isSelected,
-              onSelected: (_) {
-                setState(() => _selectedSpecialty = specialty);
-              },
-              labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                onSelected: (_) {
+                  onSpecialtyChanged(specialty);
+                },
+                labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                selectedColor: colorScheme.primaryContainer,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                checkmarkColor: colorScheme.onPrimaryContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  side: BorderSide(
+                    color: isSelected
+                        ? colorScheme.primary.withValues(alpha: 0.5)
+                        : Theme.of(context).dividerColor,
                   ),
-                selectedColor: Theme.of(context).colorScheme.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                side: BorderSide(color: Theme.of(context).dividerColor),
-              ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: AppTheme.spacing24),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: AppTheme.spacing24),
         Text(
           'doctors.filters.availability'.tr(),
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -379,21 +436,28 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         ),
         const SizedBox(height: AppTheme.spacing12),
         FilterChip(
-          selected: _availableOnly,
-          label: Text('doctors.filters.available_now'.tr()),
-          onSelected: (_) => setState(() => _availableOnly = !_availableOnly),
-          labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+            selected: availableOnly,
+            label: Text('doctors.filters.available_now'.tr()),
+            onSelected: (_) => onAvailabilityChanged(!availableOnly),
+            labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
+            selectedColor: colorScheme.secondaryContainer,
+            checkmarkColor: colorScheme.onSecondaryContainer,
+            backgroundColor: colorScheme.surfaceContainerHighest,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              side: BorderSide(
+                color: availableOnly
+                    ? colorScheme.secondary.withValues(alpha: 0.5)
+                    : Theme.of(context).dividerColor,
               ),
-            selectedColor: Theme.of(context).colorScheme.secondary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            side: BorderSide(color: Theme.of(context).dividerColor),
+            ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
+    }
 
   Widget _buildResultsHeader(BuildContext context, int count) {
     return Row(
@@ -430,3 +494,4 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
 }
+

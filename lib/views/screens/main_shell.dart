@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/navigation_controller.dart';
+import '../../utils/app_theme.dart';
 import 'home_screen.dart';
 import 'doctors_screen.dart';
 import 'consultations_screen.dart';
@@ -49,33 +50,73 @@ class _MainShellState extends State<MainShell> {
           index: _currentIndex,
           children: _screens,
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          key: ValueKey(locale.languageCode),
-          currentIndex: _currentIndex,
-          onTap: _onTabTapped,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.home_outlined),
-              activeIcon: const Icon(Icons.home),
-              label: 'navigation.home'.tr(),
+        bottomNavigationBar: Theme(
+          data: Theme.of(context).copyWith(
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            elevation: 0,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.search_outlined),
-              activeIcon: const Icon(Icons.search),
-              label: 'navigation.doctors'.tr(),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.assignment_outlined),
-              activeIcon: const Icon(Icons.assignment),
-              label: 'navigation.consultations'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.person_outlined),
-              activeIcon: const Icon(Icons.person),
-              label: 'navigation.account'.tr(),
-            ),
-          ],
+            key: ValueKey(locale.languageCode),
+            currentIndex: _currentIndex,
+            onTap: _onTabTapped,
+            items: [
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.home_outlined, false),
+                activeIcon: _buildNavIcon(Icons.home, true),
+                label: 'navigation.home'.tr(),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.search_outlined, false),
+                activeIcon: _buildNavIcon(Icons.search, true),
+                label: 'navigation.doctors'.tr(),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.assignment_outlined, false),
+                activeIcon: _buildNavIcon(Icons.assignment, true),
+                label: 'navigation.consultations'.tr(),
+              ),
+              BottomNavigationBarItem(
+                icon: _buildNavIcon(Icons.person_outlined, false),
+                activeIcon: _buildNavIcon(Icons.person, true),
+                label: 'navigation.account'.tr(),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildNavIcon(IconData icon, bool isActive) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = isActive ? colorScheme.primary : colorScheme.onSurfaceVariant;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacing12,
+        vertical: AppTheme.spacing8,
+      ),
+      decoration: isActive
+          ? BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            )
+          : null,
+      child: Icon(
+        icon,
+        size: AppTheme.iconMedium,
+        color: color,
       ),
     );
   }
