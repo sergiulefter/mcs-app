@@ -10,7 +10,6 @@ class ConsultationModel {
   final String description;
   final List<AttachmentModel> attachments;
   final DoctorResponseModel? doctorResponse;
-  final int? patientRating;
   final String? patientFeedback;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -31,7 +30,6 @@ class ConsultationModel {
     required this.description,
     required this.attachments,
     this.doctorResponse,
-    this.patientRating,
     this.patientFeedback,
     required this.createdAt,
     required this.updatedAt,
@@ -61,7 +59,6 @@ class ConsultationModel {
           ? DoctorResponseModel.fromMap(
               data['doctorResponse'] as Map<String, dynamic>)
           : null,
-      patientRating: data['patientRating'],
       patientFeedback: data['patientFeedback'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
@@ -83,7 +80,6 @@ class ConsultationModel {
       'description': description,
       'attachments': attachments.map((e) => e.toMap()).toList(),
       'doctorResponse': doctorResponse?.toMap(),
-      'patientRating': patientRating,
       'patientFeedback': patientFeedback,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
@@ -104,7 +100,6 @@ class ConsultationModel {
     String? description,
     List<AttachmentModel>? attachments,
     DoctorResponseModel? doctorResponse,
-    int? patientRating,
     String? patientFeedback,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -123,7 +118,6 @@ class ConsultationModel {
       description: description ?? this.description,
       attachments: attachments ?? this.attachments,
       doctorResponse: doctorResponse ?? this.doctorResponse,
-      patientRating: patientRating ?? this.patientRating,
       patientFeedback: patientFeedback ?? this.patientFeedback,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

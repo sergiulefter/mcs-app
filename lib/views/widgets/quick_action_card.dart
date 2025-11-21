@@ -85,9 +85,9 @@ class QuickActionCard extends StatelessWidget {
           boxShadow: Theme.of(context).brightness == Brightness.light
               ? [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-                    blurRadius: AppTheme.elevationLow,
-                    offset: const Offset(0, 2),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
                   ),
                 ]
               : null,

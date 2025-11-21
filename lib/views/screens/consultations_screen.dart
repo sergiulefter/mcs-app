@@ -47,9 +47,7 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
           ? _buildLoadingState()
           : consultationsController.error != null
               ? _buildErrorState()
-              : filteredConsultations.isEmpty
-                  ? _buildEmptyState()
-                  : _buildConsultationsList(filteredConsultations),
+              : _buildConsultationsContent(filteredConsultations),
     );
   }
 
@@ -85,59 +83,59 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    final consultationsController = context.watch<ConsultationsController>();
-
-    return Center(
-      child: Padding(
-        padding: AppTheme.screenPadding,
-        child: AppEmptyState(
-          icon: Icons.assignment_outlined,
-          title: consultationsController.selectedStatus == 'all'
-              ? 'consultations.empty_state_title'.tr()
-              : 'consultations.empty_state_filtered_title'.tr(),
-          subtitle: consultationsController.selectedStatus == 'all'
-              ? 'consultations.empty_state_subtitle'.tr()
-              : 'consultations.empty_state_filtered_subtitle'.tr(),
-          iconColor: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildConsultationsList(List<dynamic> consultations) {
+  Widget _buildConsultationsContent(List<dynamic> consultations) {
     return RefreshIndicator(
       onRefresh: _fetchConsultations,
       child: Column(
         children: [
-          // Status filter chips
           _buildStatusFilters(),
-
-          // Consultations list
           Expanded(
-            child: ListView.separated(
-              padding: AppTheme.screenPadding,
-              itemCount: consultations.length,
-              separatorBuilder: (context, index) =>
-                  const SizedBox(height: AppTheme.spacing16),
-              itemBuilder: (context, index) {
-                final consultation = consultations[index];
-                return ConsultationCard(
-                  consultation: consultation,
-                  onTap: () {
-                    // TODO: Navigate to RequestDetailScreen when implemented
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('consultations.detail_coming_soon'.tr()),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+            child: consultations.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: AppTheme.screenPadding,
+                    children: [
+                      _buildEmptyStateContent(),
+                    ],
+                  )
+                : ListView.separated(
+                    padding: AppTheme.screenPadding,
+                    itemCount: consultations.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: AppTheme.spacing16),
+                    itemBuilder: (context, index) {
+                      final consultation = consultations[index];
+                      return ConsultationCard(
+                        consultation: consultation,
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('consultations.detail_coming_soon'.tr()),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildEmptyStateContent() {
+    final consultationsController = context.watch<ConsultationsController>();
+
+    return AppEmptyState(
+      icon: Icons.assignment_outlined,
+      title: consultationsController.selectedStatus == 'all'
+          ? 'consultations.empty_state_title'.tr()
+          : 'consultations.empty_state_filtered_title'.tr(),
+      subtitle: consultationsController.selectedStatus == 'all'
+          ? 'consultations.empty_state_subtitle'.tr()
+          : 'consultations.empty_state_filtered_subtitle'.tr(),
+      iconColor: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -171,16 +169,30 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
         child: Row(
           children: statuses.map((status) {
             final isSelected = selectedStatus == status['key'];
+            final colorScheme = Theme.of(context).colorScheme;
             return Padding(
               padding: const EdgeInsets.only(right: AppTheme.spacing8),
               child: FilterChip(
                 label: Text(status['label']!),
                 selected: isSelected,
-                onSelected: (selected) {
+                onSelected: (_) {
                   consultationsController.setStatusFilter(status['key']!);
                 },
-                selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                checkmarkColor: Theme.of(context).colorScheme.primary,
+                labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                selectedColor: colorScheme.primaryContainer,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                checkmarkColor: colorScheme.onPrimaryContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  side: BorderSide(
+                    color: isSelected
+                        ? colorScheme.primary.withValues(alpha: 0.5)
+                        : Theme.of(context).dividerColor,
+                  ),
+                ),
               ),
             );
           }).toList(),
