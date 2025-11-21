@@ -200,51 +200,60 @@ class _HomeScreenState extends State<HomeScreen> {
     int pendingCount,
     int completedCount,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'home.your_stats'.tr(),
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing16),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: AppTheme.spacing16,
-          runSpacing: AppTheme.spacing16,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final spacing = AppTheme.spacing12;
+        final cardWidth =
+            (constraints.maxWidth - (spacing * 2)) / 3; // three cards + two gaps
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 100,
-              child: StatCard(
-                icon: Icons.assignment_outlined,
-                value: '$totalCount',
-                label: 'home.total_consultations'.tr(),
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            Text(
+              'home.your_stats'.tr(),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
-            SizedBox(
-              width: 100,
-              child: StatCard(
-                icon: Icons.pending_actions_outlined,
-                value: '$pendingCount',
-                label: 'home.pending_requests'.tr(),
-                color: Theme.of(context).extension<AppSemanticColors>()!.warning,
-              ),
-            ),
-            SizedBox(
-              width: 100,
-              child: StatCard(
-                icon: Icons.check_circle_outline,
-                value: '$completedCount',
-                label: 'home.completed'.tr(),
-                color: Theme.of(context).colorScheme.secondary,
-              ),
+            const SizedBox(height: AppTheme.spacing16),
+            Row(
+              children: [
+                SizedBox(
+                  width: cardWidth,
+                  child: StatCard(
+                    icon: Icons.assignment_outlined,
+                    value: '$totalCount',
+                    label: 'home.total_consultations'.tr(),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                SizedBox(width: spacing),
+                SizedBox(
+                  width: cardWidth,
+                  child: StatCard(
+                    icon: Icons.pending_actions_outlined,
+                    value: '$pendingCount',
+                    label: 'home.pending_requests'.tr(),
+                    color: Theme.of(context)
+                        .extension<AppSemanticColors>()!
+                        .warning,
+                  ),
+                ),
+                SizedBox(width: spacing),
+                SizedBox(
+                  width: cardWidth,
+                  child: StatCard(
+                    icon: Icons.check_circle_outline,
+                    value: '$completedCount',
+                    label: 'home.completed'.tr(),
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
