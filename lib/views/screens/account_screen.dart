@@ -82,7 +82,6 @@ class AccountScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildSectionHeader(BuildContext context, String title) {
     return Text(
       title,
@@ -368,66 +367,48 @@ class AccountScreen extends StatelessWidget {
   }
 
   void _showLanguageDialog(BuildContext context) {
-    final currentLocale = context.locale.languageCode;
+    String selectedLocale = context.locale.languageCode;
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('account.select_language'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LanguageSelectionCard(
-              languageName: 'English',
-              languageCode: 'en',
-              isSelected: currentLocale == 'en',
-              onTap: () async {
-                dialogContext.setLocale(const Locale('en'));
-                Navigator.of(dialogContext).pop();
-
-                // Update Firebase
-                final authController = context.read<AuthController>();
-                await authController.updatePreferredLanguage('en');
-
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('account.language_changed'.tr()),
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                    ),
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: AppTheme.spacing12),
-            LanguageSelectionCard(
-              languageName: 'Română',
-              languageCode: 'ro',
-              isSelected: currentLocale == 'ro',
-              onTap: () async {
-                dialogContext.setLocale(const Locale('ro'));
-                Navigator.of(dialogContext).pop();
-
-                // Update Firebase
-                final authController = context.read<AuthController>();
-                await authController.updatePreferredLanguage('ro');
-
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('account.language_changed'.tr()),
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
-                    ),
-                  );
-                }
-              },
-            ),
-          ],
+        content: StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LanguageSelectionCard(
+                languageName: 'English',
+                languageCode: 'en',
+                isSelected: selectedLocale == 'en',
+                onTap: () async {
+                  setState(() => selectedLocale = 'en'); // instant UI feedback
+                  await dialogContext.setLocale(const Locale('en'));
+                  if (!dialogContext.mounted) return;
+                  final authController = context.read<AuthController>();
+                  await authController.updatePreferredLanguage('en');
+                },
+              ),
+              const SizedBox(height: AppTheme.spacing12),
+              LanguageSelectionCard(
+                languageName: 'Română',
+                languageCode: 'ro',
+                isSelected: selectedLocale == 'ro',
+                onTap: () async {
+                  setState(() => selectedLocale = 'ro'); // instant UI feedback
+                  await dialogContext.setLocale(const Locale('ro'));
+                  if (!dialogContext.mounted) return;
+                  final authController = context.read<AuthController>();
+                  await authController.updatePreferredLanguage('ro');
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('common.cancel'.tr()),
+            child: Text('common.close'.tr()),
           ),
         ],
       ),
@@ -440,67 +421,40 @@ class AccountScreen extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: Text('account.select_theme'.tr()),
         content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<ThemeMode>(
-              title: Text('account.light_mode'.tr()),
-              value: ThemeMode.light,
-              groupValue: themeController.themeMode,
-              onChanged: (value) async {
-                if (value != null) {
-                  await themeController.setThemeMode(value);
-                  if (dialogContext.mounted) {
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('account.theme_changed'.tr()),
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                      ),
-                    );
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioMenuButton<ThemeMode>(
+                value: ThemeMode.light,
+                groupValue: themeController.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    themeController.setThemeMode(value);
                   }
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text('account.dark_mode'.tr()),
-              value: ThemeMode.dark,
-              groupValue: themeController.themeMode,
-              onChanged: (value) async {
-                if (value != null) {
-                  await themeController.setThemeMode(value);
-                  if (dialogContext.mounted) {
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('account.theme_changed'.tr()),
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                      ),
-                    );
+                },
+                child: Text('account.light_mode'.tr()),
+              ),
+              RadioMenuButton<ThemeMode>(
+                value: ThemeMode.dark,
+                groupValue: themeController.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    themeController.setThemeMode(value);
                   }
-                }
-              },
-            ),
-            RadioListTile<ThemeMode>(
-              title: Text('account.system_mode'.tr()),
-              value: ThemeMode.system,
-              groupValue: themeController.themeMode,
-              onChanged: (value) async {
-                if (value != null) {
-                  await themeController.setThemeMode(value);
-                  if (dialogContext.mounted) {
-                    Navigator.of(dialogContext).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('account.theme_changed'.tr()),
-                        backgroundColor: Theme.of(context).colorScheme.secondary,
-                      ),
-                    );
+                },
+                child: Text('account.dark_mode'.tr()),
+              ),
+              RadioMenuButton<ThemeMode>(
+                value: ThemeMode.system,
+                groupValue: themeController.themeMode,
+                onChanged: (value) {
+                  if (value != null) {
+                    themeController.setThemeMode(value);
                   }
-                }
-              },
-            ),
-          ],
-        ),
+                },
+                child: Text('account.system_mode'.tr()),
+              ),
+            ],
+          ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -533,3 +487,5 @@ class AccountScreen extends StatelessWidget {
     }
   }
 }
+
+

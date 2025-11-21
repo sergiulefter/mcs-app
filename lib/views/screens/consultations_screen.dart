@@ -1,77 +1,189 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../controllers/auth_controller.dart';
+import '../../controllers/consultations_controller.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/consultation_card.dart';
+import '../widgets/app_empty_state.dart';
 
-class ConsultationsScreen extends StatelessWidget {
+class ConsultationsScreen extends StatefulWidget {
   const ConsultationsScreen({super.key});
 
   @override
+  State<ConsultationsScreen> createState() => _ConsultationsScreenState();
+}
+
+class _ConsultationsScreenState extends State<ConsultationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchConsultations();
+    });
+  }
+
+  Future<void> _fetchConsultations() async {
+    final authController = context.read<AuthController>();
+    final consultationsController = context.read<ConsultationsController>();
+
+    if (authController.currentUser != null) {
+      await consultationsController.fetchUserConsultations(
+        authController.currentUser!.uid,
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final consultationsController = context.watch<ConsultationsController>();
+    final filteredConsultations = consultationsController.filteredConsultations;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('consultations.title'.tr()),
       ),
-      body: Center(
-        child: Padding(
-          padding: AppTheme.screenPadding,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 96,
-                height: 96,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                ),
-                child: Icon(
-                  Icons.assignment_outlined,
-                  size: 56,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacing24),
-              Text(
-                'consultations.title'.tr(),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: AppTheme.spacing12),
-              Text(
-                'consultations.subtitle'.tr(),
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppTheme.sectionSpacing),
-              Container(
-                padding: AppTheme.cardPadding,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  border: Border.all(
-                    color: Theme.of(context).dividerColor,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: AppTheme.iconMedium,
-                    ),
-                    const SizedBox(width: AppTheme.spacing12),
-                    Expanded(
-                      child: Text(
-                        'consultations.placeholder_info'.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+      body: consultationsController.isLoading
+          ? _buildLoadingState()
+          : consultationsController.error != null
+              ? _buildErrorState()
+              : filteredConsultations.isEmpty
+                  ? _buildEmptyState()
+                  : _buildConsultationsList(filteredConsultations),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: AppTheme.screenPadding,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AppEmptyState(
+              icon: Icons.error_outline,
+              title: 'consultations.error_title'.tr(),
+              subtitle: 'consultations.error_subtitle'.tr(),
+              iconColor:
+                  Theme.of(context).extension<AppSemanticColors>()?.error ??
+                      Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: AppTheme.spacing24),
+            ElevatedButton(
+              onPressed: _fetchConsultations,
+              child: Text('consultations.retry_button'.tr()),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    final consultationsController = context.watch<ConsultationsController>();
+
+    return Center(
+      child: Padding(
+        padding: AppTheme.screenPadding,
+        child: AppEmptyState(
+          icon: Icons.assignment_outlined,
+          title: consultationsController.selectedStatus == 'all'
+              ? 'consultations.empty_state_title'.tr()
+              : 'consultations.empty_state_filtered_title'.tr(),
+          subtitle: consultationsController.selectedStatus == 'all'
+              ? 'consultations.empty_state_subtitle'.tr()
+              : 'consultations.empty_state_filtered_subtitle'.tr(),
+          iconColor: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConsultationsList(List<dynamic> consultations) {
+    return RefreshIndicator(
+      onRefresh: _fetchConsultations,
+      child: Column(
+        children: [
+          // Status filter chips
+          _buildStatusFilters(),
+
+          // Consultations list
+          Expanded(
+            child: ListView.separated(
+              padding: AppTheme.screenPadding,
+              itemCount: consultations.length,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(height: AppTheme.spacing16),
+              itemBuilder: (context, index) {
+                final consultation = consultations[index];
+                return ConsultationCard(
+                  consultation: consultation,
+                  onTap: () {
+                    // TODO: Navigate to RequestDetailScreen when implemented
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('consultations.detail_coming_soon'.tr()),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                    );
+                  },
+                );
+              },
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusFilters() {
+    final consultationsController = context.watch<ConsultationsController>();
+    final selectedStatus = consultationsController.selectedStatus;
+
+    final statuses = [
+      {'key': 'all', 'label': 'consultations.filter.all'.tr()},
+      {'key': 'pending', 'label': 'consultations.filter.pending'.tr()},
+      {'key': 'in_review', 'label': 'consultations.filter.in_review'.tr()},
+      {'key': 'completed', 'label': 'consultations.filter.completed'.tr()},
+      {'key': 'cancelled', 'label': 'consultations.filter.cancelled'.tr()},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacing32,
+        vertical: AppTheme.spacing16,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor,
+          ),
+        ),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: statuses.map((status) {
+            final isSelected = selectedStatus == status['key'];
+            return Padding(
+              padding: const EdgeInsets.only(right: AppTheme.spacing8),
+              child: FilterChip(
+                label: Text(status['label']!),
+                selected: isSelected,
+                onSelected: (selected) {
+                  consultationsController.setStatusFilter(status['key']!);
+                },
+                selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                checkmarkColor: Theme.of(context).colorScheme.primary,
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

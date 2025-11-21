@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../models/doctor_model.dart';
 import '../../utils/app_theme.dart';
+import 'create_request_screen.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
   const DoctorProfileScreen({
@@ -493,10 +494,11 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       child: ElevatedButton.icon(
         onPressed: widget.doctor.isCurrentlyAvailable
             ? () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('doctor_profile.request_submitted'.tr()),
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => CreateRequestScreen(
+                      doctor: widget.doctor,
+                    ),
                   ),
                 );
               }

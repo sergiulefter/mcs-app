@@ -10,14 +10,16 @@ import 'account_screen.dart';
 /// Main navigation shell for Patient user type
 /// Contains bottom navigation with 4 tabs: Home, Doctors, Consultations, Account
 class MainShell extends StatefulWidget {
-  const MainShell({super.key});
+  const MainShell({super.key, this.initialIndex = 0});
+
+  final int initialIndex;
 
   @override
   State<MainShell> createState() => _MainShellState();
 }
 
 class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   // List of screens - using IndexedStack to preserve state
   final List<Widget> _screens = const [
@@ -31,6 +33,12 @@ class _MainShellState extends State<MainShell> {
     setState(() {
       _currentIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex.clamp(0, _screens.length - 1);
   }
 
   @override

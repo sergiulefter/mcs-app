@@ -137,6 +137,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      extensions: const [
+        AppSemanticColors(
+          error: errorRed,
+          success: successGreen,
+          warning: warningOrange,
+          info: infoBlue,
+        ),
+      ],
       dividerColor: dividerColor,
 
       // Color Scheme
@@ -475,6 +483,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      extensions: const [
+        AppSemanticColors(
+          error: errorRedDark,
+          success: successGreenDark,
+          warning: warningOrangeDark,
+          info: infoBlueDark,
+        ),
+      ],
       dividerColor: dividerDark,
 
       // Color Scheme
@@ -806,6 +822,46 @@ class AppTheme {
           letterSpacing: 0.5,
         ),
       ),
+    );
+  }
+}
+
+class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
+  final Color error;
+  final Color success;
+  final Color warning;
+  final Color info;
+
+  const AppSemanticColors({
+    required this.error,
+    required this.success,
+    required this.warning,
+    required this.info,
+  });
+
+  @override
+  AppSemanticColors copyWith({
+    Color? error,
+    Color? success,
+    Color? warning,
+    Color? info,
+  }) {
+    return AppSemanticColors(
+      error: error ?? this.error,
+      success: success ?? this.success,
+      warning: warning ?? this.warning,
+      info: info ?? this.info,
+    );
+  }
+
+  @override
+  AppSemanticColors lerp(ThemeExtension<AppSemanticColors>? other, double t) {
+    if (other is! AppSemanticColors) return this;
+    return AppSemanticColors(
+      error: Color.lerp(error, other.error, t)!,
+      success: Color.lerp(success, other.success, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      info: Color.lerp(info, other.info, t)!,
     );
   }
 }

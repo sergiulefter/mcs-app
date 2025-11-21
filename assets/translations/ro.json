@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "name": "Medical Correct Solution",
     "description": "A Doua Opinie Medicală Profesională"
@@ -77,7 +77,11 @@
     "request_opinion": "Solicită A Doua Opinie",
     "request_opinion_desc": "Obține perspective medicale de expert",
     "browse_doctors": "Explorează Medicii",
-    "browse_doctors_desc": "Găsește specialiști pentru tine",
+    "browse_doctors_desc": "Găsește specialiști",
+    "view_consultations": "Consultațiile Mele",
+    "view_consultations_desc": "Urmărește solicitările",
+    "notifications": "Notificări",
+    "notifications_desc": "Rămâi la curent",
     "active_consultations": "Consultații Active",
     "no_active_consultations": "Nicio consultație activă",
     "no_active_consultations_desc": "Cererile tale de consultație vor apărea aici după ce le trimiți.",
@@ -170,7 +174,80 @@
   "consultations": {
     "title": "Consultațiile Mele",
     "subtitle": "Urmărește cererile de a doua opinie",
-    "placeholder_info": "Vizualizează istoricul consultațiilor, verifică statusul cererilor și accesează răspunsurile medicilor."
+    "placeholder_info": "Vizualizează istoricul consultațiilor, verifică statusul cererilor și accesează răspunsurile medicilor.",
+    "awaiting_assignment": "În Așteptarea Atribuirii Medicului",
+    "detail_coming_soon": "Funcția de detalii consultație vine în curând",
+    "error_title": "Eroare la Încărcarea Consultațiilor",
+    "error_subtitle": "Nu s-au putut încărca consultațiile. Te rog încearcă din nou.",
+    "retry_button": "Reîncearcă",
+    "empty_state_title": "Nicio Consultație Încă",
+    "empty_state_subtitle": "Cererile tale de consultație vor apărea aici după ce le trimiți.",
+    "empty_state_filtered_title": "Nicio Consultație Găsită",
+    "empty_state_filtered_subtitle": "Nicio consultație nu se potrivește cu filtrul selectat.",
+    "status": {
+      "pending": "În Așteptare",
+      "in_review": "În Evaluare",
+      "completed": "Finalizată",
+      "cancelled": "Anulată"
+    },
+    "filter": {
+      "all": "Toate",
+      "pending": "În Așteptare",
+      "in_review": "În Evaluare",
+      "completed": "Finalizate",
+      "cancelled": "Anulate"
+    }
+  },
+  "notifications": {
+    "title": "Notificări",
+    "subtitle": "Rămâi la curent cu consultațiile tale",
+    "placeholder_info": "Primește actualizări despre cererile de consultație, răspunsurile medicilor și anunțuri importante.",
+    "no_notifications": "Nicio notificare încă",
+    "no_notifications_desc": "Vei fi notificat când medicii răspund la cererile tale sau când există actualizări importante."
+  },
+  "create_request": {
+    "title": "Solicită Consultație",
+    "step_indicator": "Pasul {current} din {total}",
+    "continue_button": "Continuă",
+    "skip_button": "Omite",
+    "submit_button": "Trimite Cererea",
+    "success_message": "Cererea de consultație a fost trimisă cu succes",
+    "error_message": "Eroare la trimiterea cererii. Te rog încearcă din nou.",
+    "step1": {
+      "title": "Detalii Cerere",
+      "subtitle": "Descrie condiția și preocupările tale în detaliu",
+      "title_label": "Titlu Scurt",
+      "title_hint": "ex., A doua opinie pentru diagnosticul de durere în piept",
+      "description_label": "Descriere Detaliată",
+      "description_hint": "Descrie simptomele, diagnosticul, preocupările și orice istoric medical relevant...",
+      "urgency_label": "Nivel de Urgență"
+    },
+    "step2": {
+      "title": "Încarcă Documente",
+      "subtitle": "Adaugă fișe medicale, rezultate analize sau imagini (opțional)",
+      "info_message": "Funcția de încărcare fișiere vine în curând. Poți trimite cererea fără atașamente deocamdată."
+    },
+    "step3": {
+      "title": "Revizuire & Trimitere",
+      "subtitle": "Te rugăm să revizuiești cererea de consultație",
+      "request_details": "Detalii Cerere",
+      "edit_button": "Editează",
+      "accept_terms": "Sunt de acord cu Termenii și Condițiile",
+      "terms_text": "Prin trimiterea acestei cereri, ești de acord cu Termenii și Condițiile și Politica de Confidențialitate. Această consultație este doar în scop informativ și nu înlocuiește îngrijirea medicală directă."
+    },
+    "urgency": {
+      "normal": "Normală",
+      "normal_desc": "Timp standard de evaluare",
+      "urgent": "Urgentă",
+      "urgent_desc": "Prioritate mai rapidă",
+      "emergency": "Urgență",
+      "emergency_desc": "Prioritate maximă"
+    },
+    "validation": {
+      "title_too_short": "Titlul trebuie să aibă cel puțin 10 caractere",
+      "description_too_short": "Descrierea trebuie să aibă cel puțin 50 de caractere",
+      "accept_terms": "Trebuie să accepți termenii și condițiile"
+    }
   },
   "account": {
     "title": "Cont",
@@ -227,6 +304,7 @@
     "edit": "Editează",
     "delete": "Șterge",
     "apply": "Aplică",
+    "close": "Închide",
     "loading": "Se încarcă...",
     "error": "Eroare",
     "success": "Succes",

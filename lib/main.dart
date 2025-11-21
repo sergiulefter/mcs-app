@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'firebase_options.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/theme_controller.dart';
+import 'controllers/consultations_controller.dart';
 import 'views/screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthController()),
         ChangeNotifierProvider(create: (_) => ThemeController()),
+        ChangeNotifierProvider(create: (_) => ConsultationsController()),
       ],
       child: Consumer<ThemeController>(
         builder: (context, themeController, child) {

@@ -78,6 +78,10 @@
     "request_opinion_desc": "Get expert medical insights",
     "browse_doctors": "Browse Doctors",
     "browse_doctors_desc": "Find specialists",
+    "view_consultations": "My Consultations",
+    "view_consultations_desc": "Track requests",
+    "notifications": "Notifications",
+    "notifications_desc": "Stay updated",
     "active_consultations": "Active Consultations",
     "no_active_consultations": "No active consultations",
     "no_active_consultations_desc": "Your consultation requests will appear here once you submit them.",
@@ -90,6 +94,7 @@
   "doctors": {
     "title": "Browse Doctors",
     "subtitle": "Find and connect with medical specialists",
+    "placeholder_info": "Search for doctors by specialty, view their profiles, and request second opinions.",
     "search_hint": "Search by doctor name or specialty",
     "results_title": "Available Specialists",
     "results_count": "{count} doctors",
@@ -169,7 +174,80 @@
   "consultations": {
     "title": "My Consultations",
     "subtitle": "Track your second opinion requests",
-    "placeholder_info": "View your consultation history, check request status, and access doctor responses."
+    "placeholder_info": "View your consultation history, check request status, and access doctor responses.",
+    "awaiting_assignment": "Awaiting Doctor Assignment",
+    "detail_coming_soon": "Consultation details feature coming soon",
+    "error_title": "Error Loading Consultations",
+    "error_subtitle": "Unable to load consultations. Please try again.",
+    "retry_button": "Retry",
+    "empty_state_title": "No Consultations Yet",
+    "empty_state_subtitle": "Your consultation requests will appear here once you submit them.",
+    "empty_state_filtered_title": "No Consultations Found",
+    "empty_state_filtered_subtitle": "No consultations match the selected filter.",
+    "status": {
+      "pending": "Pending",
+      "in_review": "In Review",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "in_review": "In Review",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "create_request": {
+    "title": "Request Consultation",
+    "step_indicator": "Step {current} of {total}",
+    "continue_button": "Continue",
+    "skip_button": "Skip",
+    "submit_button": "Submit Request",
+    "success_message": "Consultation request submitted successfully",
+    "error_message": "Error submitting request. Please try again.",
+    "step1": {
+      "title": "Request Details",
+      "subtitle": "Describe your condition and concerns in detail",
+      "title_label": "Brief Title",
+      "title_hint": "e.g., Second opinion for chest pain diagnosis",
+      "description_label": "Detailed Description",
+      "description_hint": "Describe your symptoms, diagnosis, concerns, and any relevant medical history...",
+      "urgency_label": "Urgency Level"
+    },
+    "step2": {
+      "title": "Upload Documents",
+      "subtitle": "Add medical records, test results, or images (optional)",
+      "info_message": "File upload feature coming soon. You can submit your request without attachments for now."
+    },
+    "step3": {
+      "title": "Review & Submit",
+      "subtitle": "Please review your consultation request",
+      "request_details": "Request Details",
+      "edit_button": "Edit",
+      "accept_terms": "I agree to the Terms and Conditions",
+      "terms_text": "By submitting this request, you agree to the Terms and Conditions and Privacy Policy. This consultation is for informational purposes only and does not replace direct medical care."
+    },
+    "urgency": {
+      "normal": "Normal",
+      "normal_desc": "Standard review time",
+      "urgent": "Urgent",
+      "urgent_desc": "Faster priority",
+      "emergency": "Emergency",
+      "emergency_desc": "Highest priority"
+    },
+    "validation": {
+      "title_too_short": "Title must be at least 10 characters",
+      "description_too_short": "Description must be at least 50 characters",
+      "accept_terms": "You must accept the terms and conditions"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Stay updated with your consultations",
+    "placeholder_info": "Receive updates about consultation requests, doctor responses, and important announcements.",
+    "no_notifications": "No notifications yet",
+    "no_notifications_desc": "You'll be notified when doctors respond to your requests or when there are important updates."
   },
   "account": {
     "title": "Account",
@@ -226,6 +304,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "apply": "Apply",
+    "close": "Close",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",

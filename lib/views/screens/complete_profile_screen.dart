@@ -6,6 +6,7 @@ import '../../utils/app_theme.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/app_date_picker_field.dart';
 import '../widgets/app_dropdown_field.dart';
+
 import 'main_shell.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -83,11 +84,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         preferredLanguage: currentLanguage,
       );
 
-      if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainShell()),
-        );
-      } else if (mounted) {
+        if (success && mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const MainShell(initialIndex: 3),
+            ),
+          );
+        } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
@@ -101,7 +104,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   void _handleSkip() {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const MainShell()),
+      MaterialPageRoute(
+        builder: (context) => const MainShell(initialIndex: 3),
+      ),
     );
   }
 
@@ -319,3 +324,5 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 }
+
+

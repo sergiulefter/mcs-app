@@ -6,6 +6,7 @@ import '../../controllers/navigation_controller.dart';
 import '../../utils/app_theme.dart';
 import '../widgets/quick_action_card.dart';
 import 'complete_profile_screen.dart';
+import 'notifications_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -165,12 +166,12 @@ class HomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: QuickActionCard(
-                  icon: Icons.medical_services_outlined,
-                  title: 'home.request_opinion'.tr(),
-                  description: 'home.request_opinion_desc'.tr(),
+                  icon: Icons.search_outlined,
+                  title: 'home.browse_doctors'.tr(),
+                  description: 'home.browse_doctors_desc'.tr(),
                   color: Theme.of(context).colorScheme.primary,
                   onTap: () {
-                  // Navigate to Doctors tab (index 1) to start the flow
+                  // Navigate to Doctors tab (index 1)
                   _navigateToTab(context, 1);
                 },
               ),
@@ -178,13 +179,17 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(width: AppTheme.spacing16),
               Expanded(
                 child: QuickActionCard(
-                  icon: Icons.search_outlined,
-                  title: 'home.browse_doctors'.tr(),
-                  description: 'home.browse_doctors_desc'.tr(),
+                  icon: Icons.notifications_outlined,
+                  title: 'home.notifications'.tr(),
+                  description: 'home.notifications_desc'.tr(),
                   color: Theme.of(context).colorScheme.secondary,
                   onTap: () {
-                  // Navigate to Doctors tab (index 1)
-                  _navigateToTab(context, 1);
+                  // Navigate to NotificationsScreen
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const NotificationsScreen(),
+                    ),
+                  );
                 },
               ),
             ),
