@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+
 import '../../models/doctor_model.dart';
 import '../../utils/app_theme.dart';
 
@@ -23,13 +24,15 @@ class DoctorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       child: Container(
         padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           border: Border.all(
             color: Theme.of(context).dividerColor,
@@ -37,7 +40,7 @@ class DoctorCard extends StatelessWidget {
           boxShadow: Theme.of(context).brightness == Brightness.light
               ? [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                    color: colorScheme.onSurface.withValues(alpha: 0.04),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -65,8 +68,7 @@ class DoctorCard extends StatelessWidget {
                       const SizedBox(height: AppTheme.spacing4),
                       Text(
                         'specialties.${doctor.specialty.toString().split('.').last}'.tr(),
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),
@@ -82,7 +84,7 @@ class DoctorCard extends StatelessWidget {
                   _Badge(
                     icon: Icons.circle,
                     iconSize: 12,
-                    iconColor: availabilityColor ?? Theme.of(context).colorScheme.secondary,
+                    iconColor: availabilityColor ?? colorScheme.secondary,
                     label: availabilityLabel!,
                   ),
                 _Badge(
@@ -103,7 +105,7 @@ class DoctorCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     availabilityDescription ?? '',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
                 TextButton.icon(
@@ -122,7 +124,7 @@ class DoctorCard extends StatelessWidget {
   String _initialsFromName(String name) {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return '';
-    final parts = trimmed.split(RegExp(r'\s+'));
+    final parts = trimmed.split(RegExp(r'\\s+'));
     final first = parts.first.isNotEmpty ? parts.first[0] : '';
     final last = parts.length > 1 && parts.last.isNotEmpty ? parts.last[0] : '';
     return (first + last).toUpperCase();
@@ -136,11 +138,12 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: 72,
       height: 72,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+        color: colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
       ),
       child: Center(

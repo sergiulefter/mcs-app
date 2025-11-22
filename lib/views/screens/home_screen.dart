@@ -13,6 +13,7 @@ import '../widgets/primary_cta_button.dart';
 import '../widgets/consultation_card.dart';
 import 'complete_profile_screen.dart';
 import 'notifications_screen.dart';
+import 'request_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -85,16 +86,16 @@ class _HomeScreenState extends State<HomeScreen> {
               if (user != null && !user.profileCompleted)
                 _buildProfileCompletionBanner(context),
 
-              // Stats Dashboard Section with real data
-              _buildStatsSection(context, totalCount, pendingCount, completedCount),
+              // Active Consultations Section with real data
+              _buildActiveConsultationsSection(context, activeConsultations),
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Primary CTA - Browse Doctors
               _buildPrimaryCTA(context),
               const SizedBox(height: AppTheme.sectionSpacing),
 
-              // Active Consultations Section with real data
-              _buildActiveConsultationsSection(context, activeConsultations),
+              // Stats Dashboard Section with real data
+              _buildStatsSection(context, totalCount, pendingCount, completedCount),
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Secondary Quick Actions
@@ -365,10 +366,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ConsultationCard(
                   consultation: consultation,
                   onTap: () {
-                    // TODO: Navigate to RequestDetailScreen when implemented
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('consultations.detail_coming_soon'.tr()),
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => RequestDetailScreen(
+                          consultation: consultation,
+                        ),
                       ),
                     );
                   },
@@ -415,3 +417,5 @@ class _HomeScreenState extends State<HomeScreen> {
     navigationController?.onTabChange(tabIndex);
   }
 }
+
+

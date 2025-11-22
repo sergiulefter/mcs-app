@@ -6,6 +6,7 @@ import '../../controllers/consultations_controller.dart';
 import '../../utils/app_theme.dart';
 import '../widgets/consultation_card.dart';
 import '../widgets/app_empty_state.dart';
+import 'request_detail_screen.dart';
 
 class ConsultationsScreen extends StatefulWidget {
   const ConsultationsScreen({super.key});
@@ -108,10 +109,10 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
                       return ConsultationCard(
                         consultation: consultation,
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('consultations.detail_coming_soon'.tr()),
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  RequestDetailScreen(consultation: consultation),
                             ),
                           );
                         },
@@ -201,3 +202,5 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
     );
   }
 }
+
+

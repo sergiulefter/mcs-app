@@ -134,34 +134,8 @@ class ConsultationCard extends StatelessWidget {
   }
 
   Widget _buildStatusBadge(BuildContext context) {
-    final semanticColors =
-        Theme.of(context).extension<AppSemanticColors>();
-    Color badgeColor;
-    String statusText;
-
-    switch (consultation.status) {
-      case 'pending':
-        badgeColor = Theme.of(context).colorScheme.tertiary;
-        statusText = 'consultations.status.pending'.tr();
-        break;
-      case 'in_review':
-        badgeColor = Theme.of(context).colorScheme.primary;
-        statusText = 'consultations.status.in_review'.tr();
-        break;
-      case 'completed':
-        badgeColor =
-            semanticColors?.success ?? Theme.of(context).colorScheme.primary;
-        statusText = 'consultations.status.completed'.tr();
-        break;
-      case 'cancelled':
-        badgeColor = semanticColors?.warning ??
-            Theme.of(context).colorScheme.onSurfaceVariant;
-        statusText = 'consultations.status.cancelled'.tr();
-        break;
-      default:
-        badgeColor = Theme.of(context).colorScheme.onSurfaceVariant;
-        statusText = consultation.status;
-    }
+    final badgeColor = consultation.getStatusColor(context);
+    final statusText = 'consultations.status.${consultation.status}'.tr();
 
     return Container(
       padding: const EdgeInsets.symmetric(

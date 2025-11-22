@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/seed_doctors.dart';
+import '../../utils/seed_dev_data.dart';
 import '../widgets/user_header_card.dart';
 import '../widgets/profile_detail_row.dart';
 import '../widgets/action_tile.dart';
@@ -247,11 +248,11 @@ class AccountScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(AppTheme.spacing16),
-            decoration: BoxDecoration(
-              color: colorScheme.errorContainer,
-              borderRadius: const BorderRadius.only(
+            Container(
+              padding: const EdgeInsets.all(AppTheme.spacing16),
+              decoration: BoxDecoration(
+                color: colorScheme.errorContainer,
+                borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppTheme.radiusMedium),
                 topRight: Radius.circular(AppTheme.radiusMedium),
               ),
@@ -274,16 +275,22 @@ class AccountScreen extends StatelessWidget {
               ],
             ),
           ),
-          ActionTile(
-            icon: Icons.medical_services_outlined,
-            title: 'Seed Doctors Database',
-            subtitle: 'Add 7 sample doctors to Firestore (requires admin)',
-            onTap: () => _handleSeedDoctors(context),
-          ),
-        ],
-      ),
-    );
-  }
+            ActionTile(
+              icon: Icons.medical_services_outlined,
+              title: 'Seed Doctors Database',
+              subtitle: 'Add 7 sample doctors to Firestore (requires admin)',
+              onTap: () => _handleSeedDoctors(context),
+            ),
+            ActionTile(
+              icon: Icons.cloud_download_outlined,
+              title: 'Seed Dev Data (Doctors + Consultations)',
+              subtitle: 'Bulk seed hundreds of doctors & consultations (dev only)',
+              onTap: () => _handleSeedDevData(context),
+            ),
+          ],
+        ),
+      );
+    }
 
   Widget _buildDivider(BuildContext context) {
     return Divider(
@@ -413,6 +420,49 @@ class AccountScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _handleSeedDevData(BuildContext context) async {
+    final authController = context.read<AuthController>();
+    final currentUser = authController.currentUser;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('auth.no_user_logged_in'.tr()),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Seeding dev data...'),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
+      ),
+    );
+
+    try {
+      // Run the seeder script (requires Firebase initialized)
+      await Future.sync(() => runDevSeeder(patientId: currentUser.uid));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Dev data seeded successfully'),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Seeding failed: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 
   void _showThemeDialog(BuildContext context, ThemeController themeController) {

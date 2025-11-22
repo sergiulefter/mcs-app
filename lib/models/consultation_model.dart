@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import '../utils/app_theme.dart';
 
 class ConsultationModel {
   final String id;
@@ -10,7 +12,6 @@ class ConsultationModel {
   final String description;
   final List<AttachmentModel> attachments;
   final DoctorResponseModel? doctorResponse;
-  final String? patientFeedback;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? completedAt;
@@ -30,7 +31,6 @@ class ConsultationModel {
     required this.description,
     required this.attachments,
     this.doctorResponse,
-    this.patientFeedback,
     required this.createdAt,
     required this.updatedAt,
     this.completedAt,
@@ -59,7 +59,6 @@ class ConsultationModel {
           ? DoctorResponseModel.fromMap(
               data['doctorResponse'] as Map<String, dynamic>)
           : null,
-      patientFeedback: data['patientFeedback'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
       completedAt: data['completedAt'] != null
@@ -80,7 +79,6 @@ class ConsultationModel {
       'description': description,
       'attachments': attachments.map((e) => e.toMap()).toList(),
       'doctorResponse': doctorResponse?.toMap(),
-      'patientFeedback': patientFeedback,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
       'completedAt':
@@ -100,7 +98,6 @@ class ConsultationModel {
     String? description,
     List<AttachmentModel>? attachments,
     DoctorResponseModel? doctorResponse,
-    String? patientFeedback,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? completedAt,
@@ -118,7 +115,6 @@ class ConsultationModel {
       description: description ?? this.description,
       attachments: attachments ?? this.attachments,
       doctorResponse: doctorResponse ?? this.doctorResponse,
-      patientFeedback: patientFeedback ?? this.patientFeedback,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       completedAt: completedAt ?? this.completedAt,
@@ -188,5 +184,26 @@ class DoctorResponseModel {
       'respondedAt': Timestamp.fromDate(respondedAt),
       'followUpNeeded': followUpNeeded,
     };
+  }
+}
+
+// Extension for consultation color helpers
+extension ConsultationColors on ConsultationModel {
+  Color getStatusColor(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppSemanticColors>();
+
+    switch (status) {
+      case 'pending':
+        return semantic?.warning ?? colorScheme.primary;
+      case 'in_review':
+        return colorScheme.primary;
+      case 'completed':
+        return semantic?.success ?? colorScheme.secondary;
+      case 'cancelled':
+        return semantic?.error ?? colorScheme.error;
+      default:
+        return colorScheme.onSurfaceVariant;
+    }
   }
 }

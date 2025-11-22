@@ -46,27 +46,22 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Consultations collection - patients create requests, can read their own
+    // Consultations collection - patients access their own; admins full access (seeding, management)
     match /consultations/{consultationId} {
-      function isOwnerOfConsultation() {
+      function isOwnerOfNew() {
         return isAuthenticated() &&
-               request.auth.uid == request.resource.data.patientId;
+               request.resource.data.patientId == request.auth.uid;
       }
 
-      function isOwnerOfExistingConsultation() {
+      function isOwnerExisting() {
         return isAuthenticated() &&
-               request.auth.uid == resource.data.patientId;
+               resource.data.patientId == request.auth.uid;
       }
 
-      // Patients create their own consultation requests
-      allow create: if isOwnerOfConsultation();
-
-      // Patients can read/update their own requests
-      allow read: if isOwnerOfExistingConsultation();
-      allow update: if isOwnerOfExistingConsultation();
-
-      // No deletes for now
-      allow delete: if false;
+      allow create: if isOwnerOfNew() || isAdmin();
+      allow read: if isOwnerExisting() || isAdmin();
+      allow update: if isOwnerExisting() || isAdmin();
+      allow delete: if isOwnerExisting() || isAdmin();
     }
 
     // Default rule: deny all access to any other collections

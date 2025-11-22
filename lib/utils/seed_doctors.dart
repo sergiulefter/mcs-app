@@ -1,33 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
 import '../models/doctor_model.dart';
 import '../models/medical_specialty.dart';
 import '../services/doctor_service.dart';
 
-/// Standalone script to seed sample doctors to Firestore for testing
-/// Run with: dart run lib/utils/seed_doctors.dart
-///
 /// This should be called ONCE to populate the database
 /// In production, doctors would be created by admins via Firebase Console
-
-Future<void> main() async {
-  print('🔥 Initializing Firebase...');
-
-  try {
-    await Firebase.initializeApp();
-    print('✓ Firebase initialized successfully');
-  } catch (e) {
-    print('✗ Firebase initialization failed: $e');
-    print('Note: Make sure Firebase is configured properly.');
-    return;
-  }
-
-  print('\n🌱 Starting doctor seeding...\n');
-
-  final seeder = DoctorSeeder();
-  await seeder.seedDoctors();
-
-  print('\n✅ Seeding completed! Exiting...');
-}
 
 /// Utility class to seed sample doctors to Firestore for testing
 class DoctorSeeder {

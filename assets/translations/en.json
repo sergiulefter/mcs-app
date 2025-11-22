@@ -174,6 +174,8 @@
     "accepting_consultations": "Accepting new consultation requests",
     "not_accepting_consultations": "Currently reviewing existing consultations",
     "on_vacation": "On vacation from {start} to {end}",
+    "on_vacation_prefix": "On vacation from",
+    "on_vacation_to": "to",
     "read_more": "Read more",
     "read_less": "Read less",
     "request_consultation": "Request Consultation",
@@ -206,6 +208,44 @@
       "completed": "Completed",
       "cancelled": "Cancelled"
     }
+  },
+  "request_detail": {
+    "title": "Consultation Details",
+    "request_info": "Request Information",
+    "title_label": "Title",
+    "description_label": "Description",
+    "created_at": "Created",
+    "updated_at": "Updated",
+    "urgency": {
+      "normal": "Normal",
+      "urgent": "Urgent",
+      "emergency": "Emergency"
+    },
+    "timeline": {
+      "title": "Status Timeline",
+      "created": "Request created",
+      "updated": "Last updated",
+      "completed": "Completed"
+    },
+    "doctor": {
+      "title": "Assigned Doctor",
+      "unassigned_title": "No doctor assigned",
+      "unassigned_subtitle": "We'll assign a specialist to your request soon."
+    },
+    "doctor_response": {
+      "title": "Doctor Response"
+    },
+    "attachments": {
+      "title": "Attachments",
+      "placeholder_title": "File uploads coming soon",
+      "placeholder_subtitle": "You can submit this request without attachments for now."
+    },
+    "cancel_request": "Cancel Request",
+    "cancel_dialog_title": "Cancel Consultation Request?",
+    "cancel_dialog_message": "Are you sure you want to cancel this consultation request? This action cannot be undone.",
+    "cancel_confirm": "Yes, Cancel Request",
+    "cancel_success": "Consultation request cancelled successfully",
+    "cancel_error": "Failed to cancel request. Please try again."
   },
   "create_request": {
     "title": "Request Consultation",
@@ -266,6 +306,8 @@
     "quick_actions": "Quick Actions",
     "account_section": "Account",
     "patient_account": "Patient Account",
+    "doctor_account": "Doctor Account",
+    "admin_account": "Admin Account",
     "email_label": "Email",
     "user_id_label": "User ID",
     "user_id": "User ID",

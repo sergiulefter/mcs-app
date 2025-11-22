@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../models/doctor_model.dart';
@@ -383,9 +383,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   }
 
   Widget _buildAvailabilitySection(BuildContext context) {
-    final activeVacations = widget.doctor.vacationPeriods
-        .where((vacation) => vacation.isActive())
-        .toList();
+    if (!widget.doctor.isCurrentlyAvailable) {
+      // Avoid duplicating the unavailable messaging; the footer handles it.
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,11 +395,11 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         const SizedBox(height: AppTheme.spacing16),
         Container(
           padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            border: Border.all(color: Theme.of(context).dividerColor),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -427,42 +428,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               ),
               const SizedBox(height: AppTheme.spacing8),
               Text(
-                widget.doctor.isCurrentlyAvailable
-                    ? 'doctor_profile.accepting_consultations'.tr()
-                    : 'doctor_profile.not_accepting_consultations'.tr(),
+                'doctor_profile.accepting_consultations'.tr(),
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              if (activeVacations.isNotEmpty) ...[
-                const SizedBox(height: AppTheme.spacing16),
-                const Divider(),
-                const SizedBox(height: AppTheme.spacing16),
-                ...activeVacations.map((vacation) {
-                  final dateFormat = DateFormat('dd MMM yyyy');
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppTheme.spacing8),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.event_busy,
-                          size: AppTheme.iconSmall,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: AppTheme.spacing8),
-                        Expanded(
-                          child: Text(
-                            'doctor_profile.on_vacation'.tr(namedArgs: {
-                              'start': dateFormat.format(vacation.startDate),
-                              'end': dateFormat.format(vacation.endDate),
-                            }),
-                            style:
-                                Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ],
             ],
           ),
         ),
@@ -471,10 +439,31 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   }
 
   Widget _buildRequestButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+    final activeOrUpcomingVacations = widget.doctor.vacationPeriods
+        .where((vac) => vac.isActive() || vac.startDate.isAfter(now))
+        .toList()
+      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+
+    String? startDate;
+    String? endDate;
+    String? unavailableReason;
+    if (!widget.doctor.isCurrentlyAvailable &&
+        activeOrUpcomingVacations.isNotEmpty) {
+      final vac = activeOrUpcomingVacations.first;
+      final dateFormat = DateFormat('dd MMM yyyy');
+      startDate = dateFormat.format(vac.startDate);
+      endDate = dateFormat.format(vac.endDate);
+      if (vac.reason != null && vac.reason!.isNotEmpty) {
+        unavailableReason = vac.reason!;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(AppTheme.spacing32),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: colorScheme.surface,
         border: Border(
           top: BorderSide(
             color: Theme.of(context).dividerColor,
@@ -491,9 +480,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               ]
             : null,
       ),
-      child: ElevatedButton.icon(
-        onPressed: widget.doctor.isCurrentlyAvailable
-            ? () {
+      child: widget.doctor.isCurrentlyAvailable
+          ? ElevatedButton.icon(
+              onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CreateRequestScreen(
@@ -501,28 +490,63 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     ),
                   ),
                 );
-              }
-            : null,
-        icon: const Icon(Icons.medical_services_outlined),
-        label: Text(
-          widget.doctor.isCurrentlyAvailable
-              ? 'doctor_profile.request_consultation'.tr()
-              : 'doctor_profile.unavailable_button'.tr(),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          disabledBackgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-          disabledForegroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          ),
-        ),
-      ),
+              },
+              icon: const Icon(Icons.medical_services_outlined),
+              label: Text('doctor_profile.request_consultation'.tr()),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                ),
+              ),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (startDate != null && endDate != null)
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: colorScheme.onSurface,
+                          ),
+                      children: [
+                        TextSpan(text: 'doctor_profile.on_vacation_prefix'.tr()),
+                        TextSpan(
+                          text: ' $startDate ',
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        TextSpan(text: 'doctor_profile.on_vacation_to'.tr()),
+                        TextSpan(
+                          text: ' $endDate',
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (unavailableReason != null) ...[
+                  const SizedBox(height: AppTheme.spacing8),
+                  Text(
+                    unavailableReason,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ],
+            ),
     );
   }
-
   String _initialsFromName(String name) {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return '';
@@ -667,3 +691,6 @@ class _InfoColumn extends StatelessWidget {
     );
   }
 }
+
+
+

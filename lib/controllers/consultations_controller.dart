@@ -101,4 +101,28 @@ class ConsultationsController extends ChangeNotifier {
     _selectedStatus = 'all';
     notifyListeners();
   }
+
+  // Cancel a consultation
+  Future<void> cancelConsultation(String consultationId) async {
+    try {
+      await _firestore.collection('consultations').doc(consultationId).update({
+        'status': 'cancelled',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Update local state
+      final index = _consultations.indexWhere((c) => c.id == consultationId);
+      if (index != -1) {
+        _consultations[index] = _consultations[index].copyWith(
+          status: 'cancelled',
+          updatedAt: DateTime.now(),
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
 }

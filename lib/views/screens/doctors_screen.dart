@@ -174,16 +174,12 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               final availabilityLabel = doctor.isCurrentlyAvailable
                   ? 'doctors.availability_badge.available'.tr()
                   : 'doctors.availability_badge.unavailable'.tr();
-              final availabilityDescription = doctor.isCurrentlyAvailable
-                  ? 'doctors.availability_description.available'.tr()
-                  : 'doctors.availability_description.unavailable'.tr();
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppTheme.spacing20),
                 child: DoctorCard(
                   doctor: doctor,
                   availabilityLabel: availabilityLabel,
-                  availabilityDescription: availabilityDescription,
                   availabilityColor: doctor.isCurrentlyAvailable
                       ? Theme.of(context).colorScheme.secondary
                       : Theme.of(context).colorScheme.onSurfaceVariant,

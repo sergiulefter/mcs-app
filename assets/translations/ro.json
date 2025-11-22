@@ -174,6 +174,8 @@
     "accepting_consultations": "Acceptă cereri noi de consultație",
     "not_accepting_consultations": "Evaluează consultațiile existente",
     "on_vacation": "În vacanță din {start} până în {end}",
+    "on_vacation_prefix": "În vacanță din",
+    "on_vacation_to": "până în",
     "read_more": "Citește mai mult",
     "read_less": "Citește mai puțin",
     "request_consultation": "Solicită Consultație",
@@ -206,6 +208,44 @@
       "completed": "Finalizate",
       "cancelled": "Anulate"
     }
+  },
+  "request_detail": {
+    "title": "Detalii consultație",
+    "request_info": "Informații cerere",
+    "title_label": "Titlu",
+    "description_label": "Descriere",
+    "created_at": "Creată",
+    "updated_at": "Actualizată",
+    "urgency": {
+      "normal": "Normal",
+      "urgent": "Urgent",
+      "emergency": "Urgență"
+    },
+    "timeline": {
+      "title": "Cronologie status",
+      "created": "Cerere creată",
+      "updated": "Ultima actualizare",
+      "completed": "Finalizată"
+    },
+    "doctor": {
+      "title": "Medic atriubuit",
+      "unassigned_title": "Niciun medic atribuit",
+      "unassigned_subtitle": "Vom atribui curând un specialist cererii tale."
+    },
+    "doctor_response": {
+      "title": "Răspuns medic"
+    },
+    "attachments": {
+      "title": "Atașamente",
+      "placeholder_title": "Încărcarea fișierelor va fi disponibilă în curând",
+      "placeholder_subtitle": "Poți trimite cererea fără atașamente momentan."
+    },
+    "cancel_request": "Anulează cererea",
+    "cancel_dialog_title": "Anulezi cererea de consultație?",
+    "cancel_dialog_message": "Ești sigur că vrei să anulezi această cerere de consultație? Această acțiune nu poate fi anulată.",
+    "cancel_confirm": "Da, anulează cererea",
+    "cancel_success": "Cererea de consultație a fost anulată cu succes",
+    "cancel_error": "Anularea cererii a eșuat. Te rugăm să încerci din nou."
   },
   "notifications": {
     "title": "Notificări",
@@ -266,6 +306,8 @@
     "quick_actions": "Acțiuni Rapide",
     "account_section": "Cont",
     "patient_account": "Cont Pacient",
+    "doctor_account": "Cont Medic",
+    "admin_account": "Cont Administrator",
     "email_label": "Email",
     "user_id_label": "ID Utilizator",
     "user_id": "ID Utilizator",
