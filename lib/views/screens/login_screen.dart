@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/consultations_controller.dart';
 import '../../utils/validators.dart';
 import '../../utils/app_theme.dart';
 import '../widgets/app_text_field.dart';
@@ -20,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isPrefetching = false;
 
   @override
   void dispose() {
@@ -31,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       final authController = context.read<AuthController>();
+      final consultationsController = context.read<ConsultationsController>();
 
       final success = await authController.signIn(
         email: _emailController.text.trim(),
@@ -38,10 +41,23 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (success && mounted) {
+        setState(() => _isPrefetching = true);
+
+        final userId = authController.currentUser?.uid;
+        if (userId != null) {
+          await consultationsController.primeForUser(userId, force: true);
+        }
+
+        if (!mounted) return;
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const MainShell()),
         );
+        if (mounted) {
+          setState(() => _isPrefetching = false);
+        }
       } else if (mounted) {
+        setState(() => _isPrefetching = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(authController.errorMessage ?? 'Login failed'),
@@ -190,8 +206,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Consumer<AuthController>(
       builder: (context, authController, child) {
         return ElevatedButton(
-          onPressed: authController.isLoading ? null : _handleLogin,
-          child: authController.isLoading
+          onPressed:
+              (authController.isLoading || _isPrefetching) ? null : _handleLogin,
+          child: (authController.isLoading || _isPrefetching)
               ? SizedBox(
                   height: 20,
                   width: 20,

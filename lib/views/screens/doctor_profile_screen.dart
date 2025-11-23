@@ -2,7 +2,10 @@
 import 'package:easy_localization/easy_localization.dart';
 
 import '../../models/doctor_model.dart';
+import 'package:intl/intl.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/section_header.dart';
+import '../widgets/surface_card.dart';
 import 'create_request_screen.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
@@ -76,24 +79,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
+    return SurfaceCard(
       padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(
-          color: Theme.of(context).dividerColor,
-        ),
-        boxShadow: Theme.of(context).brightness == Brightness.light
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
+      borderColor: Theme.of(context).dividerColor,
+      showShadow: Theme.of(context).brightness == Brightness.light,
       child: Column(
         children: [
           Row(
@@ -155,13 +144,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   Widget _buildQuickInfo(BuildContext context) {
     final priceFormat = NumberFormat('#,##0.00', 'en_US');
 
-    return Container(
+    return SurfaceCard(
       padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
+      borderColor: Theme.of(context).dividerColor,
+      showShadow: false,
       child: Row(
         children: [
           Expanded(
@@ -207,15 +193,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'doctor_profile.about'.tr()),
+        SectionHeader(title: 'doctor_profile.about'.tr()),
         const SizedBox(height: AppTheme.spacing16),
-        Container(
+        SurfaceCard(
           padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
+          borderColor: Theme.of(context).dividerColor,
+          showShadow: false,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -273,17 +256,14 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'doctor_profile.education'.tr()),
+        SectionHeader(title: 'doctor_profile.education'.tr()),
         const SizedBox(height: AppTheme.spacing16),
         ...sortedEducation.map((education) => Padding(
               padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
-              child: Container(
+              child: SurfaceCard(
                 padding: AppTheme.cardPadding,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  border: Border.all(color: Theme.of(context).dividerColor),
-                ),
+                borderColor: Theme.of(context).dividerColor,
+                showShadow: false,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -357,15 +337,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'doctor_profile.subspecialties'.tr()),
+        SectionHeader(title: 'doctor_profile.subspecialties'.tr()),
         const SizedBox(height: AppTheme.spacing16),
-        Container(
+        SurfaceCard(
           padding: AppTheme.cardPadding,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            border: Border.all(color: Theme.of(context).dividerColor),
-          ),
+          borderColor: Theme.of(context).dividerColor,
+          showShadow: false,
           child: Wrap(
             spacing: AppTheme.spacing8,
             runSpacing: AppTheme.spacing8,
@@ -391,15 +368,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _SectionHeader(title: 'doctor_profile.availability_status'.tr()),
+        SectionHeader(title: 'doctor_profile.availability_status'.tr()),
         const SizedBox(height: AppTheme.spacing16),
-        Container(
+        SurfaceCard(
           padding: AppTheme.cardPadding,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            border: Border.all(color: Theme.of(context).dividerColor),
-          ),
+          borderColor: Theme.of(context).dividerColor,
+          showShadow: false,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -634,22 +608,6 @@ class _Badge extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-    );
-  }
-}
-
 class _InfoColumn extends StatelessWidget {
   const _InfoColumn({
     required this.icon,
@@ -691,6 +649,3 @@ class _InfoColumn extends StatelessWidget {
     );
   }
 }
-
-
-

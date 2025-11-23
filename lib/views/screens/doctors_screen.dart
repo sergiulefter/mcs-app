@@ -6,6 +6,9 @@ import '../../utils/app_theme.dart';
 import '../widgets/app_empty_state.dart';
 import '../widgets/app_search_bar.dart';
 import '../widgets/doctor_card.dart';
+import '../widgets/section_header.dart';
+import '../widgets/surface_card.dart';
+import '../widgets/themed_filter_chip.dart';
 import 'doctor_profile_screen.dart';
 
 class DoctorsScreen extends StatefulWidget {
@@ -23,11 +26,14 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  String _selectedSpecialty = 'all';
+  Set<String> _selectedSpecialties = {};
+  Set<String> _selectedExperienceRanges = {};
   bool _availableOnly = false;
 
   bool get _hasActiveFilters =>
-      _selectedSpecialty != 'all' || _availableOnly;
+      _selectedSpecialties.isNotEmpty ||
+      _selectedExperienceRanges.isNotEmpty ||
+      _availableOnly;
 
   @override
   void initState() {
@@ -71,11 +77,31 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       final matchesSearch = searchQuery.isEmpty ||
           doctor.fullName.toLowerCase().contains(searchQuery) ||
           specialtyKey.toLowerCase().contains(searchQuery);
-      final matchesSpecialty =
-          _selectedSpecialty == 'all' || specialtyKey == _selectedSpecialty;
+      final matchesSpecialty = _selectedSpecialties.isEmpty ||
+          _selectedSpecialties.contains(specialtyKey);
+      final matchesExperience =
+          _selectedExperienceRanges.isEmpty ||
+              _selectedExperienceRanges.any(
+                (range) => _experienceMatchesRange(doctor.experienceYears, range),
+              );
       final matchesAvailability = !_availableOnly || doctor.isCurrentlyAvailable;
-      return matchesSearch && matchesSpecialty && matchesAvailability;
+      return matchesSearch && matchesSpecialty && matchesExperience && matchesAvailability;
     }).toList();
+  }
+
+  bool _experienceMatchesRange(int years, String rangeKey) {
+    switch (rangeKey) {
+      case '0_5':
+        return years < 5;
+      case '5_10':
+        return years >= 5 && years < 10;
+      case '10_15':
+        return years >= 10 && years < 15;
+      case '15_plus':
+        return years >= 15;
+      default:
+        return true;
+    }
   }
 
   @override
@@ -110,13 +136,12 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-              ),
+            SurfaceCard(
+              padding: const EdgeInsets.all(AppTheme.spacing16),
+              backgroundColor:
+                  Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+              borderColor: Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
+              showShadow: false,
               child: Icon(
                 Icons.error_outline,
                 size: 36,
@@ -227,10 +252,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
   Widget _buildFilterActions(BuildContext context) {
-    final activeCount = [
-      if (_selectedSpecialty != 'all') 1,
-      if (_availableOnly) 1,
-    ].length;
+    int activeCount = 0;
+    if (_selectedSpecialties.isNotEmpty) activeCount++;
+    if (_selectedExperienceRanges.isNotEmpty) activeCount++;
+    if (_availableOnly) activeCount++;
 
     return Row(
       children: [
@@ -264,7 +289,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   }
 
   Future<void> _openFiltersSheet(BuildContext context) async {
-    var tempSelectedSpecialty = _selectedSpecialty;
+    var tempSelectedSpecialties = {..._selectedSpecialties};
+    var tempSelectedExperienceRanges = {..._selectedExperienceRanges};
     var tempAvailableOnly = _availableOnly;
 
     await showModalBottomSheet(
@@ -313,11 +339,27 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         const SizedBox(height: AppTheme.spacing16),
                         _buildFiltersContent(
                           context,
-                          selectedSpecialty: tempSelectedSpecialty,
+                          selectedSpecialties: tempSelectedSpecialties,
+                          selectedExperienceRanges: tempSelectedExperienceRanges,
                           availableOnly: tempAvailableOnly,
                           onSpecialtyChanged: (value) {
                             setModalState(() {
-                              tempSelectedSpecialty = value;
+                              if (value == 'all') {
+                                tempSelectedSpecialties.clear();
+                              } else if (tempSelectedSpecialties.contains(value)) {
+                                tempSelectedSpecialties.remove(value);
+                              } else {
+                                tempSelectedSpecialties.add(value);
+                              }
+                            });
+                          },
+                          onExperienceChanged: (value) {
+                            setModalState(() {
+                              if (tempSelectedExperienceRanges.contains(value)) {
+                                tempSelectedExperienceRanges.remove(value);
+                              } else {
+                                tempSelectedExperienceRanges.add(value);
+                              }
                             });
                           },
                           onAvailabilityChanged: (value) {
@@ -333,11 +375,13 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                               child: OutlinedButton(
                                 onPressed: () {
                                   setModalState(() {
-                                    tempSelectedSpecialty = 'all';
+                                    tempSelectedSpecialties.clear();
+                                    tempSelectedExperienceRanges.clear();
                                     tempAvailableOnly = false;
                                   });
                                   setState(() {
-                                    _selectedSpecialty = 'all';
+                                    _selectedSpecialties.clear();
+                                    _selectedExperienceRanges.clear();
                                     _availableOnly = false;
                                   });
                                   Navigator.of(sheetContext).pop();
@@ -350,7 +394,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   setState(() {
-                                    _selectedSpecialty = tempSelectedSpecialty;
+                                    _selectedSpecialties =
+                                        {...tempSelectedSpecialties};
+                                    _selectedExperienceRanges =
+                                        {...tempSelectedExperienceRanges};
                                     _availableOnly = tempAvailableOnly;
                                   });
                                   Navigator.of(sheetContext).pop();
@@ -374,86 +421,71 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   Widget _buildFiltersContent(
     BuildContext context, {
-    required String selectedSpecialty,
+    required Set<String> selectedSpecialties,
+    required Set<String> selectedExperienceRanges,
     required bool availableOnly,
     required ValueChanged<String> onSpecialtyChanged,
+    required ValueChanged<String> onExperienceChanged,
     required ValueChanged<bool> onAvailabilityChanged,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'doctors.filters.specialty'.tr(),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-        ),
+        SectionHeader(title: 'doctors.filters.specialty'.tr()),
         const SizedBox(height: AppTheme.spacing12),
         Wrap(
           spacing: AppTheme.spacing12,
           runSpacing: AppTheme.spacing12,
           children: _specialtyOptions.map((specialty) {
-            final isSelected = specialty == selectedSpecialty;
-            return ChoiceChip(
-              label: Text(
-                specialty == 'all'
-                    ? 'doctors.filters.all_specialties'.tr()
-                    : 'specialties.$specialty'.tr(),
-              ),
+            final isAll = specialty == 'all';
+            final isSelected =
+                isAll ? selectedSpecialties.isEmpty : selectedSpecialties.contains(specialty);
+            final label = isAll
+                ? 'doctors.filters.all_specialties'.tr()
+                : 'specialties.$specialty'.tr();
+            return ThemedFilterChip(
+              label: label,
               selected: isSelected,
-                onSelected: (_) {
-                  onSpecialtyChanged(specialty);
-                },
-                labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                selectedColor: colorScheme.primaryContainer,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                checkmarkColor: colorScheme.onPrimaryContainer,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  side: BorderSide(
-                    color: isSelected
-                        ? colorScheme.primary.withValues(alpha: 0.5)
-                        : Theme.of(context).dividerColor,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: AppTheme.spacing24),
-        Text(
-          'doctors.filters.availability'.tr(),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+              onSelected: (_) => onSpecialtyChanged(specialty),
+              hideIconWhenSelected: true,
+            );
+          }).toList(),
         ),
+        const SizedBox(height: AppTheme.spacing24),
+        SectionHeader(title: 'Experience'),
         const SizedBox(height: AppTheme.spacing12),
-        FilterChip(
-            selected: availableOnly,
-            label: Text('doctors.filters.available_now'.tr()),
-            onSelected: (_) => onAvailabilityChanged(!availableOnly),
-            labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
-            selectedColor: colorScheme.secondaryContainer,
-            checkmarkColor: colorScheme.onSecondaryContainer,
-            backgroundColor: colorScheme.surfaceContainerHighest,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              side: BorderSide(
-                color: availableOnly
-                    ? colorScheme.secondary.withValues(alpha: 0.5)
-                    : Theme.of(context).dividerColor,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
+        Wrap(
+          spacing: AppTheme.spacing12,
+          runSpacing: AppTheme.spacing12,
+          children: [
+            {'key': '0_5', 'label': '< 5 years'},
+            {'key': '5_10', 'label': '5-10 years'},
+            {'key': '10_15', 'label': '10-15 years'},
+            {'key': '15_plus', 'label': '15+ years'},
+          ].map((range) {
+            final key = range['key']!;
+            final isSelected = selectedExperienceRanges.contains(key);
+            return ThemedFilterChip(
+              label: range['label']!,
+              selected: isSelected,
+              onSelected: (_) => onExperienceChanged(key),
+              hideIconWhenSelected: true,
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: AppTheme.spacing24),
+        SectionHeader(title: 'doctors.filters.availability'.tr()),
+        const SizedBox(height: AppTheme.spacing12),
+        ThemedFilterChip(
+          label: 'doctors.filters.available_now'.tr(),
+          selected: availableOnly,
+          onSelected: (_) => onAvailabilityChanged(!availableOnly),
+          icon: Icons.schedule,
+          hideIconWhenSelected: true,
+        ),
+      ],
+    );
+  }
 
   Widget _buildResultsHeader(BuildContext context, int count) {
     return Row(
@@ -484,10 +516,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   void _resetFilters() {
     setState(() {
-      _selectedSpecialty = 'all';
+      _selectedSpecialties.clear();
+      _selectedExperienceRanges.clear();
       _availableOnly = false;
     });
   }
 
 }
-

@@ -7,6 +7,7 @@ import '../../models/consultation_model.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/consultations_controller.dart';
 import '../../utils/app_theme.dart';
+import '../widgets/surface_card.dart';
 import 'consultations_screen.dart';
 
 class CreateRequestScreen extends StatefulWidget {
@@ -247,63 +248,62 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   Widget _buildDoctorCard() {
-    return Container(
-      margin: const EdgeInsets.all(AppTheme.spacing16),
-      padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-            ),
-            child: Center(
-              child: Text(
-                widget.doctor.fullName.substring(0, 1).toUpperCase(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
+    return Padding(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      child: SurfaceCard(
+        padding: AppTheme.cardPadding,
+        backgroundColor:
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+        borderColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+        showShadow: false,
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+              ),
+              child: Center(
+                child: Text(
+                  widget.doctor.fullName.substring(0, 1).toUpperCase(),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: AppTheme.spacing12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.doctor.fullName,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                Text(
-                  widget.doctor.specialty.name,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ],
+            const SizedBox(width: AppTheme.spacing12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.doctor.fullName,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  Text(
+                    widget.doctor.specialty.name,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            '${widget.doctor.consultationPrice.toInt()} ${'doctor_profile.currency'.tr()}',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ],
+            Text(
+              '${widget.doctor.consultationPrice.toInt()} ${'doctor_profile.currency'.tr()}',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -522,18 +522,12 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           const SizedBox(height: AppTheme.sectionSpacing),
 
           // Info message
-          Container(
+          SurfaceCard(
             padding: AppTheme.cardPadding,
-            decoration: BoxDecoration(
-              color: Theme.of(context)
-                  .colorScheme
-                  .secondary
-                  .withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              border: Border.all(
-                color: Theme.of(context).dividerColor,
-              ),
-            ),
+            backgroundColor:
+                Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+            borderColor: Theme.of(context).dividerColor,
+            showShadow: false,
             child: Row(
               children: [
                 Icon(
@@ -635,12 +629,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           const SizedBox(height: AppTheme.spacing24),
 
           // Terms and conditions
-          Container(
+          SurfaceCard(
             padding: AppTheme.cardPadding,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            ),
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            showShadow: false,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -664,8 +656,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   child: Text(
                     'create_request.step3.terms_text'.tr(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                 ),
@@ -702,15 +693,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     required VoidCallback onEdit,
     required Widget child,
   }) {
-    return Container(
+    return SurfaceCard(
       padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(
-          color: Theme.of(context).dividerColor,
-        ),
-      ),
+      borderColor: Theme.of(context).dividerColor,
+      showShadow: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

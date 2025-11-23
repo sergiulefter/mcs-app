@@ -9,12 +9,17 @@ class ConsultationsController extends ChangeNotifier {
   List<ConsultationModel> _consultations = [];
   bool _isLoading = false;
   String? _error;
+  String? _loadedUserId;
+  bool _hasPrimedForUser = false;
   String _selectedStatus = 'all'; // 'all' | 'pending' | 'in_review' | 'completed' | 'cancelled'
 
   List<ConsultationModel> get consultations => _consultations;
   bool get isLoading => _isLoading;
   String? get error => _error;
   String get selectedStatus => _selectedStatus;
+  bool get hasPrimedForUser => _hasPrimedForUser;
+  bool hasDataForUser(String userId) =>
+      _hasPrimedForUser && _loadedUserId == userId;
 
   // Get filtered consultations based on selected status
   List<ConsultationModel> get filteredConsultations {
@@ -46,6 +51,8 @@ class ConsultationsController extends ChangeNotifier {
       // Fetch doctor info for each consultation
       await _fetchDoctorInfo();
 
+      _loadedUserId = userId;
+      _hasPrimedForUser = true;
       _isLoading = false;
       _error = null;
       notifyListeners();
@@ -54,6 +61,14 @@ class ConsultationsController extends ChangeNotifier {
       _error = e.toString();
       notifyListeners();
     }
+  }
+
+  // Prime data for a given user; skips network if already loaded for same user unless forced.
+  Future<void> primeForUser(String userId, {bool force = false}) async {
+    if (!force && _hasPrimedForUser && _loadedUserId == userId) {
+      return;
+    }
+    await fetchUserConsultations(userId);
   }
 
   // Fetch doctor information for consultations
@@ -97,6 +112,8 @@ class ConsultationsController extends ChangeNotifier {
   void clear() {
     _consultations = [];
     _isLoading = false;
+    _loadedUserId = null;
+    _hasPrimedForUser = false;
     _error = null;
     _selectedStatus = 'all';
     notifyListeners();

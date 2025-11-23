@@ -6,6 +6,7 @@ import '../../controllers/consultations_controller.dart';
 import '../../utils/app_theme.dart';
 import '../widgets/consultation_card.dart';
 import '../widgets/app_empty_state.dart';
+import '../widgets/themed_filter_chip.dart';
 import 'request_detail_screen.dart';
 
 class ConsultationsScreen extends StatefulWidget {
@@ -170,30 +171,13 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
         child: Row(
           children: statuses.map((status) {
             final isSelected = selectedStatus == status['key'];
-            final colorScheme = Theme.of(context).colorScheme;
             return Padding(
               padding: const EdgeInsets.only(right: AppTheme.spacing8),
-              child: FilterChip(
-                label: Text(status['label']!),
+              child: ThemedFilterChip(
+                label: status['label']!,
                 selected: isSelected,
-                onSelected: (_) {
-                  consultationsController.setStatusFilter(status['key']!);
-                },
-                labelStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                selectedColor: colorScheme.primaryContainer,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                checkmarkColor: colorScheme.onPrimaryContainer,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  side: BorderSide(
-                    color: isSelected
-                        ? colorScheme.primary.withValues(alpha: 0.5)
-                        : Theme.of(context).dividerColor,
-                  ),
-                ),
+                onSelected: (_) =>
+                    consultationsController.setStatusFilter(status['key']!),
               ),
             );
           }).toList(),

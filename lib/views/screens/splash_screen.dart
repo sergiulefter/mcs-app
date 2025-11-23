@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/consultations_controller.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/constants.dart';
 import 'language_selection_screen.dart';
@@ -20,6 +21,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool _showLoadingUi = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,12 +41,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
       // Wait for auth state to be initialized
       // Shows loading UI while Firebase checks for existing session
-      await Future.any([
-        Future.delayed(const Duration(seconds: 3)), // Max 3 seconds timeout
-        _waitForAuthState(authController),
-      ]);
+      await _waitForAuthState(authController);
 
       if (!mounted) return;
+
+      if (authController.isAuthenticated) {
+        setState(() {
+          _showLoadingUi = true;
+        });
+      }
 
       // Check preferences for language selection and onboarding
       final prefs = await SharedPreferences.getInstance();
@@ -52,8 +58,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (!mounted) return;
 
-      // Navigate to appropriate screen based on auth state
-      _navigateToNextScreen(languageSelected, onboardingCompleted);
+      if (authController.isAuthenticated) {
+        await _primeUserData(authController);
+        if (!mounted) return;
+        _navigateToMainShell();
+      } else {
+        _navigateToAuthFlow(languageSelected, onboardingCompleted);
+      }
     } catch (e) {
       // If Firebase fails to initialize, still show the app
       if (!mounted) return;
@@ -61,33 +72,43 @@ class _SplashScreenState extends State<SplashScreen> {
       final languageSelected = prefs.getBool('language_selected') ?? false;
       final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
       if (!mounted) return;
-      _navigateToNextScreen(languageSelected, onboardingCompleted);
+      _navigateToAuthFlow(languageSelected, onboardingCompleted);
     }
   }
 
   // Wait for auth state to be initialized (checks if Firebase has determined auth status)
   Future<void> _waitForAuthState(AuthController authController) async {
-    // If auth state has been initialized, return immediately
-    if (authController.authStateInitialized) {
-      return;
+    while (!authController.authStateInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
     }
-
-    // Otherwise wait briefly and check again
-    await Future.delayed(const Duration(milliseconds: 100));
-    return _waitForAuthState(authController);
   }
 
-  void _navigateToNextScreen(bool languageSelected, bool onboardingCompleted) {
-    final authController = context.read<AuthController>();
+  Future<void> _primeUserData(AuthController authController) async {
+    final userId = authController.currentUser?.uid;
+    if (userId == null) return;
+    final consultationsController = context.read<ConsultationsController>();
+    await consultationsController.primeForUser(userId, force: true);
+  }
 
+  void _navigateToMainShell() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => const MainShell(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: AppConstants.mediumDuration,
+      ),
+    );
+  }
+
+  void _navigateToAuthFlow(bool languageSelected, bool onboardingCompleted) {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) {
-          // If user is authenticated, go directly to MainShell
-          if (authController.isAuthenticated) {
-            return const MainShell();
-          }
-
           // If language not selected, show language selection first
           if (!languageSelected) {
             return const LanguageSelectionScreen();
@@ -114,6 +135,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_showLoadingUi) {
+      // For unauthenticated users we skip the dynamic splash; show a blank canvas while routing.
+      return Scaffold(
+        body: Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+        ),
+      );
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Column(
