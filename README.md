@@ -38,34 +38,7 @@ A modern Flutter mobile application built with clean architecture principles, fe
    flutter pub get
    ```
 
-3. **Configure Firebase** (Required - generates Firebase config files)
-
-   Install Firebase CLI:
-   ```bash
-   npm install -g firebase-tools
-   ```
-
-   Login to Firebase:
-   ```bash
-   firebase login
-   ```
-
-   Install FlutterFire CLI:
-   ```bash
-   dart pub global activate flutterfire_cli
-   ```
-
-   Configure Firebase project:
-   ```bash
-   flutterfire configure
-   ```
-
-   This will generate:
-   - `lib/firebase_options.dart`
-   - `android/app/google-services.json`
-   - `ios/Runner/GoogleService-Info.plist`
-
-4. **Run the app**
+3. **Run the app**
    ```bash
    flutter run
    ```
@@ -85,10 +58,6 @@ This project uses Firebase (`mcs-app-f1e37`) with the following services:
 
 3. **Firebase Storage**
    - For medical documents and images (future implementation)
-
-4. **Cloud Functions** (optional, configured in `functions/`)
-   - Admin claim management
-   - Server-side business logic
 
 **Important**: Firebase config files are **not committed to Git** for security.
 Run `flutterfire configure` to generate them locally.

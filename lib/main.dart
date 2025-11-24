@@ -7,7 +7,7 @@ import 'firebase_options.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/theme_controller.dart';
 import 'controllers/consultations_controller.dart';
-import 'views/screens/splash_screen.dart';
+import 'views/patient/screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
 
