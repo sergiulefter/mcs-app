@@ -116,13 +116,6 @@ flutter test --coverage
 
 ## Security
 
-### Firebase Configuration
-- Firebase config files are **auto-generated** and **not committed to Git**:
-  - `lib/firebase_options.dart`
-  - `android/app/google-services.json`
-  - `ios/Runner/GoogleService-Info.plist`
-- Run `flutterfire configure` to regenerate these files locally
-
 ### Firestore Security Rules
 Security rules are defined in `firestore.rules`:
 - `users/` - Users can only read/write their own data

@@ -3,7 +3,7 @@ import '../models/medical_specialty.dart';
 import '../services/doctor_service.dart';
 
 /// This should be called ONCE to populate the database
-/// In production, doctors would be created by admins via Firebase Console
+/// In production, doctors would be created by admins via admin panel
 
 /// Utility class to seed sample doctors to Firestore for testing
 class DoctorSeeder {
