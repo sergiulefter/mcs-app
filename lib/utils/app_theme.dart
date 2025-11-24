@@ -466,10 +466,11 @@ class AppTheme {
           letterSpacing: 0.5,
         ),
         labelSmall: TextStyle(
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.w500,
           color: textTertiary,
           letterSpacing: 0.5,
+          height: 1.2,
         ),
       ),
     );
@@ -816,10 +817,11 @@ class AppTheme {
           letterSpacing: 0.5,
         ),
         labelSmall: TextStyle(
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: FontWeight.w500,
           color: textTertiaryDark,
           letterSpacing: 0.5,
+          height: 1.2,
         ),
       ),
     );

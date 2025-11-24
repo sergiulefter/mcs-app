@@ -672,12 +672,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             child: ElevatedButton(
               onPressed: _isSubmitting ? null : _submitRequest,
               child: _isSubmitting
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     )
                   : Text('create_request.submit_button'.tr()),

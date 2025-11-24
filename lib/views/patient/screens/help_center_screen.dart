@@ -170,6 +170,7 @@ class HelpCenterScreen extends StatelessWidget {
                   : Theme.of(context).dividerColor,
             ),
           ),
+          // Remove ExpansionTile's default divider since we use a custom border
           child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(

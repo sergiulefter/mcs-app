@@ -134,6 +134,7 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         style: IconButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.surface,
+          minimumSize: const Size(48, 48),
           padding: const EdgeInsets.all(AppTheme.spacing12),
         ),
       ),
