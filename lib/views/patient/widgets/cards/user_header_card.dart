@@ -80,12 +80,18 @@ class UserHeaderCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                 ),
                 const SizedBox(height: AppTheme.spacing4),
                 // Email
                 Text(
                   email,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                 ),
                 const SizedBox(height: AppTheme.spacing8),
                 // Account Type Badge

@@ -256,77 +256,83 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       children: [
         SectionHeader(title: 'doctor_profile.education'.tr()),
         const SizedBox(height: AppTheme.spacing16),
-        ...sortedEducation.map((education) => Padding(
-              padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
-              child: SurfaceCard(
-                padding: AppTheme.cardPadding,
-                borderColor: Theme.of(context).dividerColor,
-                showShadow: false,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppTheme.spacing8),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary
-                                .withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                          ),
-                          child: Icon(
-                            Icons.school,
-                            size: AppTheme.iconMedium,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+        ...sortedEducation.map((education) {
+          final theme = Theme.of(context);
+          final isDark = theme.brightness == Brightness.dark;
+          final iconColor = theme.colorScheme.onSurface;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
+            child: SurfaceCard(
+              padding: AppTheme.cardPadding,
+              borderColor: Theme.of(context).dividerColor,
+              showShadow: false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppTheme.spacing8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary
+                              .withValues(alpha: isDark ? 0.25 : 0.1),
+                          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                         ),
-                        const SizedBox(width: AppTheme.spacing12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                education.degree,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                              const SizedBox(height: AppTheme.spacing4),
-                              Text(
-                                education.institution,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium,
-                              ),
-                            ],
-                          ),
+                        child: Icon(
+                          Icons.school,
+                          size: AppTheme.iconMedium,
+                          color: iconColor,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: AppTheme.spacing8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppTheme.spacing12,
-                        vertical: AppTheme.spacing4,
                       ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                      ),
-                      child: Text(
-                        education.year.toString(),
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
+                      const SizedBox(width: AppTheme.spacing12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              education.degree,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
+                            const SizedBox(height: AppTheme.spacing4),
+                            Text(
+                              education.institution,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium,
+                            ),
+                          ],
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: AppTheme.spacing8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacing12,
+                      vertical: AppTheme.spacing4,
                     ),
-                  ],
-                ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                    ),
+                    child: Text(
+                      education.year.toString(),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                ],
               ),
-            )),
+            ),
+          );
+        }),
       ],
     );
   }

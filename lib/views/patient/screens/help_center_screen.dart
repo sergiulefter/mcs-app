@@ -151,43 +151,71 @@ class HelpCenterScreen extends StatelessWidget {
   }
 
   Widget _buildFaqTile(BuildContext context, _FaqItem item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacing12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacing20,
-            vertical: AppTheme.spacing12,
-          ),
-          childrenPadding: const EdgeInsets.fromLTRB(
-            AppTheme.spacing20,
-            0,
-            AppTheme.spacing20,
-            AppTheme.spacing20,
-          ),
-          title: Text(
-            item.question,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          children: [
-            Text(
-              item.answer,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    height: 1.5,
-                  ),
+    bool isExpanded = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        final colorScheme = Theme.of(context).colorScheme;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: AppTheme.spacing12),
+          decoration: BoxDecoration(
+            color: isExpanded
+                ? colorScheme.primary.withValues(alpha: 0.06)
+                : colorScheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            border: Border.all(
+              color: isExpanded
+                  ? colorScheme.primary.withValues(alpha: 0.4)
+                  : Theme.of(context).dividerColor,
             ),
-          ],
-        ),
-      ),
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              onExpansionChanged: (expanded) => setState(() => isExpanded = expanded),
+              tilePadding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacing20,
+                vertical: AppTheme.spacing12,
+              ),
+              childrenPadding: const EdgeInsets.fromLTRB(
+                AppTheme.spacing20,
+                0,
+                AppTheme.spacing20,
+                AppTheme.spacing20,
+              ),
+              trailing: AnimatedRotation(
+                turns: isExpanded ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: Icon(
+                  Icons.chevron_right,
+                  color: isExpanded
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              title: Text(
+                item.question,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: isExpanded
+                          ? colorScheme.primary
+                          : Theme.of(context).textTheme.titleMedium?.color,
+                    ),
+              ),
+              children: [
+                Text(
+                  item.answer,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.5,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
