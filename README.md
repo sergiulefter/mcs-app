@@ -59,9 +59,6 @@ This project uses Firebase (`mcs-app-f1e37`) with the following services:
 3. **Firebase Storage**
    - For medical documents and images (future implementation)
 
-**Important**: Firebase config files are **not committed to Git** for security.
-Run `flutterfire configure` to generate them locally.
-
 ## Running the App
 
 ### Development
