@@ -280,11 +280,17 @@ class _HelpCenterActionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'home.help_center'.tr(),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                  FittedBox(
+                    alignment: Alignment.centerLeft,
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'home.help_center'.tr(),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
                   ),
                   const SizedBox(height: AppTheme.spacing8),
                   Text(

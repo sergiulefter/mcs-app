@@ -74,24 +74,30 @@ class UserHeaderCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Display Name
-                Text(
-                  effectiveName,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
+                // Display Name (scales down to fit without wrapping/ellipsis)
+                FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    effectiveName,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing4),
                 // Email
-                Text(
-                  email,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  softWrap: false,
+                FittedBox(
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    email,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+                    maxLines: 1,
+                    softWrap: false,
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing8),
                 // Account Type Badge

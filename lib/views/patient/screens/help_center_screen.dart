@@ -289,12 +289,18 @@ class _SupportOptionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+            FittedBox(
+              alignment: Alignment.centerLeft,
+              fit: BoxFit.scaleDown,
+              child: Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
+                maxLines: 1,
+                softWrap: false,
               ),
+            ),
               const SizedBox(height: AppTheme.spacing4),
               Text(
                 description,
