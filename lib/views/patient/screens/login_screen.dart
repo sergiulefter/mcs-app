@@ -6,6 +6,8 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
+import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'signup_screen.dart';
 import 'main_shell.dart';
 
@@ -43,16 +45,31 @@ class _LoginScreenState extends State<LoginScreen> {
       if (success && mounted) {
         setState(() => _isPrefetching = true);
 
-        final userId = authController.currentUser?.uid;
-        if (userId != null) {
+        final user = authController.currentUser;
+        final userId = user?.uid;
+
+        // Only prefetch consultations for patients (not doctors/admins)
+        if (userId != null && user?.isDoctor != true && user?.userType != 'admin') {
           await consultationsController.primeForUser(userId, force: true);
         }
 
         if (!mounted) return;
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainShell()),
-        );
+        // Role-based navigation
+        if (user?.userType == 'admin') {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+          );
+        } else if (user?.isDoctor == true) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const DoctorMainShell()),
+          );
+        } else {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const MainShell()),
+          );
+        }
+
         if (mounted) {
           setState(() => _isPrefetching = false);
         }

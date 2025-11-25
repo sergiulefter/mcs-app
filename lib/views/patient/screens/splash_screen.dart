@@ -62,13 +62,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (authController.isAuthenticated) {
         // Check user type for role-based routing
-        final userType = authController.currentUser?.userType ?? 'patient';
+        final user = authController.currentUser;
 
-        if (userType == 'admin') {
+        if (user?.userType == 'admin') {
           // Admin users go to admin dashboard
           if (!mounted) return;
           _navigateToAdminDashboard();
-        } else if (userType == 'doctor') {
+        } else if (user?.isDoctor == true) {
           // Doctor users go to doctor portal
           if (!mounted) return;
           _navigateToDoctorShell();

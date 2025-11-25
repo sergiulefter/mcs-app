@@ -25,8 +25,11 @@ class UserHeaderCard extends StatelessWidget {
   /// Optional: The user's profile photo URL.
   final String? photoUrl;
 
-  /// The user type for the badge (e.g., 'patient', 'doctor').
+  /// The user type for the badge (e.g., 'patient', 'admin').
   final String userType;
+
+  /// Whether the user is a doctor (determined by presence in doctors collection).
+  final bool isDoctor;
 
   /// Optional: Fallback text if display name is empty.
   final String? fallbackName;
@@ -40,6 +43,7 @@ class UserHeaderCard extends StatelessWidget {
     required this.email,
     this.photoUrl,
     this.userType = 'patient',
+    this.isDoctor = false,
     this.fallbackName,
     this.avatarSize = 72,
   });
@@ -169,9 +173,10 @@ class UserHeaderCard extends StatelessWidget {
   }
 
   Color _getBadgeColor(BuildContext context) {
+    if (isDoctor) {
+      return Theme.of(context).colorScheme.primary;
+    }
     switch (userType.toLowerCase()) {
-      case 'doctor':
-        return Theme.of(context).colorScheme.primary;
       case 'admin':
         return Theme.of(context).colorScheme.tertiary;
       case 'patient':
@@ -181,9 +186,10 @@ class UserHeaderCard extends StatelessWidget {
   }
 
   String _getBadgeText() {
+    if (isDoctor) {
+      return 'account.doctor_account'.tr();
+    }
     switch (userType.toLowerCase()) {
-      case 'doctor':
-        return 'account.doctor_account'.tr();
       case 'admin':
         return 'account.admin_account'.tr();
       case 'patient':

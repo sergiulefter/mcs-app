@@ -14,8 +14,11 @@ class AdminService {
   /// This method:
   /// 1. Creates a Firebase Auth user with the provided email/password
   /// 2. Re-authenticates as admin (since createUserWithEmailAndPassword switches context)
-  /// 3. Creates a user document in the 'users' collection with userType='doctor'
-  /// 4. Creates a doctor profile in the 'doctors' collection
+  /// 3. Creates a doctor profile in the 'doctors' collection ONLY
+  ///
+  /// Note: Doctors are stored ONLY in the 'doctors' collection.
+  /// The 'users' collection is for patients and admins only.
+  /// Doctor identity is determined by presence in 'doctors' collection at sign-in.
   ///
   /// Requires admin credentials to re-authenticate after creating the doctor's auth account.
   ///
@@ -46,17 +49,7 @@ class AdminService {
         password: adminPassword,
       );
 
-      // 3. Create user document with userType='doctor' (now writing as admin)
-      await _firestore.collection('users').doc(uid).set({
-        'uid': uid,
-        'email': email,
-        'displayName': doctorData.fullName,
-        'userType': 'doctor',
-        'profileCompleted': false, // Doctor must complete profile on first login
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      // 4. Create doctor profile (with isAvailable: false until profile completed)
+      // 3. Create doctor profile ONLY (no user document - doctors are not in 'users' collection)
       final doctor = doctorData.copyWith(
         uid: uid,
         email: email,

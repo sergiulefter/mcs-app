@@ -9,16 +9,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 /// - Optional action button
 /// - Consistent styling with AppTheme
 /// - Professional appearance for "no data" states
-///
-/// Example:
-/// ```dart
-/// AppEmptyState(
-///   icon: Icons.search_off_outlined,
-///   title: 'No doctors found',
-///   subtitle: 'Try adjusting your search or filters',
-///   iconColor: AppTheme.primaryBlue,
-/// )
-/// ```
+
 class AppEmptyState extends StatelessWidget {
   /// The icon to display
   final IconData icon;

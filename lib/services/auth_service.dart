@@ -74,7 +74,7 @@ class AuthService {
     DocumentSnapshot doctorDoc = await _firestore.collection('doctors').doc(user.uid).get();
 
     if (doctorDoc.exists) {
-      // Create a UserModel from doctor data with userType = 'doctor'
+      // Create a UserModel from doctor data with isDoctor flag
       final doctorData = doctorDoc.data() as Map<String, dynamic>;
       return UserModel(
         uid: user.uid,
@@ -84,7 +84,7 @@ class AuthService {
         createdAt: doctorData['createdAt'] != null
             ? DateTime.parse(doctorData['createdAt'])
             : DateTime.now(),
-        userType: 'doctor',
+        isDoctor: true,
       );
     }
 
@@ -124,7 +124,7 @@ class AuthService {
         createdAt: doctorData['createdAt'] != null
             ? DateTime.parse(doctorData['createdAt'])
             : DateTime.now(),
-        userType: 'doctor',
+        isDoctor: true,
       );
     }
 

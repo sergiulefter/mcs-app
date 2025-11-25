@@ -13,6 +13,10 @@ class UserModel {
   final String userType;
   final bool profileCompleted;
 
+  // Runtime flag - set when user is loaded from doctors collection
+  // This is NOT stored in Firestore
+  final bool isDoctor;
+
   UserModel({
     required this.uid,
     required this.email,
@@ -25,6 +29,7 @@ class UserModel {
     this.preferredLanguage = 'en',
     this.userType = 'patient',
     this.profileCompleted = false,
+    this.isDoctor = false,
   });
 
   // Create UserModel from Firebase User
@@ -96,6 +101,7 @@ class UserModel {
     String? preferredLanguage,
     String? userType,
     bool? profileCompleted,
+    bool? isDoctor,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -109,6 +115,7 @@ class UserModel {
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       userType: userType ?? this.userType,
       profileCompleted: profileCompleted ?? this.profileCompleted,
+      isDoctor: isDoctor ?? this.isDoctor,
     );
   }
 }

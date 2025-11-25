@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/seed_dev_data.dart';
@@ -50,6 +51,7 @@ class AccountScreen extends StatelessWidget {
                 email: user.email,
                 photoUrl: user.photoUrl,
                 userType: user.userType,
+                isDoctor: user.isDoctor,
                 fallbackName: 'account.not_set'.tr(),
               ),
               const SizedBox(height: AppTheme.sectionSpacing),
@@ -478,6 +480,10 @@ class AccountScreen extends StatelessWidget {
 
   Future<void> _handleSignOut(BuildContext context) async {
     final authController = context.read<AuthController>();
+    final consultationsController = context.read<ConsultationsController>();
+
+    // Clear cached data before signing out
+    consultationsController.clear();
     await authController.signOut();
 
     if (context.mounted) {

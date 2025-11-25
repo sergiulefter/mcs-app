@@ -9,6 +9,7 @@ import 'package:mcs_app/views/patient/widgets/cards/stat_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/home/home_sections.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
 
 /// Doctor home screen - Dashboard with stats, availability, and recent requests
 class DoctorHomeScreen extends StatefulWidget {
@@ -119,14 +120,17 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                 // Profile Completion Banner (if incomplete)
                 if (_doctor != null && !_doctor!.isProfileComplete)
                   ProfileCompletionBanner(
-                    onCompleteProfile: () {
-                      // TODO: Navigate to DoctorProfileEditScreen when implemented
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('doctor.account.coming_soon'.tr()),
-                          backgroundColor: Theme.of(context).colorScheme.primary,
+                    onCompleteProfile: () async {
+                      final result = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DoctorProfileEditScreen(),
                         ),
                       );
+                      // Reload doctor data if profile was updated
+                      if (result == true) {
+                        _loadDoctorData();
+                      }
                     },
                   ),
 

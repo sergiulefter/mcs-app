@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
 import 'package:mcs_app/views/patient/screens/main_shell.dart';
@@ -47,7 +49,13 @@ class AdminDashboardScreen extends StatelessWidget {
     );
 
     if (confirmed == true && context.mounted) {
-      await FirebaseAuth.instance.signOut();
+      final authController = context.read<AuthController>();
+      final consultationsController = context.read<ConsultationsController>();
+
+      // Clear cached data before signing out
+      consultationsController.clear();
+      await authController.signOut();
+
       if (context.mounted) {
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -103,7 +111,8 @@ class AdminDashboardScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final authController = context.read<AuthController>();
+    final user = authController.currentUser;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

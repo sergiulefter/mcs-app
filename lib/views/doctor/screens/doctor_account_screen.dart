@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
@@ -12,6 +13,8 @@ import 'package:mcs_app/views/patient/widgets/cards/language_selection_card.dart
 import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
+import 'package:mcs_app/views/doctor/screens/availability_screen.dart';
 
 /// Doctor account screen - Profile display, settings, and sign out
 class DoctorAccountScreen extends StatefulWidget {
@@ -223,28 +226,32 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
           icon: Icons.edit_outlined,
           title: 'doctor.account.edit_profile'.tr(),
           subtitle: 'doctor.account.edit_profile_desc'.tr(),
-          onTap: () {
-            // TODO: Navigate to DoctorProfileEditScreen
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('doctor.account.coming_soon'.tr()),
-                backgroundColor: Theme.of(context).colorScheme.primary,
+          onTap: () async {
+            final result = await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const DoctorProfileEditScreen(),
               ),
             );
+            // Reload doctor data if profile was updated
+            if (result == true) {
+              _loadDoctorData();
+            }
           },
         ),
         ActionTile(
           icon: Icons.event_busy_outlined,
           title: 'doctor.account.manage_availability'.tr(),
           subtitle: 'doctor.account.manage_availability_desc'.tr(),
-          onTap: () {
-            // TODO: Navigate to AvailabilityScreen
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('doctor.account.coming_soon'.tr()),
-                backgroundColor: Theme.of(context).colorScheme.primary,
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AvailabilityScreen(),
               ),
             );
+            // Reload doctor data after returning
+            _loadDoctorData();
           },
         ),
         ActionTile(
@@ -389,6 +396,10 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
 
   Future<void> _handleSignOut(BuildContext context) async {
     final authController = context.read<AuthController>();
+    final consultationsController = context.read<ConsultationsController>();
+
+    // Clear cached data before signing out
+    consultationsController.clear();
     await authController.signOut();
 
     if (context.mounted) {

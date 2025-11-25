@@ -116,6 +116,7 @@ class AuthController extends ChangeNotifier {
     try {
       await _authService.signOut();
       _currentUser = null;
+      _errorMessage = null; // Clear any previous error messages
       _isLoading = false;
       notifyListeners();
     } catch (e) {
