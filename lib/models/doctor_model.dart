@@ -88,6 +88,9 @@ class DoctorModel {
     return true;
   }
 
+  /// Check if doctor profile is complete (has bio and education)
+  bool get isProfileComplete => bio.isNotEmpty && education.isNotEmpty;
+
   /// Get formatted experience string
   String get experienceLabel => '$experienceYears ${experienceYears == 1 ? 'year' : 'years'} experience';
 

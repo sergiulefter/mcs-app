@@ -59,4 +59,98 @@ class Validators {
     }
     return null;
   }
+
+  // Experience years validation (0-60 range)
+  static String? validateExperienceYears(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Years of experience is required';
+    }
+
+    final years = int.tryParse(value);
+    if (years == null) {
+      return 'Please enter a valid number';
+    }
+
+    if (years < 0 || years > 60) {
+      return 'Experience must be between 0 and 60 years';
+    }
+
+    return null;
+  }
+
+  // Consultation price validation (positive number)
+  static String? validateConsultationPrice(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Consultation price is required';
+    }
+
+    final price = double.tryParse(value);
+    if (price == null) {
+      return 'Please enter a valid price';
+    }
+
+    if (price <= 0) {
+      return 'Price must be greater than 0';
+    }
+
+    if (price > 10000) {
+      return 'Price cannot exceed 10,000 RON';
+    }
+
+    return null;
+  }
+
+  // Phone validation (optional, but if provided must be valid)
+  static String? validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null; // Phone is optional
+    }
+
+    final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length < 10) {
+      return 'Phone number must have at least 10 digits';
+    }
+
+    return null;
+  }
+
+  // Experience years validation - OPTIONAL (0-60 range if provided)
+  static String? validateExperienceYearsOptional(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null; // Optional field
+    }
+
+    final years = int.tryParse(value);
+    if (years == null) {
+      return 'Please enter a valid number';
+    }
+
+    if (years < 0 || years > 60) {
+      return 'Experience must be between 0 and 60 years';
+    }
+
+    return null;
+  }
+
+  // Consultation price validation - OPTIONAL (positive number if provided)
+  static String? validateConsultationPriceOptional(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return null; // Optional field
+    }
+
+    final price = double.tryParse(value);
+    if (price == null) {
+      return 'Please enter a valid price';
+    }
+
+    if (price <= 0) {
+      return 'Price must be greater than 0';
+    }
+
+    if (price > 10000) {
+      return 'Price cannot exceed 10,000 RON';
+    }
+
+    return null;
+  }
 }

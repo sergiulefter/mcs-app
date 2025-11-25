@@ -63,17 +63,35 @@ class AuthService {
     User? user = userCredential.user;
     if (user == null) return null;
 
-    // Get user data from Firestore
-    DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
+    // First check if user exists in 'users' collection
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
 
-    if (doc.exists) {
-      return UserModel.fromMap(doc.data() as Map<String, dynamic>, user.uid);
-    } else {
-      // If user document doesn't exist, create one
-      UserModel userModel = UserModel.fromFirebaseUser(user);
-      await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
-      return userModel;
+    if (userDoc.exists) {
+      return UserModel.fromMap(userDoc.data() as Map<String, dynamic>, user.uid);
     }
+
+    // Check if user exists in 'doctors' collection
+    DocumentSnapshot doctorDoc = await _firestore.collection('doctors').doc(user.uid).get();
+
+    if (doctorDoc.exists) {
+      // Create a UserModel from doctor data with userType = 'doctor'
+      final doctorData = doctorDoc.data() as Map<String, dynamic>;
+      return UserModel(
+        uid: user.uid,
+        email: doctorData['email'] ?? user.email ?? '',
+        displayName: doctorData['fullName'],
+        photoUrl: doctorData['photoUrl'],
+        createdAt: doctorData['createdAt'] != null
+            ? DateTime.parse(doctorData['createdAt'])
+            : DateTime.now(),
+        userType: 'doctor',
+      );
+    }
+
+    // If user document doesn't exist in either collection, create one in 'users'
+    UserModel userModel = UserModel.fromFirebaseUser(user);
+    await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
+    return userModel;
   }
 
   // Sign out
@@ -88,10 +106,28 @@ class AuthService {
 
   // Get user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
-    DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
-    if (doc.exists) {
-      return UserModel.fromMap(doc.data() as Map<String, dynamic>, uid);
+    // First check 'users' collection
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+    if (userDoc.exists) {
+      return UserModel.fromMap(userDoc.data() as Map<String, dynamic>, uid);
     }
+
+    // Check 'doctors' collection
+    DocumentSnapshot doctorDoc = await _firestore.collection('doctors').doc(uid).get();
+    if (doctorDoc.exists) {
+      final doctorData = doctorDoc.data() as Map<String, dynamic>;
+      return UserModel(
+        uid: uid,
+        email: doctorData['email'] ?? '',
+        displayName: doctorData['fullName'],
+        photoUrl: doctorData['photoUrl'],
+        createdAt: doctorData['createdAt'] != null
+            ? DateTime.parse(doctorData['createdAt'])
+            : DateTime.now(),
+        userType: 'doctor',
+      );
+    }
+
     return null;
   }
 

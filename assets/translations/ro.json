@@ -1,4 +1,4 @@
-{
+﻿{
   "app": {
     "name": "Medical Correct Solution",
     "description": "A Doua Opinie Medicală Profesională"
@@ -377,6 +377,7 @@
     "edit": "Editează",
     "delete": "Șterge",
     "apply": "Aplică",
+    "confirm": "Confirmă",
     "close": "Închide",
     "loading": "Se încarcă...",
     "error": "Eroare",
@@ -400,5 +401,124 @@
     "login_failed": "Autentificarea a eșuat",
     "profile_save_failed": "Salvarea profilului a eșuat",
     "unknown_error": "A apărut o eroare necunoscută"
+  },
+  "languages": {
+    "RO": "Română",
+    "EN": "Engleză",
+    "FR": "Franceză",
+    "DE": "Germană",
+    "HU": "Maghiară",
+    "RU": "Rusă"
+  },
+  "admin": {
+    "dashboard_title": "Panou Administrator",
+    "welcome": "Bine ai venit, Admin",
+    "admin_user": "Administrator",
+    "quick_actions": "Acțiuni Rapide",
+    "sign_out": "Deconectare",
+    "sign_out_title": "Deconectare",
+    "sign_out_message": "Ești sigur că vrei să te deconectezi?",
+    "info_title": "Panou Administrator",
+    "info_description": "Gestionează medici, utilizatori și setări de sistem. Mai multe funcții în curând.",
+    "view_patient_app": "Vezi Aplicația Pacient",
+    "view_patient_app_desc": "Vizualizează aplicația din perspectiva pacientului",
+    "admin_panel_section": "Panou Administrator",
+    "go_to_admin_panel": "Mergi la Panoul Admin",
+    "go_to_admin_panel_desc": "Gestionează medici, utilizatori și setări",
+    "create_doctor": {
+      "button": "Creează Medic Nou",
+      "description": "Adaugă un medic nou pe platformă",
+      "title": "Creează Cont Medic",
+      "subtitle": "Adaugă un medic nou pe platforma Medical Correct Solution",
+      "section_basic": "Informații de Bază",
+      "section_professional": "Detalii Profesionale",
+      "section_consultation": "Setări Consultație",
+      "field_full_name": "Nume Complet",
+      "field_full_name_hint": "ex., Dr. Maria Ionescu",
+      "field_email": "Adresă Email",
+      "field_email_hint": "doctor@exemplu.com",
+      "field_password": "Parolă Inițială",
+      "field_password_hint": "Minim 6 caractere",
+      "field_phone": "Număr de Telefon",
+      "field_phone_hint": "+40 7XX XXX XXX",
+      "field_specialty": "Specialitate Principală",
+      "field_specialty_hint": "Selectează specialitatea",
+      "field_experience": "Ani de Experiență",
+      "field_experience_hint": "ex., 15",
+      "field_price": "Preț Consultație (RON)",
+      "field_price_hint": "ex., 350",
+      "field_languages": "Limbi Vorbite",
+      "field_available": "Disponibil Inițial",
+      "field_available_hint": "Medicul va fi vizibil pacienților. Recomandat: OPRIT până medicul își completează profilul.",
+      "submit": "Creează Cont Medic",
+      "success": "Contul de medic a fost creat cu succes! Medicul se poate autentifica acum.",
+      "error_generic": "Crearea contului de medic a eșuat. Te rugăm să încerci din nou.",
+      "error_email_exists": "Un medic cu acest email există deja.",
+      "error_weak_password": "Parola este prea slabă. Te rugăm să folosești o parolă mai puternică.",
+      "error_invalid_email": "Te rugăm să introduci o adresă de email validă.",
+      "error_not_logged_in": "Trebuie să fii autentificat ca admin pentru a crea medici.",
+      "error_wrong_admin_password": "Parolă admin incorectă. Te rugăm să încerci din nou.",
+      "confirm_password_title": "Confirmă Parola",
+      "confirm_password_message": "Pentru securitate, te rugăm să introduci parola ta de admin pentru a crea acest cont de medic.",
+      "confirm_password_label": "Parola Ta",
+      "validation": {
+        "specialty_required": "Te rugăm să selectezi o specialitate",
+        "languages_required": "Te rugăm să selectezi cel puțin o limbă"
+      }
+    }
+  },
+  "doctor": {
+    "navigation": {
+      "home": "Acasă",
+      "requests": "Cereri",
+      "calendar": "Calendar",
+      "account": "Cont"
+    },
+    "home": {
+      "welcome": "Bine ai venit, {name}",
+      "doctor": "Doctor",
+      "availability": "Disponibilitatea Ta",
+      "available": "Accepți cereri de consultație",
+      "unavailable": "Nu accepți cereri noi",
+      "now_available": "Ești acum disponibil pentru consultații",
+      "now_unavailable": "Ești acum indisponibil pentru consultații",
+      "availability_error": "Actualizarea disponibilității a eșuat. Te rugăm să încerci din nou.",
+      "stats_title": "Statisticile Tale",
+      "stats": {
+        "pending": "În Așteptare",
+        "in_review": "În Evaluare",
+        "completed": "Finalizate"
+      },
+      "recent_requests": "Cereri Recente",
+      "no_requests": "Nicio cerere în așteptare",
+      "no_requests_desc": "Cererile noi de consultație vor apărea aici când pacienții le trimit.",
+      "availability_disabled_hint": "Completează profilul pentru a activa disponibilitatea"
+    },
+    "requests": {
+      "title": "Cereri de Consultație",
+      "coming_soon": "În Curând",
+      "coming_soon_desc": "Funcția de cereri de consultație este în dezvoltare și va fi disponibilă în curând."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "coming_soon": "În Curând",
+      "coming_soon_desc": "Funcția de calendar și programare este în dezvoltare și va fi disponibilă în curând."
+    },
+    "account": {
+      "profile_details": "Detalii Profil",
+      "quick_actions": "Acțiuni Rapide",
+      "specialty": "Specialitate",
+      "experience": "Experiență",
+      "years": "{years} ani",
+      "languages": "Limbi Vorbite",
+      "price": "Preț Consultație",
+      "available": "Disponibil",
+      "unavailable": "Indisponibil",
+      "edit_profile": "Editează Profilul",
+      "edit_profile_desc": "Actualizează informațiile profesionale",
+      "manage_availability": "Gestionează Disponibilitatea",
+      "manage_availability_desc": "Setează perioade de concediu și disponibilitate",
+      "coming_soon": "Funcție disponibilă în curând"
+    }
   }
 }

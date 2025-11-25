@@ -6,6 +6,8 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'language_selection_screen.dart';
 import 'login_screen.dart';
 import 'main_shell.dart';
@@ -59,9 +61,23 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
 
       if (authController.isAuthenticated) {
-        await _primeUserData(authController);
-        if (!mounted) return;
-        _navigateToMainShell();
+        // Check user type for role-based routing
+        final userType = authController.currentUser?.userType ?? 'patient';
+
+        if (userType == 'admin') {
+          // Admin users go to admin dashboard
+          if (!mounted) return;
+          _navigateToAdminDashboard();
+        } else if (userType == 'doctor') {
+          // Doctor users go to doctor portal
+          if (!mounted) return;
+          _navigateToDoctorShell();
+        } else {
+          // Patient users go to main shell
+          await _primeUserData(authController);
+          if (!mounted) return;
+          _navigateToMainShell();
+        }
       } else {
         _navigateToAuthFlow(languageSelected, onboardingCompleted);
       }
@@ -94,6 +110,38 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => const MainShell(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: AppConstants.mediumDuration,
+      ),
+    );
+  }
+
+  void _navigateToAdminDashboard() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const AdminDashboardScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: AppConstants.mediumDuration,
+      ),
+    );
+  }
+
+  void _navigateToDoctorShell() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const DoctorMainShell(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,

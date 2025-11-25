@@ -45,16 +45,26 @@ class UserModel {
       email: map['email'] ?? '',
       displayName: map['displayName'],
       photoUrl: map['photoUrl'],
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
-      dateOfBirth: map['dateOfBirth'] != null
-          ? DateTime.parse(map['dateOfBirth'])
-          : null,
+      createdAt: _parseDateTime(map['createdAt']) ?? DateTime.now(),
+      dateOfBirth: _parseDateTime(map['dateOfBirth']),
       gender: map['gender'],
       phone: map['phone'],
       preferredLanguage: map['preferredLanguage'] ?? 'en',
       userType: map['userType'] ?? 'patient',
       profileCompleted: map['profileCompleted'] ?? false,
     );
+  }
+
+  /// Parse DateTime from various formats (String, Timestamp, or null)
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    // Handle Firestore Timestamp (has toDate() method)
+    if (value.runtimeType.toString().contains('Timestamp')) {
+      return (value as dynamic).toDate();
+    }
+    return null;
   }
 
   // Convert UserModel to Map for Firestore

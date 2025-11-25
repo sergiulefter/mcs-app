@@ -377,6 +377,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "apply": "Apply",
+    "confirm": "Confirm",
     "close": "Close",
     "loading": "Loading...",
     "error": "Error",
@@ -400,5 +401,124 @@
     "login_failed": "Login failed",
     "profile_save_failed": "Failed to save profile",
     "unknown_error": "An unknown error occurred"
+  },
+  "languages": {
+    "RO": "Romanian",
+    "EN": "English",
+    "FR": "French",
+    "DE": "German",
+    "HU": "Hungarian",
+    "RU": "Russian"
+  },
+  "admin": {
+    "dashboard_title": "Admin Dashboard",
+    "welcome": "Welcome, Admin",
+    "admin_user": "Administrator",
+    "quick_actions": "Quick Actions",
+    "sign_out": "Sign Out",
+    "sign_out_title": "Sign Out",
+    "sign_out_message": "Are you sure you want to sign out?",
+    "info_title": "Admin Panel",
+    "info_description": "Manage doctors, users, and system settings. More features coming soon.",
+    "view_patient_app": "View Patient App",
+    "view_patient_app_desc": "See the app from a patient's perspective",
+    "admin_panel_section": "Admin Panel",
+    "go_to_admin_panel": "Go to Admin Panel",
+    "go_to_admin_panel_desc": "Manage doctors, users, and settings",
+    "create_doctor": {
+      "button": "Create New Doctor",
+      "description": "Add a new doctor to the platform",
+      "title": "Create Doctor Account",
+      "subtitle": "Add a new doctor to the Medical Correct Solution platform",
+      "section_basic": "Basic Information",
+      "section_professional": "Professional Details",
+      "section_consultation": "Consultation Settings",
+      "field_full_name": "Full Name",
+      "field_full_name_hint": "e.g., Dr. Maria Ionescu",
+      "field_email": "Email Address",
+      "field_email_hint": "doctor@example.com",
+      "field_password": "Initial Password",
+      "field_password_hint": "Minimum 6 characters",
+      "field_phone": "Phone Number",
+      "field_phone_hint": "+40 7XX XXX XXX",
+      "field_specialty": "Primary Specialty",
+      "field_specialty_hint": "Select specialty",
+      "field_experience": "Years of Experience",
+      "field_experience_hint": "e.g., 15",
+      "field_price": "Consultation Price (RON)",
+      "field_price_hint": "e.g., 350",
+      "field_languages": "Languages Spoken",
+      "field_available": "Initially Available",
+      "field_available_hint": "Doctor will be visible to patients. Recommended: OFF until doctor completes profile.",
+      "submit": "Create Doctor Account",
+      "success": "Doctor account created successfully! The doctor can now log in.",
+      "error_generic": "Failed to create doctor account. Please try again.",
+      "error_email_exists": "A doctor with this email already exists.",
+      "error_weak_password": "Password is too weak. Please use a stronger password.",
+      "error_invalid_email": "Please enter a valid email address.",
+      "error_not_logged_in": "You must be logged in as admin to create doctors.",
+      "error_wrong_admin_password": "Incorrect admin password. Please try again.",
+      "confirm_password_title": "Confirm Your Password",
+      "confirm_password_message": "For security, please enter your admin password to create this doctor account.",
+      "confirm_password_label": "Your Password",
+      "validation": {
+        "specialty_required": "Please select a specialty",
+        "languages_required": "Please select at least one language"
+      }
+    }
+  },
+  "doctor": {
+    "navigation": {
+      "home": "Home",
+      "requests": "Requests",
+      "calendar": "Calendar",
+      "account": "Account"
+    },
+    "home": {
+      "welcome": "Welcome, {name}",
+      "doctor": "Doctor",
+      "availability": "Your Availability",
+      "available": "Accepting consultation requests",
+      "unavailable": "Not accepting new requests",
+      "now_available": "You are now available for consultations",
+      "now_unavailable": "You are now unavailable for consultations",
+      "availability_error": "Failed to update availability. Please try again.",
+      "stats_title": "Your Statistics",
+      "stats": {
+        "pending": "Pending",
+        "in_review": "In Review",
+        "completed": "Completed"
+      },
+      "recent_requests": "Recent Requests",
+      "no_requests": "No pending requests",
+      "no_requests_desc": "New consultation requests will appear here when patients submit them.",
+      "availability_disabled_hint": "Complete your profile to enable availability"
+    },
+    "requests": {
+      "title": "Consultation Requests",
+      "coming_soon": "Coming Soon",
+      "coming_soon_desc": "The consultation requests feature is being developed and will be available soon."
+    },
+    "calendar": {
+      "title": "Calendar",
+      "coming_soon": "Coming Soon",
+      "coming_soon_desc": "The calendar and scheduling feature is being developed and will be available soon."
+    },
+    "account": {
+      "profile_details": "Profile Details",
+      "quick_actions": "Quick Actions",
+      "specialty": "Specialty",
+      "experience": "Experience",
+      "years": "{years} years",
+      "languages": "Languages",
+      "price": "Consultation Price",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "edit_profile": "Edit Profile",
+      "edit_profile_desc": "Update your professional information",
+      "manage_availability": "Manage Availability",
+      "manage_availability_desc": "Set vacation periods and availability",
+      "coming_soon": "Feature coming soon"
+    }
   }
 }

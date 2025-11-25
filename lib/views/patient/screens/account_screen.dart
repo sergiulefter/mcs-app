@@ -7,6 +7,7 @@ import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/seed_dev_data.dart';
 import 'package:mcs_app/utils/seed_doctors.dart';
+import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/patient/widgets/cards/action_tile.dart';
 import 'package:mcs_app/views/patient/widgets/cards/language_selection_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
@@ -64,6 +65,14 @@ class AccountScreen extends StatelessWidget {
               const SizedBox(height: AppTheme.spacing16),
               _buildQuickActionsCard(context),
               const SizedBox(height: AppTheme.sectionSpacing),
+
+              // Admin Panel Section (only for admin users)
+              if (user.userType == 'admin') ...[
+                SectionHeader(title: 'admin.admin_panel_section'.tr()),
+                const SizedBox(height: AppTheme.spacing16),
+                _buildAdminPanelCard(context),
+                const SizedBox(height: AppTheme.sectionSpacing),
+              ],
 
               // Account Section
               SectionHeader(title: 'account.account_section'.tr()),
@@ -177,6 +186,25 @@ class AccountScreen extends StatelessWidget {
               content: Text('account.change_password_coming_soon'.tr()),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildAdminPanelCard(BuildContext context) {
+    return SurfaceCard(
+      padding: EdgeInsets.zero,
+      child: ActionTile(
+        icon: Icons.admin_panel_settings_outlined,
+        title: 'admin.go_to_admin_panel'.tr(),
+        subtitle: 'admin.go_to_admin_panel_desc'.tr(),
+        onTap: () {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const AdminDashboardScreen(),
+            ),
+            (route) => false,
           );
         },
       ),
