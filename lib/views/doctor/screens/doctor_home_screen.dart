@@ -267,32 +267,48 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
 
   Widget _buildStatsRow(BuildContext context) {
     // TODO: Replace with real data from Firestore
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          StatCard(
-            value: '0',
-            label: 'doctor.home.stats.pending'.tr(),
-            icon: Icons.pending_actions_outlined,
-            color: Theme.of(context).colorScheme.tertiary,
-          ),
-          const SizedBox(width: AppTheme.spacing12),
-          StatCard(
-            value: '0',
-            label: 'doctor.home.stats.in_review'.tr(),
-            icon: Icons.rate_review_outlined,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(width: AppTheme.spacing12),
-          StatCard(
-            value: '0',
-            label: 'doctor.home.stats.completed'.tr(),
-            icon: Icons.task_alt_outlined,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-        ],
-      ),
+    final semantic = Theme.of(context).extension<AppSemanticColors>();
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final spacing = AppTheme.spacing12;
+        final cardWidth = (constraints.maxWidth - (spacing * 2)) / 3;
+
+        return Row(
+          children: [
+            SizedBox(
+              width: cardWidth,
+              child: StatCard(
+                value: '0',
+                label: 'doctor.home.stats.pending'.tr(),
+                icon: Icons.pending_actions_outlined,
+                color: semantic?.warning ?? AppTheme.warningOrange,
+              ),
+            ),
+            SizedBox(width: spacing),
+            SizedBox(
+              width: cardWidth,
+              child: StatCard(
+                value: '0',
+                label: 'doctor.home.stats.in_review'.tr(),
+                icon: Icons.rate_review_outlined,
+                color: colorScheme.primary,
+              ),
+            ),
+            SizedBox(width: spacing),
+            SizedBox(
+              width: cardWidth,
+              child: StatCard(
+                value: '0',
+                label: 'doctor.home.stats.completed'.tr(),
+                icon: Icons.task_alt_outlined,
+                color: colorScheme.secondary,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
