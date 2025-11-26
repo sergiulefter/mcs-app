@@ -497,7 +497,54 @@
     "requests": {
       "title": "Cereri de Consultație",
       "coming_soon": "În Curând",
-      "coming_soon_desc": "Funcția de cereri de consultație este în dezvoltare și va fi disponibilă în curând."
+      "coming_soon_desc": "Funcția de cereri de consultație este în dezvoltare și va fi disponibilă în curând.",
+      "empty_title": "Nicio cerere încă",
+      "empty_subtitle": "Cererile noi de consultație vor apărea aici când pacienții le trimit.",
+      "patient_unknown": "Pacient",
+      "filters": {
+        "all": "Toate",
+        "pending": "În așteptare",
+        "in_review": "În evaluare",
+        "info_requested": "Informații solicitate",
+        "completed": "Finalizate"
+      },
+      "status": {
+        "pending": "În așteptare",
+        "in_review": "În evaluare",
+        "info_requested": "Informații solicitate",
+        "completed": "Finalizate",
+        "cancelled": "Anulate"
+      },
+      "urgency": {
+        "normal": "Rutină",
+        "urgent": "Urgent",
+        "emergency": "Critic"
+      },
+      "detail": {
+        "title": "Detalii cerere",
+        "request_details": "Informații cerere",
+        "request_details_subtitle": "Context și metadate pentru această consultație",
+        "urgency": "Urgență",
+        "status": "Status",
+        "created_at": "Creată",
+        "completed_at": "Finalizată",
+        "info_requests": "Solicitări de informații",
+        "attachments": "Atașamente",
+        "attachments_subtitle": "Fișiere partajate de pacient",
+        "no_attachments_title": "Nicio atașare",
+        "no_attachments_subtitle": "Pacientul nu a încărcat fișiere pentru această cerere.",
+        "info_requests_title": "Solicitări anterioare de informații",
+        "info_requests_subtitle": "Mesaje trimise pacientului",
+        "actions": "Acțiuni",
+        "actions_subtitle": "Gestionează această consultație",
+        "start_review": "Începe evaluarea",
+        "request_more_info": "Solicită mai multe informații",
+        "write_response": "Scrie răspunsul",
+        "status_updated": "Status actualizat",
+        "urgency_normal": "Rutină",
+        "urgency_urgent": "Urgent",
+        "urgency_emergency": "Critic"
+      }
     },
     "calendar": {
       "title": "Calendar",

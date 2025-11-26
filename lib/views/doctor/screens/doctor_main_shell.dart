@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:provider/provider.dart';
 import 'doctor_home_screen.dart';
-import 'doctor_requests_screen.dart';
+import 'requests_list_screen.dart';
 import 'doctor_calendar_screen.dart';
 import 'doctor_account_screen.dart';
 
@@ -19,14 +21,10 @@ class DoctorMainShell extends StatefulWidget {
 
 class _DoctorMainShellState extends State<DoctorMainShell> {
   late int _currentIndex;
+  late final DoctorConsultationsController _doctorConsultationsController;
 
   // List of screens - using IndexedStack to preserve state
-  final List<Widget> _screens = const [
-    DoctorHomeScreen(),
-    DoctorRequestsScreen(),
-    DoctorCalendarScreen(),
-    DoctorAccountScreen(),
-  ];
+  late final List<Widget> _screens;
 
   void _onTabTapped(int index) {
     setState(() {
@@ -37,6 +35,16 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
   @override
   void initState() {
     super.initState();
+    _doctorConsultationsController = DoctorConsultationsController();
+    _screens = [
+      const DoctorHomeScreen(),
+      ChangeNotifierProvider.value(
+        value: _doctorConsultationsController,
+        child: const RequestsListScreen(),
+      ),
+      const DoctorCalendarScreen(),
+      const DoctorAccountScreen(),
+    ];
     _currentIndex = widget.initialIndex.clamp(0, _screens.length - 1);
   }
 
@@ -118,5 +126,11 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
         color: color,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _doctorConsultationsController.dispose();
+    super.dispose();
   }
 }

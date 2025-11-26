@@ -2,16 +2,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../utils/app_theme.dart';
 
+DateTime _parseDate(dynamic value) {
+  if (value == null) return DateTime.now();
+  if (value is Timestamp) return value.toDate();
+  if (value is DateTime) return value;
+  return DateTime.tryParse(value.toString()) ?? DateTime.now();
+}
+
 class ConsultationModel {
   final String id;
   final String patientId;
   final String? doctorId; // Optional - can be null if not yet assigned
-  final String status; // "pending" | "in_review" | "completed" | "cancelled"
+  final String status; // "pending" | "in_review" | "info_requested" | "completed" | "cancelled"
   final String urgency; // "normal" | "urgent" | "emergency"
   final String title;
   final String description;
   final List<AttachmentModel> attachments;
   final DoctorResponseModel? doctorResponse;
+  final List<InfoRequestModel> infoRequests;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? completedAt;
@@ -20,6 +28,8 @@ class ConsultationModel {
   // Cached doctor info (not from Firestore, fetched separately)
   String? doctorName;
   String? doctorSpecialty;
+  String? patientName;
+  String? patientEmail;
 
   ConsultationModel({
     required this.id,
@@ -31,12 +41,15 @@ class ConsultationModel {
     required this.description,
     required this.attachments,
     this.doctorResponse,
+    this.infoRequests = const [],
     required this.createdAt,
     required this.updatedAt,
     this.completedAt,
     required this.termsAcceptedAt,
     this.doctorName,
     this.doctorSpecialty,
+    this.patientName,
+    this.patientEmail,
   });
 
   // Create from Firestore document
@@ -59,12 +72,16 @@ class ConsultationModel {
           ? DoctorResponseModel.fromMap(
               data['doctorResponse'] as Map<String, dynamic>)
           : null,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      infoRequests: (data['infoRequests'] as List<dynamic>?)
+              ?.map((e) => InfoRequestModel.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      createdAt: _parseDate(data['createdAt']),
+      updatedAt: _parseDate(data['updatedAt']),
       completedAt: data['completedAt'] != null
-          ? (data['completedAt'] as Timestamp).toDate()
+          ? _parseDate(data['completedAt'])
           : null,
-      termsAcceptedAt: (data['termsAcceptedAt'] as Timestamp).toDate(),
+      termsAcceptedAt: _parseDate(data['termsAcceptedAt']),
     );
   }
 
@@ -79,6 +96,7 @@ class ConsultationModel {
       'description': description,
       'attachments': attachments.map((e) => e.toMap()).toList(),
       'doctorResponse': doctorResponse?.toMap(),
+      'infoRequests': infoRequests.map((info) => info.toMap()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
       'completedAt':
@@ -98,12 +116,15 @@ class ConsultationModel {
     String? description,
     List<AttachmentModel>? attachments,
     DoctorResponseModel? doctorResponse,
+    List<InfoRequestModel>? infoRequests,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? completedAt,
     DateTime? termsAcceptedAt,
     String? doctorName,
     String? doctorSpecialty,
+    String? patientName,
+    String? patientEmail,
   }) {
     return ConsultationModel(
       id: id ?? this.id,
@@ -115,12 +136,15 @@ class ConsultationModel {
       description: description ?? this.description,
       attachments: attachments ?? this.attachments,
       doctorResponse: doctorResponse ?? this.doctorResponse,
+      infoRequests: infoRequests ?? this.infoRequests,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       completedAt: completedAt ?? this.completedAt,
       termsAcceptedAt: termsAcceptedAt ?? this.termsAcceptedAt,
       doctorName: doctorName ?? this.doctorName,
       doctorSpecialty: doctorSpecialty ?? this.doctorSpecialty,
+      patientName: patientName ?? this.patientName,
+      patientEmail: patientEmail ?? this.patientEmail,
     );
   }
 }
@@ -144,7 +168,7 @@ class AttachmentModel {
       name: map['name'] ?? '',
       url: map['url'] ?? '',
       type: map['type'] ?? 'document',
-      uploadedAt: (map['uploadedAt'] as Timestamp).toDate(),
+      uploadedAt: _parseDate(map['uploadedAt']),
     );
   }
 
@@ -161,28 +185,76 @@ class AttachmentModel {
 // Doctor response model
 class DoctorResponseModel {
   final String text;
+  final String? recommendations;
   final DateTime respondedAt;
   final bool followUpNeeded;
+  final List<AttachmentModel> responseAttachments;
 
   DoctorResponseModel({
     required this.text,
+    this.recommendations,
     required this.respondedAt,
     required this.followUpNeeded,
+    this.responseAttachments = const [],
   });
 
   factory DoctorResponseModel.fromMap(Map<String, dynamic> map) {
     return DoctorResponseModel(
       text: map['text'] ?? '',
-      respondedAt: (map['respondedAt'] as Timestamp).toDate(),
+      respondedAt: _parseDate(map['respondedAt']),
       followUpNeeded: map['followUpNeeded'] ?? false,
+      recommendations: map['recommendations'],
+      responseAttachments: (map['responseAttachments'] as List<dynamic>?)
+              ?.map((e) => AttachmentModel.fromMap(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'text': text,
+      'recommendations': recommendations,
       'respondedAt': Timestamp.fromDate(respondedAt),
       'followUpNeeded': followUpNeeded,
+      'responseAttachments':
+          responseAttachments.map((attachment) => attachment.toMap()).toList(),
+    };
+  }
+}
+
+// Info request model
+class InfoRequestModel {
+  final String message;
+  final List<String> questions;
+  final String doctorId;
+  final DateTime requestedAt;
+
+  InfoRequestModel({
+    required this.message,
+    required this.questions,
+    required this.doctorId,
+    required this.requestedAt,
+  });
+
+  factory InfoRequestModel.fromMap(Map<String, dynamic> map) {
+    return InfoRequestModel(
+      message: map['message'] ?? '',
+      questions: (map['questions'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      doctorId: map['doctorId'] ?? '',
+      requestedAt: _parseDate(map['requestedAt']),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'message': message,
+      'questions': questions,
+      'doctorId': doctorId,
+      'requestedAt': Timestamp.fromDate(requestedAt),
     };
   }
 }
@@ -198,6 +270,8 @@ extension ConsultationColors on ConsultationModel {
         return semantic?.warning ?? colorScheme.primary;
       case 'in_review':
         return colorScheme.primary;
+      case 'info_requested':
+        return semantic?.warning ?? AppTheme.warningOrange;
       case 'completed':
         return semantic?.success ?? colorScheme.secondary;
       case 'cancelled':

@@ -496,8 +496,87 @@
     },
     "requests": {
       "title": "Consultation Requests",
-      "coming_soon": "Coming Soon",
-      "coming_soon_desc": "The consultation requests feature is being developed and will be available soon."
+      "empty_title": "No requests yet",
+      "empty_subtitle": "New consultation requests will appear here once patients submit them.",
+      "patient_unknown": "Patient",
+      "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "in_review": "In Review",
+        "info_requested": "Info Requested",
+        "completed": "Completed"
+      },
+      "status": {
+        "pending": "Pending",
+        "in_review": "In Review",
+        "info_requested": "Info Requested",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "urgency": {
+        "normal": "Routine",
+        "urgent": "Urgent",
+        "emergency": "Critical"
+      },
+      "detail": {
+        "title": "Request Details",
+        "request_details": "Request Information",
+        "request_details_subtitle": "Context and metadata for this consultation",
+        "urgency": "Urgency",
+        "status": "Status",
+        "created_at": "Created",
+        "completed_at": "Completed",
+        "info_requests": "Info Requests",
+        "attachments": "Attachments",
+        "attachments_subtitle": "Files shared by the patient",
+        "no_attachments_title": "No attachments",
+        "no_attachments_subtitle": "The patient did not upload any files for this request.",
+        "info_requests_title": "Previous info requests",
+        "info_requests_subtitle": "Messages you have sent to the patient",
+        "actions": "Actions",
+        "actions_subtitle": "Manage this consultation",
+        "start_review": "Start Review",
+        "request_more_info": "Request More Info",
+        "write_response": "Write Response",
+        "status_updated": "Status updated",
+        "urgency_normal": "Routine",
+        "urgency_urgent": "Urgent",
+        "urgency_emergency": "Critical"
+      }
+    },
+    "response_form": {
+      "title": "Submit Response",
+      "response_label": "Medical opinion",
+      "response_hint": "Provide a clear, structured medical opinion for the patient...",
+      "recommendations_label": "Recommendations (optional)",
+      "recommendations_hint": "Follow-up steps, treatment ideas, or additional advice",
+      "follow_up_title": "Follow-up needed",
+      "follow_up_subtitle": "Mark if the patient should schedule a follow-up",
+      "submit": "Submit Response",
+      "success": "Response submitted to patient",
+      "error": "Unable to submit response. Please try again.",
+      "validation": {
+        "required": "Response is required",
+        "min_length": "Response must be at least 200 characters",
+        "max_length": "Response must be under 2000 characters"
+      }
+    },
+    "request_more_info": {
+      "title": "Request More Information",
+      "message_label": "Message to patient",
+      "message_hint": "Describe what information you need (e.g., symptoms, lab results)...",
+      "questions_title": "Specific questions",
+      "question_label": "Question",
+      "question_hint": "Add a specific question for the patient",
+      "add_question": "Add another question",
+      "submit": "Send request",
+      "success": "Information request sent to patient",
+      "error": "Unable to send request. Please try again.",
+      "validation": {
+        "required": "Message is required",
+        "min_length": "Message must be at least 100 characters",
+        "max_length": "Message must be under 500 characters"
+      }
     },
     "calendar": {
       "title": "Calendar",
