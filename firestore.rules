@@ -28,8 +28,8 @@ service cloud.firestore {
     // Users collection - users can only read/write their own data
     // Admins can also create/update user docs when onboarding doctors
     match /users/{userId} {
-      // Allow read if authenticated and accessing own document, or if admin
-      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      // Allow read if accessing own document, if admin, or if authenticated doctor (assigned doctor needs patient context)
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isDoctorAccount());
 
       // Allow create during signup (own document) or by admin (onboarding doctors)
       allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());

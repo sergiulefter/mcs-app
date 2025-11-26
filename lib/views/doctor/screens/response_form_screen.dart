@@ -21,6 +21,8 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
   final _recommendationsController = TextEditingController();
   bool _followUpNeeded = false;
   bool _isSubmitting = false;
+  static const int _responseMin = 200;
+  static const int _responseMax = 2000;
 
   @override
   void dispose() {
@@ -65,19 +67,30 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
                   controller: _responseController,
                   maxLines: 8,
                   hintText: 'doctor.response_form.response_hint'.tr(),
+                  onChanged: (_) => setState(() {}),
                   validator: (value) {
                     final text = value?.trim() ?? '';
                     if (text.isEmpty) {
                       return 'doctor.response_form.validation.required'.tr();
                     }
-                    if (text.length < 200) {
+                    if (text.length < _responseMin) {
                       return 'doctor.response_form.validation.min_length'.tr();
                     }
-                    if (text.length > 2000) {
+                    if (text.length > _responseMax) {
                       return 'doctor.response_form.validation.max_length'.tr();
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: AppTheme.spacing8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${_responseController.text.trim().length}/$_responseMax',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).hintColor,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing16),
                 AppTextField(

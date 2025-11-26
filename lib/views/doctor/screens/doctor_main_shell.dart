@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
+import 'package:mcs_app/controllers/doctor_profile_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'doctor_home_screen.dart';
@@ -22,6 +24,7 @@ class DoctorMainShell extends StatefulWidget {
 class _DoctorMainShellState extends State<DoctorMainShell> {
   late int _currentIndex;
   late final DoctorConsultationsController _doctorConsultationsController;
+  late final DoctorProfileController _doctorProfileController;
 
   // List of screens - using IndexedStack to preserve state
   late final List<Widget> _screens;
@@ -36,8 +39,26 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
   void initState() {
     super.initState();
     _doctorConsultationsController = DoctorConsultationsController();
+    _doctorProfileController = DoctorProfileController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthController>();
+      final doctorId = auth.currentUser?.uid;
+      if (doctorId != null) {
+        _doctorProfileController.prime(doctorId);
+      }
+    });
     _screens = [
-      const DoctorHomeScreen(),
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(
+            value: _doctorProfileController,
+          ),
+          ChangeNotifierProvider.value(
+            value: _doctorConsultationsController,
+          ),
+        ],
+        child: const DoctorHomeScreen(),
+      ),
       ChangeNotifierProvider.value(
         value: _doctorConsultationsController,
         child: const RequestsListScreen(),
@@ -46,7 +67,10 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
         value: _doctorConsultationsController,
         child: const DoctorCalendarScreen(),
       ),
-      const DoctorAccountScreen(),
+      ChangeNotifierProvider.value(
+        value: _doctorProfileController,
+        child: const DoctorAccountScreen(),
+      ),
     ];
     _currentIndex = widget.initialIndex.clamp(0, _screens.length - 1);
   }
@@ -134,6 +158,7 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
   @override
   void dispose() {
     _doctorConsultationsController.dispose();
+    _doctorProfileController.dispose();
     super.dispose();
   }
 }

@@ -391,6 +391,64 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
             response.text,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
+          if (response.recommendations != null &&
+              response.recommendations!.isNotEmpty) ...[
+            const SizedBox(height: AppTheme.spacing12),
+            _buildLabelValue(
+              context,
+              label: 'request_detail.doctor_response.recommendations_label'.tr(),
+              value: response.recommendations ?? '',
+            ),
+          ],
+          const SizedBox(height: AppTheme.spacing12),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppTheme.spacing12,
+            runSpacing: AppTheme.spacing8,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.refresh_outlined,
+                    size: AppTheme.iconSmall,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: AppTheme.spacing8),
+                  Text(
+                    'request_detail.doctor_response.follow_up_needed'.tr(),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacing12,
+                  vertical: AppTheme.spacing8,
+                ),
+                decoration: BoxDecoration(
+                  color: (response.followUpNeeded
+                          ? Theme.of(context).colorScheme.secondary
+                          : Theme.of(context).colorScheme.error)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                ),
+                child: Text(
+                  response.followUpNeeded
+                      ? 'common.yes'.tr()
+                      : 'common.no'.tr(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: response.followUpNeeded
+                            ? Theme.of(context).colorScheme.secondary
+                            : Theme.of(context).colorScheme.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

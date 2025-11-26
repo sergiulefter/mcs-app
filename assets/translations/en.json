@@ -233,7 +233,11 @@
       "unassigned_subtitle": "We'll assign a specialist to your request soon."
     },
     "doctor_response": {
-      "title": "Doctor Response"
+      "title": "Doctor Response",
+      "response_label": "Response",
+      "recommendations_label": "Recommendations",
+      "follow_up_needed": "Follow-up needed?",
+      "responded_at": "Responded"
     },
     "attachments": {
       "title": "Attachments",
@@ -383,7 +387,8 @@
     "error": "Error",
     "success": "Success",
     "warning": "Warning",
-    "info": "Info"
+    "info": "Info",
+    "yes": "Yes"
   },
   "validation": {
     "required_field": "This field is required",
@@ -485,6 +490,7 @@
       "availability_error": "Failed to update availability. Please try again.",
       "stats_title": "Your Statistics",
       "stats": {
+        "total": "Total",
         "pending": "Pending",
         "in_review": "In Review",
         "completed": "Completed"
@@ -550,8 +556,8 @@
       "response_hint": "Provide a clear, structured medical opinion for the patient...",
       "recommendations_label": "Recommendations (optional)",
       "recommendations_hint": "Follow-up steps, treatment ideas, or additional advice",
-      "follow_up_title": "Follow-up needed",
-      "follow_up_subtitle": "Mark if the patient should schedule a follow-up",
+      "follow_up_title": "Follow-up needed?",
+      "follow_up_subtitle": "Mark if the patient should schedule a follow-up consultation",
       "submit": "Submit Response",
       "success": "Response submitted to patient",
       "error": "Unable to submit response. Please try again.",
@@ -615,6 +621,8 @@
       "bio_hint": "Describe your experience and expertise...",
       "bio_helper": "This will be displayed to patients",
       "consultation_price": "Consultation Price (RON)",
+      "experience_years": "Years of Experience",
+      "experience_years_hint": "e.g., 10",
       "languages_spoken": "Languages Spoken",
       "subspecialties": "Subspecialties",
       "subspecialties_hint": "Select your areas of expertise",
@@ -642,7 +650,11 @@
         "institution_required": "Institution is required",
         "degree_required": "Degree is required",
         "year_required": "Year is required",
-        "year_invalid": "Please enter a valid year"
+        "year_invalid": "Please enter a valid year",
+        "subspecialties_required": "Please select at least one subspecialty",
+        "price_required": "Consultation price is required",
+        "experience_required": "Experience years are required",
+        "experience_invalid": "Please enter experience between 1 and 60 years"
       }
     },
     "availability": {
@@ -662,7 +674,6 @@
       "end_date": "End Date",
       "reason": "Reason",
       "reason_hint": "e.g., Medical conference",
-      "reason_optional": "(Optional)",
       "delete_vacation": "Delete Vacation",
       "delete_vacation_confirm": "Are you sure you want to delete this vacation period?",
       "vacation_added": "Vacation period added",

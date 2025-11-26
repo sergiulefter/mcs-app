@@ -7,7 +7,7 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
-import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
+import 'package:mcs_app/views/doctor/widgets/doctor_request_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
@@ -477,7 +477,24 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
                   (event) => Padding(
                     padding:
                         const EdgeInsets.only(bottom: AppTheme.spacing12),
-                    child: _ConsultationCard(consultation: event),
+                    child: DoctorRequestCard(
+                      consultation: event,
+                      onTap: () {
+                        final controller =
+                            context.read<DoctorConsultationsController>();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ChangeNotifierProvider.value(
+                              value: controller,
+                              child: RequestReviewScreen(
+                                consultationId: event.id,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 )
                 .toList(),
@@ -517,173 +534,6 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
       }
     }
     return false;
-  }
-
-  Color _urgencyColor(BuildContext context, String urgency) {
-    final colorScheme = Theme.of(context).colorScheme;
-    switch (urgency) {
-      case 'urgent':
-        return AppTheme.warningOrange;
-      case 'emergency':
-        return colorScheme.error;
-      default:
-        return colorScheme.primary;
-    }
-  }
-}
-
-class _ConsultationCard extends StatelessWidget {
-  const _ConsultationCard({required this.consultation});
-
-  final ConsultationModel consultation;
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = context.read<DoctorConsultationsController>();
-    final patient = controller.patientProfile(consultation.patientId);
-    final patientName =
-        patient?.displayName ?? patient?.email ?? 'doctor.requests.patient_unknown'.tr();
-    final dateLabel =
-        DateFormat.yMMMd().add_Hm().format(consultation.createdAt);
-
-    return SurfaceCard(
-      padding: AppTheme.cardPadding,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => ChangeNotifierProvider.value(
-                value: controller,
-                child: RequestReviewScreen(
-                  consultationId: consultation.id,
-                ),
-              ),
-            ),
-          );
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    consultation.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                ),
-                _buildBadge(
-                  context,
-                  _statusLabel(context, consultation.status),
-                  consultation.getStatusColor(context),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppTheme.spacing8),
-            Text(
-              consultation.description,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
-            ),
-            const SizedBox(height: AppTheme.spacing12),
-            Row(
-              children: [
-                Icon(
-                  Icons.person_outline,
-                  size: AppTheme.iconSmall,
-                  color: Theme.of(context).hintColor,
-                ),
-                const SizedBox(width: AppTheme.spacing8),
-                Expanded(
-                  child: Text(
-                    patientName,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppTheme.spacing8),
-            Row(
-              children: [
-                Icon(
-                  Icons.schedule_outlined,
-                  size: AppTheme.iconSmall,
-                  color: Theme.of(context).hintColor,
-                ),
-                const SizedBox(width: AppTheme.spacing8),
-                Text(
-                  dateLabel,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).hintColor,
-                      ),
-                ),
-                const Spacer(),
-                _buildBadge(
-                  context,
-                  _urgencyLabel(context, consultation.urgency),
-                  _urgencyColor(context, consultation.urgency),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBadge(BuildContext context, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w700,
-            ),
-      ),
-    );
-  }
-
-  String _statusLabel(BuildContext context, String status) {
-    switch (status) {
-      case 'pending':
-        return 'doctor.requests.status.pending'.tr();
-      case 'in_review':
-        return 'doctor.requests.status.in_review'.tr();
-      case 'info_requested':
-        return 'doctor.requests.status.info_requested'.tr();
-      case 'completed':
-        return 'doctor.requests.status.completed'.tr();
-      case 'cancelled':
-        return 'doctor.requests.status.cancelled'.tr();
-      default:
-        return status;
-    }
-  }
-
-  String _urgencyLabel(BuildContext context, String urgency) {
-    switch (urgency) {
-      case 'urgent':
-        return 'doctor.requests.urgency.urgent'.tr();
-      case 'emergency':
-        return 'doctor.requests.urgency.emergency'.tr();
-      default:
-        return 'doctor.requests.urgency.normal'.tr();
-    }
   }
 
   Color _urgencyColor(BuildContext context, String urgency) {

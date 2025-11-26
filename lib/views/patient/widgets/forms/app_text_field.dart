@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 
 /// A reusable text field widget with external label and consistent styling.
@@ -41,6 +42,9 @@ class AppTextField extends StatelessWidget {
   /// Optional: Callback when suffix icon is tapped.
   final VoidCallback? onSuffixIconTap;
 
+  /// Optional: Focus node to control focus.
+  final FocusNode? focusNode;
+
   /// Optional: Keyboard type for the field.
   final TextInputType? keyboardType;
 
@@ -71,6 +75,9 @@ class AppTextField extends StatelessWidget {
   /// Optional: Whether the field is enabled.
   final bool enabled;
 
+  /// Optional: Input formatters for the field.
+  final List<TextInputFormatter>? inputFormatters;
+
   /// Optional: Maximum number of lines.
   final int? maxLines;
 
@@ -85,6 +92,7 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.onSuffixIconTap,
+    this.focusNode,
     this.keyboardType,
     this.textInputAction,
     this.textCapitalization = TextCapitalization.none,
@@ -95,6 +103,7 @@ class AppTextField extends StatelessWidget {
     this.onChanged,
     this.onFieldSubmitted,
     this.enabled = true,
+    this.inputFormatters,
     this.maxLines = 1,
     this.minLines,
   });
@@ -126,11 +135,13 @@ class AppTextField extends StatelessWidget {
         // Text Field
         TextFormField(
           controller: controller,
+          focusNode: focusNode,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
           textCapitalization: textCapitalization,
           obscureText: obscureText,
           enabled: enabled,
+          inputFormatters: inputFormatters,
           maxLines: maxLines,
           minLines: minLines,
           onChanged: onChanged,

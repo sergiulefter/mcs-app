@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
@@ -27,6 +28,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
   // Form controllers
   final _bioController = TextEditingController();
   final _priceController = TextEditingController();
+  final _experienceController = TextEditingController();
 
   // Form state
   List<String> _selectedLanguages = [];
@@ -39,6 +41,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
   bool _isSaving = false;
   String? _languagesError;
   String? _educationError;
+  String? _subspecialtiesError;
 
   // Available options
   final List<String> _languageOptions = ['RO', 'EN', 'FR', 'DE', 'HU', 'RU'];
@@ -63,6 +66,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
   void dispose() {
     _bioController.dispose();
     _priceController.dispose();
+    _experienceController.dispose();
     super.dispose();
   }
 
@@ -83,6 +87,8 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
           _priceController.text = doctor.consultationPrice > 0
               ? doctor.consultationPrice.toStringAsFixed(0)
               : '';
+          _experienceController.text =
+              doctor.experienceYears > 0 ? doctor.experienceYears.toString() : '';
           _selectedLanguages = List.from(doctor.languages);
           _selectedSubspecialties = List.from(doctor.subspecialties);
           _educationEntries = List.from(doctor.education);
@@ -101,6 +107,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
     setState(() {
       _languagesError = null;
       _educationError = null;
+      _subspecialtiesError = null;
     });
 
     // Validate form fields
@@ -111,7 +118,15 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
     // Custom validation for languages
     if (_selectedLanguages.isEmpty) {
       setState(() {
-        _languagesError = 'doctor.profile_edit.validation.languages_required'.tr();
+      _languagesError = 'doctor.profile_edit.validation.languages_required'.tr();
+    });
+    return;
+  }
+
+    if (_selectedSubspecialties.isEmpty) {
+      setState(() {
+        _subspecialtiesError =
+            'doctor.profile_edit.validation.subspecialties_required'.tr();
       });
       return;
     }
@@ -133,6 +148,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
       final updateData = {
         'bio': _bioController.text.trim(),
         'consultationPrice': double.tryParse(_priceController.text) ?? 0.0,
+        'experienceYears': int.tryParse(_experienceController.text) ?? 0,
         'languages': _selectedLanguages,
         'subspecialties': _selectedSubspecialties,
         'education': _educationEntries.map((e) => e.toMap()).toList(),
@@ -210,10 +226,14 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
                   options: _subspecialtyOptions,
                   selectedOptions: _selectedSubspecialties,
                   onSelectionChanged: (selected) {
-                    setState(() => _selectedSubspecialties = selected);
+                    setState(() {
+                      _selectedSubspecialties = selected;
+                      _subspecialtiesError = null;
+                    });
                   },
-                  isRequired: false,
-                  isOptional: true,
+                  isRequired: true,
+                  isOptional: false,
+                  errorText: _subspecialtiesError,
                   optionalText: 'doctor.profile_edit.subspecialties_hint'.tr(),
                 ),
                 const SizedBox(height: AppTheme.sectionSpacing),
@@ -330,16 +350,46 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
           controller: _priceController,
           prefixIcon: Icons.payments_outlined,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          isOptional: true,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+          ],
+          isOptional: false,
           validator: (value) {
-            if (value != null && value.isNotEmpty) {
-              final price = double.tryParse(value);
-              if (price == null || price < 0) {
-                return 'validation.invalid_price'.tr();
-              }
-              if (price > 10000) {
-                return 'validation.price_too_high'.tr();
-              }
+            final text = value?.trim() ?? '';
+            if (text.isEmpty) {
+              return 'doctor.profile_edit.validation.price_required'.tr();
+            }
+            final price = double.tryParse(text);
+            if (price == null || price <= 0) {
+              return 'validation.invalid_price'.tr();
+            }
+            if (price > 10000) {
+              return 'validation.price_too_high'.tr();
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: AppTheme.spacing16),
+
+        // Experience years field
+        AppTextField(
+          label: 'doctor.profile_edit.experience_years'.tr(),
+          hintText: '10',
+          controller: _experienceController,
+          prefixIcon: Icons.work_history_outlined,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+          ],
+          isOptional: false,
+          validator: (value) {
+            final text = value?.trim() ?? '';
+            if (text.isEmpty) {
+              return 'doctor.profile_edit.validation.experience_required'.tr();
+            }
+            final years = int.tryParse(text);
+            if (years == null || years <= 0 || years > 60) {
+              return 'doctor.profile_edit.validation.experience_invalid'.tr();
             }
             return null;
           },

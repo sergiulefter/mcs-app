@@ -22,7 +22,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   final DoctorService _doctorService = DoctorService();
   DoctorModel? _doctor;
   bool _isLoading = true;
-  bool _isTogglingAvailability = false;
+  // kept for future state expansion (e.g., disabling actions during async ops)
 
   @override
   void initState() {
@@ -49,40 +49,6 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  Future<void> _toggleAvailability(bool value) async {
-    final userId = context.read<AuthController>().currentUser?.uid;
-    if (userId == null || _doctor == null) return;
-
-    setState(() => _isTogglingAvailability = true);
-
-    try {
-      await _doctorService.updateAvailability(userId, value);
-      await _loadDoctorData();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('doctor.availability.availability_updated'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('doctor.home.availability_error'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isTogglingAvailability = false);
       }
     }
   }
@@ -183,7 +149,6 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   }
 
   Widget _buildAvailabilityStatusCard(BuildContext context) {
-    final isAvailable = _doctor?.isAvailable ?? false;
     final isCurrentlyAvailable = _doctor?.isCurrentlyAvailable ?? false;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -257,31 +222,6 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
           ),
           const SizedBox(height: AppTheme.spacing16),
 
-          // Toggle row
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'doctor.home.availability'.tr(),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              Switch(
-                value: isAvailable,
-                onChanged: _isTogglingAvailability
-                    ? null
-                    : (value) => _toggleAvailability(value),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppTheme.spacing8),
-          Text(
-            'doctor.availability.toggle_hint'.tr(),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).hintColor,
-                ),
-          ),
         ],
       ),
     );
@@ -561,9 +501,21 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                   hintText: 'doctor.availability.reason_hint'.tr(),
                   controller: reasonController,
                   prefixIcon: Icons.notes_outlined,
-                  isOptional: true,
-                  optionalText: 'doctor.availability.reason_optional'.tr(),
+                  isOptional: false,
                   textCapitalization: TextCapitalization.sentences,
+                  validator: (value) {
+                    final text = value?.trim() ?? '';
+                    if (text.isEmpty) {
+                      return 'doctor.availability.validation.reason_required'.tr();
+                    }
+                    if (text.length < 3) {
+                      return 'doctor.availability.validation.reason_too_short'.tr();
+                    }
+                    if (text.length > 120) {
+                      return 'doctor.availability.validation.reason_too_long'.tr();
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),

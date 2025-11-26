@@ -24,22 +24,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchConsultations();
+      _primeConsultations();
     });
   }
 
-  Future<void> _fetchConsultations() async {
+  Future<void> _primeConsultations() async {
     final authController = context.read<AuthController>();
     final consultationsController = context.read<ConsultationsController>();
 
     if (authController.currentUser == null) return;
 
     final userId = authController.currentUser!.uid;
-    if (consultationsController.hasDataForUser(userId)) {
-      return;
-    }
-
-    await consultationsController.primeForUser(userId);
+    await consultationsController.primeForUser(userId, force: true);
   }
 
   String _getGreeting() {

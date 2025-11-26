@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/controllers/doctor_profile_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/models/doctor_model.dart';
-import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
 import 'package:mcs_app/views/patient/widgets/cards/action_tile.dart';
@@ -25,45 +25,14 @@ class DoctorAccountScreen extends StatefulWidget {
 }
 
 class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
-  final DoctorService _doctorService = DoctorService();
-  DoctorModel? _doctor;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDoctorData();
-  }
-
-  Future<void> _loadDoctorData() async {
-    final authController = context.read<AuthController>();
-    final userId = authController.currentUser?.uid;
-
-    if (userId == null) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final doctor = await _doctorService.fetchDoctorById(userId);
-      if (mounted) {
-        setState(() {
-          _doctor = doctor;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authController = context.watch<AuthController>();
+    final profile = context.watch<DoctorProfileController>();
     final user = authController.currentUser;
+    final doctor = profile.doctor;
 
-    if (_isLoading || user == null) {
+    if (user == null || doctor == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
@@ -77,13 +46,13 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Doctor Header
-              _buildDoctorHeader(context),
+              _buildDoctorHeader(context, doctor),
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Profile Details Section
               SectionHeader(title: 'doctor.account.profile_details'.tr()),
               const SizedBox(height: AppTheme.spacing16),
-              _buildProfileDetailsCard(context),
+              _buildProfileDetailsCard(context, doctor),
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Quick Actions Section
@@ -102,9 +71,9 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
     );
   }
 
-  Widget _buildDoctorHeader(BuildContext context) {
-    final doctorName = _doctor?.fullName ?? '';
-    final specialty = _doctor?.specialty.name ?? '';
+  Widget _buildDoctorHeader(BuildContext context, DoctorModel doctor) {
+    final doctorName = doctor.fullName;
+    final specialty = doctor.specialty.name;
     final initials = _getInitials(doctorName);
 
     return Row(
@@ -154,17 +123,17 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
                   vertical: AppTheme.spacing4,
                 ),
                 decoration: BoxDecoration(
-                  color: (_doctor?.isCurrentlyAvailable ?? false)
+                  color: doctor.isCurrentlyAvailable
                       ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1)
                       : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                 ),
                 child: Text(
-                  (_doctor?.isCurrentlyAvailable ?? false)
+                  doctor.isCurrentlyAvailable
                       ? 'doctor.account.available'.tr()
                       : 'doctor.account.unavailable'.tr(),
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: (_doctor?.isCurrentlyAvailable ?? false)
+                        color: doctor.isCurrentlyAvailable
                             ? Theme.of(context).colorScheme.secondary
                             : Theme.of(context).colorScheme.error,
                         fontWeight: FontWeight.w600,
@@ -178,7 +147,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
     );
   }
 
-  Widget _buildProfileDetailsCard(BuildContext context) {
+  Widget _buildProfileDetailsCard(BuildContext context, DoctorModel doctor) {
     final notProvidedText = 'account.not_provided'.tr();
 
     return ListCard(
@@ -187,30 +156,26 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
         ProfileDetailRow(
           icon: Icons.medical_services_outlined,
           label: 'doctor.account.specialty'.tr(),
-          value: _doctor?.specialty.name ?? notProvidedText,
+          value: doctor.specialty.name,
           notProvidedText: notProvidedText,
         ),
         ProfileDetailRow(
           icon: Icons.work_history_outlined,
           label: 'doctor.account.experience'.tr(),
-          value: _doctor != null
-              ? 'doctor.account.years'.tr(namedArgs: {'years': _doctor!.experienceYears.toString()})
-              : notProvidedText,
+          value: 'doctor.account.years'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
           notProvidedText: notProvidedText,
         ),
         ProfileDetailRow(
           icon: Icons.language_outlined,
           label: 'doctor.account.languages'.tr(),
-          value: _doctor?.languages.isNotEmpty == true
-              ? _doctor!.languages.join(', ')
-              : notProvidedText,
+          value: doctor.languages.isNotEmpty ? doctor.languages.join(', ') : notProvidedText,
           notProvidedText: notProvidedText,
         ),
         ProfileDetailRow(
           icon: Icons.payments_outlined,
           label: 'doctor.account.price'.tr(),
-          value: _doctor != null && _doctor!.consultationPrice > 0
-              ? '${_doctor!.consultationPrice.toStringAsFixed(0)} RON'
+          value: doctor.consultationPrice > 0
+              ? '${doctor.consultationPrice.toStringAsFixed(0)} RON'
               : notProvidedText,
           notProvidedText: notProvidedText,
         ),
@@ -227,6 +192,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
           title: 'doctor.account.edit_profile'.tr(),
           subtitle: 'doctor.account.edit_profile_desc'.tr(),
           onTap: () async {
+            final profileController = context.read<DoctorProfileController>();
             final result = await Navigator.push<bool>(
               context,
               MaterialPageRoute(
@@ -235,7 +201,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
             );
             // Reload doctor data if profile was updated
             if (result == true) {
-              _loadDoctorData();
+              await profileController.refresh();
             }
           },
         ),
@@ -244,6 +210,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
           title: 'doctor.account.manage_availability'.tr(),
           subtitle: 'doctor.account.manage_availability_desc'.tr(),
           onTap: () async {
+            final profileController = context.read<DoctorProfileController>();
             await Navigator.push(
               context,
               MaterialPageRoute(
@@ -251,7 +218,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
               ),
             );
             // Reload doctor data after returning
-            _loadDoctorData();
+            await profileController.refresh();
           },
         ),
         ActionTile(

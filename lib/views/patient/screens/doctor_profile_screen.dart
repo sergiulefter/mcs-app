@@ -23,6 +23,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final doctor = widget.doctor;
+
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(
@@ -32,28 +34,28 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               child: ListView(
                 padding: AppTheme.screenPadding,
                 children: [
-                  _buildHeader(context),
+                  _buildHeader(context, doctor),
                   const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildQuickInfo(context),
-                  if (widget.doctor.bio.isNotEmpty) ...[
+                  _buildQuickInfo(context, doctor),
+                  if (doctor.bio.isNotEmpty) ...[
                     const SizedBox(height: AppTheme.sectionSpacing),
-                    _buildBioSection(context),
+                    _buildBioSection(context, doctor),
                   ],
-                  if (widget.doctor.education.isNotEmpty) ...[
+                  if (doctor.education.isNotEmpty) ...[
                     const SizedBox(height: AppTheme.sectionSpacing),
-                    _buildEducationSection(context),
+                    _buildEducationSection(context, doctor),
                   ],
-                  if (widget.doctor.subspecialties.isNotEmpty) ...[
+                  if (doctor.subspecialties.isNotEmpty) ...[
                     const SizedBox(height: AppTheme.sectionSpacing),
-                    _buildSubspecialtiesSection(context),
+                    _buildSubspecialtiesSection(context, doctor),
                   ],
                   const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildAvailabilitySection(context),
+                  _buildAvailabilitySection(context, doctor),
                   const SizedBox(height: AppTheme.spacing32),
                 ],
               ),
             ),
-            _buildRequestButton(context),
+            _buildRequestButton(context, doctor),
           ],
         ),
       ),
@@ -76,7 +78,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, DoctorModel doctor) {
     return SurfaceCard(
       padding: AppTheme.cardPadding,
       borderColor: Theme.of(context).dividerColor,
@@ -85,14 +87,14 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         children: [
           Row(
             children: [
-              _Avatar(initials: _initialsFromName(widget.doctor.fullName)),
+              _Avatar(initials: _initialsFromName(doctor.fullName)),
               const SizedBox(width: AppTheme.spacing16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.doctor.fullName,
+                      doctor.fullName,
                       style:
                           Theme.of(context).textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
@@ -100,7 +102,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     ),
                     const SizedBox(height: AppTheme.spacing8),
                     Text(
-                      _getSpecialtyName(widget.doctor.specialty),
+                      _getSpecialtyName(doctor.specialty),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
@@ -114,13 +116,13 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           Row(
             children: [
               _Badge(
-                icon: widget.doctor.isCurrentlyAvailable
+                icon: doctor.isCurrentlyAvailable
                     ? Icons.check_circle_outline
                     : Icons.access_time,
-                iconColor: widget.doctor.isCurrentlyAvailable
+                iconColor: doctor.isCurrentlyAvailable
                     ? Theme.of(context).colorScheme.secondary
                     : Theme.of(context).colorScheme.onSurfaceVariant,
-                label: widget.doctor.isCurrentlyAvailable
+                label: doctor.isCurrentlyAvailable
                     ? 'doctor_profile.available_now'.tr()
                     : 'doctor_profile.unavailable'.tr(),
               ),
@@ -129,7 +131,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                 icon: Icons.work_outline,
                 iconColor: Theme.of(context).colorScheme.primary,
                 label: 'doctor_profile.years_experience'.tr(
-                  namedArgs: {'years': widget.doctor.experienceYears.toString()},
+                  namedArgs: {'years': doctor.experienceYears.toString()},
                 ),
               ),
             ],
@@ -139,7 +141,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildQuickInfo(BuildContext context) {
+  Widget _buildQuickInfo(BuildContext context, DoctorModel doctor) {
     final priceFormat = NumberFormat('#,##0.00', 'en_US');
 
     return SurfaceCard(
@@ -152,7 +154,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             child: _InfoColumn(
               icon: Icons.language,
               label: 'doctor_profile.languages'.tr(),
-              value: widget.doctor.languagesLabel,
+              value: doctor.languagesLabel,
             ),
           ),
           Container(
@@ -164,7 +166,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             child: _InfoColumn(
               icon: Icons.attach_money,
               label: 'doctor_profile.consultation_price'.tr(),
-              value: '${priceFormat.format(widget.doctor.consultationPrice)} ${'doctor_profile.currency'.tr()}',
+              value: '${priceFormat.format(doctor.consultationPrice)} ${'doctor_profile.currency'.tr()}',
             ),
           ),
           Container(
@@ -176,7 +178,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             child: _InfoColumn(
               icon: Icons.school_outlined,
               label: 'doctor_profile.experience'.tr(),
-              value: 'doctor_profile.years'.tr(namedArgs: {'years': widget.doctor.experienceYears.toString()}),
+              value: 'doctor_profile.years'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
             ),
           ),
         ],
@@ -184,8 +186,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildBioSection(BuildContext context) {
-    final bioLines = widget.doctor.bio.split('\n').length;
+  Widget _buildBioSection(BuildContext context, DoctorModel doctor) {
+    final bioLines = doctor.bio.split('\n').length;
     final shouldShowExpandButton = bioLines > 5;
 
     return Column(
@@ -201,7 +203,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.doctor.bio,
+                doctor.bio,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       height: 1.6,
                     ),
@@ -247,8 +249,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildEducationSection(BuildContext context) {
-    final sortedEducation = [...widget.doctor.education]
+  Widget _buildEducationSection(BuildContext context, DoctorModel doctor) {
+    final sortedEducation = [...doctor.education]
       ..sort((a, b) => b.year.compareTo(a.year));
 
     return Column(
@@ -337,7 +339,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildSubspecialtiesSection(BuildContext context) {
+  Widget _buildSubspecialtiesSection(BuildContext context, DoctorModel doctor) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -350,7 +352,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           child: Wrap(
             spacing: AppTheme.spacing8,
             runSpacing: AppTheme.spacing8,
-            children: widget.doctor.subspecialties.map((subspecialty) {
+            children: doctor.subspecialties.map((subspecialty) {
               return _Badge(
                 label: subspecialty,
                 icon: Icons.medical_services_outlined,
@@ -363,8 +365,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildAvailabilitySection(BuildContext context) {
-    if (!widget.doctor.isCurrentlyAvailable) {
+  Widget _buildAvailabilitySection(BuildContext context, DoctorModel doctor) {
+    if (!doctor.isCurrentlyAvailable) {
       // Avoid duplicating the unavailable messaging; the footer handles it.
       return const SizedBox.shrink();
     }
@@ -387,7 +389,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     width: 12,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: widget.doctor.isCurrentlyAvailable
+                      color: doctor.isCurrentlyAvailable
                           ? Theme.of(context).colorScheme.secondary
                           : Theme.of(context).colorScheme.onSurfaceVariant,
                       shape: BoxShape.circle,
@@ -395,7 +397,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   ),
                   const SizedBox(width: AppTheme.spacing12),
                   Text(
-                    widget.doctor.isCurrentlyAvailable
+                    doctor.isCurrentlyAvailable
                         ? 'doctor_profile.available_now'.tr()
                         : 'doctor_profile.unavailable'.tr(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -416,10 +418,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildRequestButton(BuildContext context) {
+  Widget _buildRequestButton(BuildContext context, DoctorModel doctor) {
     final colorScheme = Theme.of(context).colorScheme;
     final now = DateTime.now();
-    final activeOrUpcomingVacations = widget.doctor.vacationPeriods
+    final activeOrUpcomingVacations = doctor.vacationPeriods
         .where((vac) => vac.isActive() || vac.startDate.isAfter(now))
         .toList()
       ..sort((a, b) => a.startDate.compareTo(b.startDate));
@@ -427,7 +429,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     String? startDate;
     String? endDate;
     String? unavailableReason;
-    if (!widget.doctor.isCurrentlyAvailable &&
+    if (!doctor.isCurrentlyAvailable &&
         activeOrUpcomingVacations.isNotEmpty) {
       final vac = activeOrUpcomingVacations.first;
       final dateFormat = DateFormat('dd MMM yyyy');
@@ -458,13 +460,13 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               ]
             : null,
       ),
-      child: widget.doctor.isCurrentlyAvailable
+      child: doctor.isCurrentlyAvailable
           ? ElevatedButton.icon(
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => CreateRequestScreen(
-                      doctor: widget.doctor,
+                      doctor: doctor,
                     ),
                   ),
                 );

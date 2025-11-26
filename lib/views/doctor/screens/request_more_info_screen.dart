@@ -18,13 +18,21 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _messageController = TextEditingController();
   final List<TextEditingController> _questionControllers = [TextEditingController()];
+  final List<FocusNode> _questionFocusNodes = [FocusNode()];
   bool _isSubmitting = false;
+  static const int _messageMin = 100;
+  static const int _messageMax = 500;
+  static const int _questionMin = 10;
+  static const int _questionMax = 200;
 
   @override
   void dispose() {
     _messageController.dispose();
     for (final controller in _questionControllers) {
       controller.dispose();
+    }
+    for (final node in _questionFocusNodes) {
+      node.dispose();
     }
     super.dispose();
   }
@@ -47,19 +55,30 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                   controller: _messageController,
                   maxLines: 4,
                   hintText: 'doctor.request_more_info.message_hint'.tr(),
+                  onChanged: (_) => setState(() {}),
                   validator: (value) {
                     final text = value?.trim() ?? '';
                     if (text.isEmpty) {
                       return 'doctor.request_more_info.validation.required'.tr();
                     }
-                    if (text.length < 100) {
+                    if (text.length < _messageMin) {
                       return 'doctor.request_more_info.validation.min_length'.tr();
                     }
-                    if (text.length > 500) {
+                    if (text.length > _messageMax) {
                       return 'doctor.request_more_info.validation.max_length'.tr();
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: AppTheme.spacing8),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    '${_messageController.text.trim().length}/$_messageMax',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).hintColor,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: AppTheme.sectionSpacing),
                 Align(
@@ -79,10 +98,46 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                     separatorBuilder: (context, _) =>
                         const SizedBox(height: AppTheme.spacing12),
                     itemBuilder: (context, index) {
-                      return AppTextField(
-                        label: '${'doctor.request_more_info.question_label'.tr()} ${index + 1}',
-                        controller: _questionControllers[index],
-                        hintText: 'doctor.request_more_info.question_hint'.tr(),
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: AppTextField(
+                              label: '${'doctor.request_more_info.question_label'.tr()} ${index + 1}',
+                              controller: _questionControllers[index],
+                              hintText: 'doctor.request_more_info.question_hint'.tr(),
+                              focusNode: _questionFocusNodes[index],
+                              onChanged: (_) => setState(() {}),
+                              maxLines: 2,
+                              validator: (value) {
+                                final text = value?.trim() ?? '';
+                                if (text.isEmpty) {
+                                  return 'doctor.request_more_info.validation.question_required'.tr();
+                                }
+                                if (text.length < _questionMin) {
+                                  return 'doctor.request_more_info.validation.question_too_short'.tr();
+                                }
+                                if (text.length > _questionMax) {
+                                  return 'doctor.request_more_info.validation.question_too_long'.tr();
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: AppTheme.spacing8),
+                          if (_questionControllers.length > 1)
+                            IconButton(
+                              tooltip: 'common.delete'.tr(),
+                              onPressed: () {
+                                setState(() {
+                                  _questionControllers.removeAt(index).dispose();
+                                  _questionFocusNodes.removeAt(index).dispose();
+                                });
+                              },
+                              icon: const Icon(Icons.remove_circle_outline),
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                        ],
                       );
                     },
                   ),
@@ -94,6 +149,11 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                     onPressed: () {
                       setState(() {
                         _questionControllers.add(TextEditingController());
+                        _questionFocusNodes.add(FocusNode());
+                      });
+                      // Move focus to the newly added field.
+                      Future.delayed(const Duration(milliseconds: 100), () {
+                        _questionFocusNodes.last.requestFocus();
                       });
                     },
                     icon: const Icon(Icons.add),

@@ -32,10 +32,20 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-populate name from signup
     final currentUser = context.read<AuthController>().currentUser;
-    if (currentUser?.displayName != null) {
-      _nameController.text = currentUser!.displayName!;
+    if (currentUser != null) {
+      if (currentUser.displayName != null && currentUser.displayName!.isNotEmpty) {
+        _nameController.text = currentUser.displayName!;
+      }
+      if (currentUser.phone != null && currentUser.phone!.isNotEmpty) {
+        _phoneController.text = currentUser.phone!;
+      }
+      if (currentUser.dateOfBirth != null) {
+        _selectedDateOfBirth = currentUser.dateOfBirth;
+      }
+      if (currentUser.gender != null && currentUser.gender!.isNotEmpty) {
+        _selectedGender = currentUser.gender;
+      }
     }
   }
 
@@ -236,26 +246,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'profile.profile_setup'.tr(),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(),
-            ),
-            Text(
-              'profile.step_of'.tr(namedArgs: {'current': '1', 'total': '1'}),
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        LinearProgressIndicator(
-          value: 1.0,
-          backgroundColor: Theme.of(context).dividerColor,
-          valueColor:
-              AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        Text(
+          'profile.profile_setup'.tr(),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(),
         ),
       ],
     );

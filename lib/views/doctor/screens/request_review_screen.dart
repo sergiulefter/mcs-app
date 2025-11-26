@@ -5,6 +5,9 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/request_more_info_screen.dart';
 import 'package:mcs_app/views/doctor/screens/response_form_screen.dart';
+import 'package:mcs_app/views/doctor/widgets/patient_info_card.dart';
+import 'package:mcs_app/views/doctor/widgets/status_chip.dart';
+import 'package:mcs_app/views/doctor/widgets/urgency_badge.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +50,14 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context, consultation, patientName, dateText),
+              _buildHeader(
+                context,
+                consultation,
+                patientName,
+                patient?.email,
+                patient?.phone,
+                dateText,
+              ),
               const SizedBox(height: AppTheme.sectionSpacing),
               _buildRequestDetails(context, consultation),
               const SizedBox(height: AppTheme.sectionSpacing),
@@ -69,6 +79,8 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
     BuildContext context,
     ConsultationModel consultation,
     String patientName,
+    String? patientEmail,
+    String? patientPhone,
     String dateText,
   ) {
     return Column(
@@ -85,7 +97,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                     ?.copyWith(fontWeight: FontWeight.w700),
               ),
             ),
-            _statusChip(context, consultation.status),
+            StatusChip(status: consultation.status),
           ],
         ),
         const SizedBox(height: AppTheme.spacing8),
@@ -94,20 +106,12 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: AppTheme.spacing12),
-        Row(
-          children: [
-            Icon(Icons.person_outline,
-                size: AppTheme.iconSmall, color: Theme.of(context).hintColor),
-            const SizedBox(width: AppTheme.spacing8),
-            Expanded(
-              child: Text(
-                patientName,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-          ],
+        PatientInfoCard(
+          name: patientName,
+          email: patientEmail ?? '',
+          phone: patientPhone,
         ),
-        const SizedBox(height: AppTheme.spacing8),
+        const SizedBox(height: AppTheme.spacing12),
         Row(
           children: [
             Icon(Icons.schedule_outlined,
@@ -145,13 +149,13 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
         _detailRow(
           context,
           label: 'doctor.requests.detail.urgency'.tr(),
-          value: _urgencyLabel(consultation.urgency),
+          valueWidget: UrgencyBadge(urgency: consultation.urgency),
         ),
         const SizedBox(height: AppTheme.spacing8),
         _detailRow(
           context,
           label: 'doctor.requests.detail.status'.tr(),
-          value: _statusLabel(consultation.status),
+          valueWidget: StatusChip(status: consultation.status),
         ),
         const SizedBox(height: AppTheme.spacing8),
         _detailRow(
@@ -376,7 +380,8 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
   Widget _detailRow(
     BuildContext context, {
     required String label,
-    required String value,
+    String? value,
+    Widget? valueWidget,
   }) {
     return Row(
       children: [
@@ -389,76 +394,15 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                 ),
           ),
         ),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        if (valueWidget != null)
+          valueWidget
+        else if (value != null)
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
       ],
     );
   }
 
-  Widget _statusChip(BuildContext context, String status) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
-      ),
-      decoration: BoxDecoration(
-        color: consultationStatusColor(context, status).withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-      ),
-      child: Text(
-        _statusLabel(status),
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: consultationStatusColor(context, status),
-              fontWeight: FontWeight.w700,
-            ),
-      ),
-    );
-  }
-
-  Color consultationStatusColor(BuildContext context, String status) {
-    switch (status) {
-      case 'pending':
-        return AppTheme.warningOrange;
-      case 'in_review':
-        return Theme.of(context).colorScheme.primary;
-      case 'info_requested':
-        return AppTheme.warningOrange;
-      case 'completed':
-        return Theme.of(context).colorScheme.secondary;
-      case 'cancelled':
-        return Theme.of(context).colorScheme.error;
-      default:
-        return Theme.of(context).hintColor;
-    }
-  }
-
-  String _statusLabel(String status) {
-    switch (status) {
-      case 'pending':
-        return 'doctor.requests.status.pending'.tr();
-      case 'in_review':
-        return 'doctor.requests.status.in_review'.tr();
-      case 'info_requested':
-        return 'doctor.requests.status.info_requested'.tr();
-      case 'completed':
-        return 'doctor.requests.status.completed'.tr();
-      case 'cancelled':
-        return 'doctor.requests.status.cancelled'.tr();
-      default:
-        return status;
-    }
-  }
-
-  String _urgencyLabel(String urgency) {
-    switch (urgency) {
-      case 'urgent':
-        return 'doctor.requests.urgency.urgent'.tr();
-      case 'emergency':
-        return 'doctor.requests.urgency.emergency'.tr();
-      default:
-        return 'doctor.requests.urgency.normal'.tr();
-    }
-  }
 }

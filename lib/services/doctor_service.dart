@@ -18,8 +18,14 @@ class DoctorService {
   }
 
   /// Fetch a single doctor by UID
-  Future<DoctorModel?> fetchDoctorById(String uid) async {
-    final docSnapshot = await _firestore.collection(_collection).doc(uid).get();
+  Future<DoctorModel?> fetchDoctorById(
+    String uid, {
+    bool serverOnly = false,
+  }) async {
+    final docSnapshot = await _firestore
+        .collection(_collection)
+        .doc(uid)
+        .get(serverOnly ? const GetOptions(source: Source.server) : null);
     if (!docSnapshot.exists) return null;
 
     return DoctorModel.fromMap(
@@ -42,7 +48,11 @@ class DoctorService {
 
   /// Stream a single doctor (real-time updates)
   Stream<DoctorModel?> streamDoctor(String uid) {
-    return _firestore.collection(_collection).doc(uid).snapshots().map((snapshot) {
+    return _firestore
+        .collection(_collection)
+        .doc(uid)
+        .snapshots(includeMetadataChanges: true)
+        .map((snapshot) {
       if (!snapshot.exists) return null;
       return DoctorModel.fromMap(
         snapshot.data() as Map<String, dynamic>,

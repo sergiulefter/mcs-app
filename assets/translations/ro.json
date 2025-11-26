@@ -233,7 +233,9 @@
       "unassigned_subtitle": "Vom atribui curând un specialist cererii tale."
     },
     "doctor_response": {
-      "title": "Răspuns medic"
+      "title": "Răspuns medic",
+      "recommendations_label": "Recomandări",
+      "follow_up_needed": "Este nevoie de o consultație ulterioară?"
     },
     "attachments": {
       "title": "Atașamente",
@@ -383,7 +385,8 @@
     "error": "Eroare",
     "success": "Succes",
     "warning": "Avertisment",
-    "info": "Informație"
+    "info": "Informație",
+    "yes": "Da"
   },
   "validation": {
     "required_field": "Acest câmp este obligatoriu",
@@ -474,6 +477,33 @@
       "calendar": "Calendar",
       "account": "Cont"
     },
+    "response_form": {
+      "title": "Trimite răspunsul",
+      "response_label": "Opinia medicală",
+      "response_hint": "Oferă o opinie medicală clară și structurată pentru pacient...",
+      "recommendations_label": "Recomandări (opțional)",
+      "recommendations_hint": "Pași de urmat, idei de tratament sau sfaturi suplimentare",
+      "follow_up_title": "Este nevoie de o consultație ulterioară?",
+      "follow_up_subtitle": "Bifează dacă pacientul trebuie să programeze o consultație ulterioară",
+      "submit": "Trimite răspunsul",
+      "success": "Răspuns trimis pacientului",
+      "error": "Trimiterea răspunsului a eșuat. Te rugăm să încerci din nou.",
+      "validation": {
+        "required": "Răspunsul este obligatoriu",
+        "min_length": "Răspunsul trebuie să aibă cel puțin 200 de caractere",
+        "max_length": "Răspunsul trebuie să aibă sub 2000 de caractere"
+      }
+    },
+    "request_more_info": {
+      "title": "Solicită mai multe informații",
+      "message_label": "Mesaj pentru pacient",
+      "message_hint": "Descrie ce informații ai nevoie (ex: simptome, analize)...",
+      "questions_title": "Întrebări specifice",
+      "add_question": "Adaugă încă o întrebare",
+      "submit": "Trimite solicitarea",
+      "question_label": "Întrebare",
+      "question_hint": "Adaugă o întrebare specifică pentru pacient"
+    },
     "home": {
       "welcome": "Bine ai venit, {name}",
       "doctor": "Doctor",
@@ -485,6 +515,7 @@
       "availability_error": "Actualizarea disponibilității a eșuat. Te rugăm să încerci din nou.",
       "stats_title": "Statisticile Tale",
       "stats": {
+        "total": "Total",
         "pending": "În Așteptare",
         "in_review": "În Evaluare",
         "completed": "Finalizate"
@@ -583,6 +614,8 @@
       "bio_hint": "Descrie experiența și expertiza ta...",
       "bio_helper": "Aceasta va fi afișată pacienților",
       "consultation_price": "Preț Consultație (RON)",
+      "experience_years": "Ani de experiență",
+      "experience_years_hint": "ex: 10",
       "languages_spoken": "Limbi Vorbite",
       "subspecialties": "Subspecialități",
       "subspecialties_hint": "Selectează domeniile tale de expertiză",
@@ -610,7 +643,11 @@
         "institution_required": "Instituția este obligatorie",
         "degree_required": "Diploma este obligatorie",
         "year_required": "Anul este obligatoriu",
-        "year_invalid": "Te rugăm să introduci un an valid"
+        "year_invalid": "Te rugăm să introduci un an valid",
+        "subspecialties_required": "Te rugăm să selectezi cel puțin o subspecialitate",
+        "price_required": "Prețul consultației este obligatoriu",
+        "experience_required": "Anii de experiență sunt obligatorii",
+        "experience_invalid": "Te rugăm să introduci o experiență între 1 și 60 de ani"
       }
     },
     "availability": {
@@ -630,7 +667,6 @@
       "end_date": "Data Sfârșit",
       "reason": "Motiv",
       "reason_hint": "ex: Conferință medicală",
-      "reason_optional": "(Opțional)",
       "delete_vacation": "Șterge Concediu",
       "delete_vacation_confirm": "Sigur dorești să ștergi această perioadă de concediu?",
       "vacation_added": "Perioadă de concediu adăugată",
