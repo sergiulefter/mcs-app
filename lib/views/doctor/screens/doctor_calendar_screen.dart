@@ -1,11 +1,78 @@
-import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
+import 'package:mcs_app/models/consultation_model.dart';
+import 'package:mcs_app/models/doctor_model.dart';
+import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
+import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
+import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
+import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
+import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-/// Placeholder screen for doctor calendar/schedule
-/// Will be implemented in Priority 5C
-class DoctorCalendarScreen extends StatelessWidget {
+/// Doctor-facing calendar view for consultations and availability.
+class DoctorCalendarScreen extends StatefulWidget {
   const DoctorCalendarScreen({super.key});
+
+  @override
+  State<DoctorCalendarScreen> createState() => _DoctorCalendarScreenState();
+}
+
+class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
+  final DoctorService _doctorService = DoctorService();
+  DoctorModel? _doctor;
+
+  bool _isDoctorLoading = true;
+  bool _initialized = false;
+
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay = DateTime.now();
+
+  String _statusFilter = 'all';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _primeData());
+  }
+
+  Future<void> _primeData({bool force = false}) async {
+    final auth = context.read<AuthController>();
+    final controller = context.read<DoctorConsultationsController>();
+    final doctorId = auth.currentUser?.uid;
+    if (doctorId == null) return;
+
+    setState(() => _isDoctorLoading = true);
+
+    try {
+      await controller.primeForDoctor(doctorId, force: force);
+      final doctor = await _doctorService.fetchDoctorById(doctorId);
+
+      if (!mounted) return;
+      setState(() {
+        _doctor = doctor;
+        _isDoctorLoading = false;
+        _initialized = true;
+        _selectedDay ??= DateTime.now();
+        _focusedDay = _selectedDay!;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isDoctorLoading = false;
+        _initialized = true;
+      });
+    }
+  }
+
+  Future<void> _refresh() async {
+    await _primeData(force: true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,46 +82,619 @@ class DoctorCalendarScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
-        child: Center(
+        child: Consumer<DoctorConsultationsController>(
+          builder: (context, controller, _) {
+            if ((_isDoctorLoading || controller.isLoading) && !_initialized) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            final filteredConsultations =
+                _applyStatusFilter(controller.consultations);
+            final eventsByDay = _groupByDay(filteredConsultations);
+            final selectedEvents = _selectedDay != null
+                ? eventsByDay[_dayKey(_selectedDay!)] ?? const []
+                : const <ConsultationModel>[];
+
+            return RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: AppTheme.screenPadding,
+                children: [
+                  _buildViewToggle(context),
+                  const SizedBox(height: AppTheme.spacing16),
+                  _buildStatusFilters(context),
+                  const SizedBox(height: AppTheme.sectionSpacing),
+                  _buildCalendar(context, eventsByDay),
+                  const SizedBox(height: AppTheme.sectionSpacing),
+                  _buildDaySummary(context, selectedEvents),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildViewToggle(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Text(
+          'doctor.calendar.view_label'.tr(),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        const Spacer(),
+        Wrap(
+          spacing: AppTheme.spacing8,
+          children: [
+            ChoiceChip(
+              label: Text('doctor.calendar.view_month'.tr()),
+              selected: _calendarFormat == CalendarFormat.month,
+              onSelected: (_) =>
+                  setState(() => _calendarFormat = CalendarFormat.month),
+              labelStyle: Theme.of(context).textTheme.labelLarge,
+              selectedColor: colorScheme.primary.withValues(alpha: 0.12),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                side: BorderSide(color: Theme.of(context).dividerColor),
+              ),
+            ),
+            ChoiceChip(
+              label: Text('doctor.calendar.view_week'.tr()),
+              selected: _calendarFormat == CalendarFormat.week,
+              onSelected: (_) =>
+                  setState(() => _calendarFormat = CalendarFormat.week),
+              labelStyle: Theme.of(context).textTheme.labelLarge,
+              selectedColor: colorScheme.primary.withValues(alpha: 0.12),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                side: BorderSide(color: Theme.of(context).dividerColor),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusFilters(BuildContext context) {
+    final filters = <String, String>{
+      'all': 'doctor.requests.filters.all'.tr(),
+      'pending': 'doctor.requests.filters.pending'.tr(),
+      'in_review': 'doctor.requests.filters.in_review'.tr(),
+      'info_requested': 'doctor.requests.filters.info_requested'.tr(),
+      'completed': 'doctor.requests.filters.completed'.tr(),
+    };
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final entry in filters.entries)
+            Padding(
+              padding: const EdgeInsets.only(right: AppTheme.spacing8),
+              child: ThemedFilterChip(
+                label: entry.value,
+                selected: _statusFilter == entry.key,
+                onSelected: (_) => setState(() => _statusFilter = entry.key),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendar(
+    BuildContext context,
+    Map<DateTime, List<ConsultationModel>> eventsByDay,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return TableCalendar<ConsultationModel>(
+      firstDay: DateTime.utc(2020),
+      lastDay: DateTime.utc(2035),
+      focusedDay: _focusedDay,
+      locale: context.locale.languageCode,
+      calendarFormat: _calendarFormat,
+      availableCalendarFormats: const {
+        CalendarFormat.month: 'Month',
+        CalendarFormat.week: 'Week',
+      },
+      rowHeight: 72,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+      eventLoader: (day) => eventsByDay[_dayKey(day)] ?? const [],
+      holidayPredicate: _isVacationDay,
+      onDaySelected: (selectedDay, focusedDay) {
+        setState(() {
+          _selectedDay = selectedDay;
+          _focusedDay = focusedDay;
+        });
+      },
+      onPageChanged: (focusedDay) => _focusedDay = focusedDay,
+      headerStyle: HeaderStyle(
+        titleCentered: false,
+        formatButtonVisible: false,
+        titleTextStyle: (textTheme.titleLarge ?? const TextStyle()).copyWith(
+          fontWeight: FontWeight.w700,
+        ),
+        leftChevronIcon: const Icon(Icons.chevron_left),
+        rightChevronIcon: const Icon(Icons.chevron_right),
+      ),
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekdayStyle: textTheme.labelLarge!,
+        weekendStyle: textTheme.labelLarge!,
+      ),
+      calendarStyle: CalendarStyle(
+        outsideDaysVisible: false,
+        cellMargin: EdgeInsets.zero,
+        cellPadding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.spacing16,
+          vertical: AppTheme.spacing12,
+        ),
+        todayDecoration: BoxDecoration(
+          color: colorScheme.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          border: Border.all(color: colorScheme.primary),
+        ),
+        selectedDecoration: BoxDecoration(
+          color: colorScheme.primary,
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        ),
+        selectedTextStyle:
+            (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+          color: colorScheme.onPrimary,
+          fontWeight: FontWeight.w700,
+        ),
+        holidayDecoration: BoxDecoration(
+          color: colorScheme.tertiary.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        ),
+        holidayTextStyle:
+            (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+          color: colorScheme.tertiary,
+          fontWeight: FontWeight.w700,
+        ),
+        weekendTextStyle: textTheme.bodyMedium!,
+        defaultTextStyle: textTheme.bodyMedium!,
+        markerDecoration: BoxDecoration(
+          color: colorScheme.primary,
+          shape: BoxShape.circle,
+        ),
+      ),
+      calendarBuilders: CalendarBuilders(
+        markerBuilder: (context, day, events) {
+          if (events.isEmpty) return null;
+          final colors = events
+              .map((event) => _urgencyColor(context, event.urgency))
+              .toSet()
+              .take(3)
+              .toList();
+          return Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppTheme.spacing4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: colors
+                    .map(
+                      (color) => Container(
+                        width: 8,
+                        height: 8,
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: AppTheme.spacing2),
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          );
+        },
+        disabledBuilder: (context, day, focusedDay) {
+          final isVacation = _isVacationDay(day);
+          return _buildDayCell(
+            context,
+            day,
+            eventsByDay[_dayKey(day)] ?? const [],
+            isDisabled: true,
+            isVacation: isVacation,
+          );
+        },
+        defaultBuilder: (context, day, focusedDay) {
+          final isVacation = _isVacationDay(day);
+          return _buildDayCell(
+            context,
+            day,
+            eventsByDay[_dayKey(day)] ?? const [],
+            isSelected: isSameDay(day, _selectedDay),
+            isToday: isSameDay(day, DateTime.now()),
+            isVacation: isVacation,
+          );
+        },
+        todayBuilder: (context, day, focusedDay) {
+          final isVacation = _isVacationDay(day);
+          return _buildDayCell(
+            context,
+            day,
+            eventsByDay[_dayKey(day)] ?? const [],
+            isToday: true,
+            isVacation: isVacation,
+          );
+        },
+        selectedBuilder: (context, day, focusedDay) {
+          final isVacation = _isVacationDay(day);
+          return _buildDayCell(
+            context,
+            day,
+            eventsByDay[_dayKey(day)] ?? const [],
+            isSelected: true,
+            isVacation: isVacation,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDayCell(
+    BuildContext context,
+    DateTime day,
+    List<ConsultationModel> events, {
+    bool isSelected = false,
+    bool isToday = false,
+    bool isVacation = false,
+    bool isDisabled = false,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final background = isSelected
+        ? colorScheme.primary
+        : isToday
+            ? colorScheme.primary.withValues(alpha: 0.12)
+            : isVacation
+                ? colorScheme.tertiary.withValues(alpha: 0.12)
+                : colorScheme.surface;
+
+    final textColor = isSelected
+        ? colorScheme.onPrimary
+        : isDisabled
+            ? Theme.of(context).hintColor
+            : Theme.of(context).colorScheme.onSurface;
+
+    return Padding(
+      padding: const EdgeInsets.all(AppTheme.spacing4),
+      child: SizedBox.expand(
+        child: Container(
+          decoration: BoxDecoration(
+            color: background,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            border: Border.all(
+              color: isSelected
+                  ? colorScheme.primary
+                  : Theme.of(context).dividerColor,
+              width: 1.5,
+            ),
+          ),
           child: Padding(
-            padding: AppTheme.screenPadding,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacing8,
+              vertical: AppTheme.spacing8,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                  ),
-                  child: Icon(
-                    Icons.calendar_month_outlined,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacing24),
                 Text(
-                  'doctor.calendar.coming_soon'.tr(),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppTheme.spacing8),
-                Text(
-                  'doctor.calendar.coming_soon_desc'.tr(),
+                  '${day.day}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).hintColor,
+                        color: textColor,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w600,
                       ),
-                  textAlign: TextAlign.center,
                 ),
+                if (isVacation)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppTheme.spacing4),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppTheme.spacing8,
+                        vertical: AppTheme.spacing2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.tertiary.withValues(alpha: 0.2),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusSmall),
+                      ),
+                      child: Text(
+                        'doctor.calendar.vacation_badge'.tr(),
+                        style:
+                            Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: colorScheme.tertiary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                      ),
+                    ),
+                  ),
+                if (events.isNotEmpty && !isVacation)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppTheme.spacing4),
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildDaySummary(
+    BuildContext context,
+    List<ConsultationModel> events,
+  ) {
+    final dateLabel = _selectedDay != null
+        ? DateFormat.yMMMMd(context.locale.toLanguageTag()).format(_selectedDay!)
+        : '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'doctor.calendar.day_overview'.tr()),
+        const SizedBox(height: AppTheme.spacing8),
+        Text(
+          dateLabel,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).hintColor,
+              ),
+        ),
+        const SizedBox(height: AppTheme.spacing16),
+        if (events.isEmpty)
+          AppEmptyState(
+            icon: Icons.calendar_today_outlined,
+            title: 'doctor.calendar.no_consultations_title'.tr(),
+            subtitle: 'doctor.calendar.no_consultations_subtitle'.tr(),
+          )
+        else
+          Column(
+            children: events
+                .map(
+                  (event) => Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: AppTheme.spacing12),
+                    child: _ConsultationCard(consultation: event),
+                  ),
+                )
+                .toList(),
+          ),
+      ],
+    );
+  }
+
+  Map<DateTime, List<ConsultationModel>> _groupByDay(
+    List<ConsultationModel> consultations,
+  ) {
+    final Map<DateTime, List<ConsultationModel>> grouped = {};
+    for (final consultation in consultations) {
+      final key = _dayKey(consultation.createdAt);
+      grouped.putIfAbsent(key, () => []).add(consultation);
+    }
+    return grouped;
+  }
+
+  List<ConsultationModel> _applyStatusFilter(
+    List<ConsultationModel> consultations,
+  ) {
+    if (_statusFilter == 'all') return consultations;
+    return consultations.where((c) => c.status == _statusFilter).toList();
+  }
+
+  DateTime _dayKey(DateTime day) => DateTime(day.year, day.month, day.day);
+
+  bool _isVacationDay(DateTime day) {
+    if (_doctor == null) return false;
+    for (final vacation in _doctor!.vacationPeriods) {
+      final start = _dayKey(vacation.startDate);
+      final end = _dayKey(vacation.endDate);
+      if ((day.isAfter(start) || isSameDay(day, start)) &&
+          (day.isBefore(end) || isSameDay(day, end))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Color _urgencyColor(BuildContext context, String urgency) {
+    final colorScheme = Theme.of(context).colorScheme;
+    switch (urgency) {
+      case 'urgent':
+        return AppTheme.warningOrange;
+      case 'emergency':
+        return colorScheme.error;
+      default:
+        return colorScheme.primary;
+    }
+  }
+}
+
+class _ConsultationCard extends StatelessWidget {
+  const _ConsultationCard({required this.consultation});
+
+  final ConsultationModel consultation;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.read<DoctorConsultationsController>();
+    final patient = controller.patientProfile(consultation.patientId);
+    final patientName =
+        patient?.displayName ?? patient?.email ?? 'doctor.requests.patient_unknown'.tr();
+    final dateLabel =
+        DateFormat.yMMMd().add_Hm().format(consultation.createdAt);
+
+    return SurfaceCard(
+      padding: AppTheme.cardPadding,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChangeNotifierProvider.value(
+                value: controller,
+                child: RequestReviewScreen(
+                  consultationId: consultation.id,
+                ),
+              ),
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    consultation.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                ),
+                _buildBadge(
+                  context,
+                  _statusLabel(context, consultation.status),
+                  consultation.getStatusColor(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacing8),
+            Text(
+              consultation.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).hintColor,
+                  ),
+            ),
+            const SizedBox(height: AppTheme.spacing12),
+            Row(
+              children: [
+                Icon(
+                  Icons.person_outline,
+                  size: AppTheme.iconSmall,
+                  color: Theme.of(context).hintColor,
+                ),
+                const SizedBox(width: AppTheme.spacing8),
+                Expanded(
+                  child: Text(
+                    patientName,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacing8),
+            Row(
+              children: [
+                Icon(
+                  Icons.schedule_outlined,
+                  size: AppTheme.iconSmall,
+                  color: Theme.of(context).hintColor,
+                ),
+                const SizedBox(width: AppTheme.spacing8),
+                Text(
+                  dateLabel,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).hintColor,
+                      ),
+                ),
+                const Spacer(),
+                _buildBadge(
+                  context,
+                  _urgencyLabel(context, consultation.urgency),
+                  _urgencyColor(context, consultation.urgency),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBadge(BuildContext context, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacing12,
+        vertical: AppTheme.spacing8,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
+      ),
+    );
+  }
+
+  String _statusLabel(BuildContext context, String status) {
+    switch (status) {
+      case 'pending':
+        return 'doctor.requests.status.pending'.tr();
+      case 'in_review':
+        return 'doctor.requests.status.in_review'.tr();
+      case 'info_requested':
+        return 'doctor.requests.status.info_requested'.tr();
+      case 'completed':
+        return 'doctor.requests.status.completed'.tr();
+      case 'cancelled':
+        return 'doctor.requests.status.cancelled'.tr();
+      default:
+        return status;
+    }
+  }
+
+  String _urgencyLabel(BuildContext context, String urgency) {
+    switch (urgency) {
+      case 'urgent':
+        return 'doctor.requests.urgency.urgent'.tr();
+      case 'emergency':
+        return 'doctor.requests.urgency.emergency'.tr();
+      default:
+        return 'doctor.requests.urgency.normal'.tr();
+    }
+  }
+
+  Color _urgencyColor(BuildContext context, String urgency) {
+    final colorScheme = Theme.of(context).colorScheme;
+    switch (urgency) {
+      case 'urgent':
+        return AppTheme.warningOrange;
+      case 'emergency':
+        return colorScheme.error;
+      default:
+        return colorScheme.primary;
+    }
   }
 }

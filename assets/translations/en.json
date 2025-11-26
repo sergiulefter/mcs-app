@@ -581,7 +581,14 @@
     "calendar": {
       "title": "Calendar",
       "coming_soon": "Coming Soon",
-      "coming_soon_desc": "The calendar and scheduling feature is being developed and will be available soon."
+      "coming_soon_desc": "The calendar and scheduling feature is being developed and will be available soon.",
+      "view_label": "View",
+      "view_month": "Month",
+      "view_week": "Week",
+      "day_overview": "Day overview",
+      "no_consultations_title": "No consultations this day",
+      "no_consultations_subtitle": "Select another date to view your schedule.",
+      "vacation_badge": "Vacation"
     },
     "account": {
       "profile_details": "Profile Details",

@@ -42,7 +42,10 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
         value: _doctorConsultationsController,
         child: const RequestsListScreen(),
       ),
-      const DoctorCalendarScreen(),
+      ChangeNotifierProvider.value(
+        value: _doctorConsultationsController,
+        child: const DoctorCalendarScreen(),
+      ),
       const DoctorAccountScreen(),
     ];
     _currentIndex = widget.initialIndex.clamp(0, _screens.length - 1);
