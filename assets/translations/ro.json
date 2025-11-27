@@ -234,8 +234,10 @@
     },
     "doctor_response": {
       "title": "Răspuns medic",
+      "response_label": "Răspuns",
       "recommendations_label": "Recomandări",
-      "follow_up_needed": "Este nevoie de o consultație ulterioară?"
+      "follow_up_needed": "Este nevoie de o consultație ulterioară?",
+      "responded_at": "Răspuns la"
     },
     "attachments": {
       "title": "Atașamente",
@@ -248,35 +250,6 @@
     "cancel_confirm": "Da, anulează cererea",
     "cancel_success": "Cererea de consultație a fost anulată cu succes",
     "cancel_error": "Anularea cererii a eșuat. Te rugăm să încerci din nou."
-  },
-  "notifications": {
-    "title": "Notificări",
-    "subtitle": "Rămâi la curent cu consultațiile tale",
-    "placeholder_info": "Primește actualizări despre cererile de consultație, răspunsurile medicilor și anunțuri importante.",
-    "no_notifications": "Nicio notificare încă",
-    "no_notifications_desc": "Vei fi notificat când medicii răspund la cererile tale sau când există actualizări importante."
-  },
-  "help_center": {
-    "title": "Centru de Ajutor",
-    "subtitle": "Ghiduri, întrebări frecvente și asistență într-un singur loc.",
-    "contact_title": "Ai nevoie de ajutor?",
-    "contact_subtitle": "Scrie-ne pentru întrebări despre cont, plăți sau consultații.",
-    "contact_email": "Suport prin email",
-    "contact_email_value": "support@mcs-app.com",
-    "contact_chat": "Chat în aplicație",
-    "contact_chat_desc": "Discută cu echipa noastră (în curând)",
-    "contact_phone": "Sună-ne",
-    "contact_phone_value": "+40 800 123 456",
-    "faq_title": "Întrebări frecvente",
-    "faq_request_question": "Cum solicit o a doua opinie?",
-    "faq_request_answer": "Mergi la tabul Doctors, alege un specialist și apasă Request Consultation ca să trimiți detaliile.",
-    "faq_documents_question": "Trebuie sa încarc documente medicale?",
-    "faq_documents_answer": "Da, încărcarea fișelor medicale și rezultatelor testelor este obligatorie și ne ajută să oferim o opinie mai precisă.",
-    "faq_timeline_question": "Când primesc un răspuns?",
-    "faq_timeline_answer": "Primești de obicei un răspuns în 1-2 zile lucrătoare. Cazurile urgente sunt prioritizate când sunt marcate ca urgente.",
-    "faq_profile_question": "Cum îmi actualizez profilul?",
-    "faq_profile_answer": "Deschide Account > Edit Profile ca să modifici datele personale și preferințele.",
-    "coming_soon": "Disponibil în curând"
   },
   "create_request": {
     "title": "Solicită Consultație",
@@ -321,6 +294,35 @@
       "description_too_short": "Descrierea trebuie să aibă cel puțin 50 de caractere",
       "accept_terms": "Trebuie să accepți termenii și condițiile"
     }
+  },
+  "notifications": {
+    "title": "Notificări",
+    "subtitle": "Rămâi la curent cu consultațiile tale",
+    "placeholder_info": "Primește actualizări despre cererile de consultație, răspunsurile medicilor și anunțuri importante.",
+    "no_notifications": "Nicio notificare încă",
+    "no_notifications_desc": "Vei fi notificat când medicii răspund la cererile tale sau când există actualizări importante."
+  },
+  "help_center": {
+    "title": "Centru de Ajutor",
+    "subtitle": "Ghiduri, întrebări frecvente și asistență într-un singur loc.",
+    "contact_title": "Ai nevoie de ajutor?",
+    "contact_subtitle": "Scrie-ne pentru întrebări despre cont, plăți sau consultații.",
+    "contact_email": "Suport prin email",
+    "contact_email_value": "support@mcs-app.com",
+    "contact_chat": "Chat în aplicație",
+    "contact_chat_desc": "Discută cu echipa noastră (în curând)",
+    "contact_phone": "Sună-ne",
+    "contact_phone_value": "+40 800 123 456",
+    "faq_title": "Întrebări frecvente",
+    "faq_request_question": "Cum solicit o a doua opinie?",
+    "faq_request_answer": "Mergi la tabul Doctors, alege un specialist și apasă Request Consultation ca să trimiți detaliile.",
+    "faq_documents_question": "Trebuie sa încarc documente medicale?",
+    "faq_documents_answer": "Da, încărcarea fișelor medicale și rezultatelor testelor este obligatorie și ne ajută să oferim o opinie mai precisă.",
+    "faq_timeline_question": "Când primesc un răspuns?",
+    "faq_timeline_answer": "Primești de obicei un răspuns în 1-2 zile lucrătoare. Cazurile urgente sunt prioritizate când sunt marcate ca urgente.",
+    "faq_profile_question": "Cum îmi actualizez profilul?",
+    "faq_profile_answer": "Deschide Account > Edit Profile ca să modifici datele personale și preferințele.",
+    "coming_soon": "Disponibil în curând"
   },
   "account": {
     "title": "Cont",
@@ -477,33 +479,6 @@
       "calendar": "Calendar",
       "account": "Cont"
     },
-    "response_form": {
-      "title": "Trimite răspunsul",
-      "response_label": "Opinia medicală",
-      "response_hint": "Oferă o opinie medicală clară și structurată pentru pacient...",
-      "recommendations_label": "Recomandări (opțional)",
-      "recommendations_hint": "Pași de urmat, idei de tratament sau sfaturi suplimentare",
-      "follow_up_title": "Este nevoie de o consultație ulterioară?",
-      "follow_up_subtitle": "Bifează dacă pacientul trebuie să programeze o consultație ulterioară",
-      "submit": "Trimite răspunsul",
-      "success": "Răspuns trimis pacientului",
-      "error": "Trimiterea răspunsului a eșuat. Te rugăm să încerci din nou.",
-      "validation": {
-        "required": "Răspunsul este obligatoriu",
-        "min_length": "Răspunsul trebuie să aibă cel puțin 200 de caractere",
-        "max_length": "Răspunsul trebuie să aibă sub 2000 de caractere"
-      }
-    },
-    "request_more_info": {
-      "title": "Solicită mai multe informații",
-      "message_label": "Mesaj pentru pacient",
-      "message_hint": "Descrie ce informații ai nevoie (ex: simptome, analize)...",
-      "questions_title": "Întrebări specifice",
-      "add_question": "Adaugă încă o întrebare",
-      "submit": "Trimite solicitarea",
-      "question_label": "Întrebare",
-      "question_hint": "Adaugă o întrebare specifică pentru pacient"
-    },
     "home": {
       "welcome": "Bine ai venit, {name}",
       "doctor": "Doctor",
@@ -575,6 +550,40 @@
         "urgency_normal": "Rutină",
         "urgency_urgent": "Urgent",
         "urgency_emergency": "Critic"
+      }
+    },
+    "response_form": {
+      "title": "Trimite răspunsul",
+      "response_label": "Opinia medicală",
+      "response_hint": "Oferă o opinie medicală clară și structurată pentru pacient...",
+      "recommendations_label": "Recomandări (opțional)",
+      "recommendations_hint": "Pași de urmat, idei de tratament sau sfaturi suplimentare",
+      "follow_up_title": "Este nevoie de o consultație ulterioară?",
+      "follow_up_subtitle": "Bifează dacă pacientul trebuie să programeze o consultație ulterioară",
+      "submit": "Trimite răspunsul",
+      "success": "Răspuns trimis pacientului",
+      "error": "Trimiterea răspunsului a eșuat. Te rugăm să încerci din nou.",
+      "validation": {
+        "required": "Răspunsul este obligatoriu",
+        "min_length": "Răspunsul trebuie să aibă cel puțin 200 de caractere",
+        "max_length": "Răspunsul trebuie să aibă sub 2000 de caractere"
+      }
+    },
+    "request_more_info": {
+      "title": "Solicită mai multe informații",
+      "message_label": "Mesaj pentru pacient",
+      "message_hint": "Descrie ce informații ai nevoie (ex: simptome, analize)...",
+      "questions_title": "Întrebări specifice",
+      "question_label": "Întrebare",
+      "question_hint": "Adaugă o întrebare specifică pentru pacient",
+      "add_question": "Adaugă încă o întrebare",
+      "submit": "Trimite solicitarea",
+      "success": "Solicitare de informații trimisă pacientului",
+      "error": "Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.",
+      "validation": {
+        "required": "Mesajul este obligatoriu",
+        "min_length": "Mesajul trebuie să aibă cel puțin 100 de caractere",
+        "max_length": "Mesajul trebuie să aibă sub 500 de caractere"
       }
     },
     "calendar": {

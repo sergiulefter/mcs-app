@@ -502,6 +502,8 @@
     },
     "requests": {
       "title": "Consultation Requests",
+      "coming_soon": "Coming Soon",
+      "coming_soon_desc": "The consultation requests feature is being developed and will be available soon.",
       "empty_title": "No requests yet",
       "empty_subtitle": "New consultation requests will appear here once patients submit them.",
       "patient_unknown": "Patient",
