@@ -246,7 +246,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     final completed =
         controller.consultations.where((c) => c.status == 'completed').length;
 
-    final semantic = Theme.of(context).extension<AppSemanticColors>();
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
 
     return LayoutBuilder(
@@ -272,7 +272,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                 value: '$pending',
                 label: 'doctor.home.stats.pending'.tr(),
                 icon: Icons.pending_actions_outlined,
-                color: semantic?.warning ?? AppTheme.warningOrange,
+                color: semantic.warning,
               ),
             ),
             SizedBox(width: spacing),

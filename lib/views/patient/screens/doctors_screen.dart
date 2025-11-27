@@ -323,12 +323,15 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              'doctors.filters.title'.tr(),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w700),
+                            Expanded(
+                              child: Text(
+                                'doctors.filters.title'.tr(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.w700),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.close),
@@ -386,7 +389,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                   });
                                   Navigator.of(sheetContext).pop();
                                 },
-                                child: Text('doctors.filters.clear'.tr()),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text('doctors.filters.clear'.tr()),
+                                ),
                               ),
                             ),
                             const SizedBox(width: AppTheme.spacing12),
@@ -491,15 +497,24 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'doctors.results_title'.tr(),
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+        Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'doctors.results_title'.tr(),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ),
         ),
-        Text(
-          'doctors.results_count'.tr(namedArgs: {'count': count.toString()}),
-          style: Theme.of(context).textTheme.bodyMedium,
+        Flexible(
+          child: Text(
+            'doctors.results_count'.tr(namedArgs: {'count': count.toString()}),
+            style: Theme.of(context).textTheme.bodyMedium,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

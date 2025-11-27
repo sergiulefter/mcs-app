@@ -7,6 +7,7 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
+import 'package:mcs_app/views/doctor/widgets/urgency_badge.dart';
 import 'doctor_profile_screen.dart';
 
 class RequestDetailScreen extends StatefulWidget {
@@ -110,7 +111,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
   ) {
     final statusColor = consultation.getStatusColor(context);
     final statusText = 'consultations.status.${consultation.status}'.tr();
-    final urgencyText = 'request_detail.urgency.${consultation.urgency}'.tr();
 
     return Container(
       padding: AppTheme.cardPadding,
@@ -139,23 +139,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
             ),
           ),
           const SizedBox(width: AppTheme.spacing12),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppTheme.spacing12,
-              vertical: AppTheme.spacing8,
-            ),
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            ),
-            child: Text(
-              urgencyText,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ),
+          UrgencyBadge(urgency: consultation.urgency),
         ],
       ),
     );
@@ -415,11 +399,16 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                   const SizedBox(width: AppTheme.spacing8),
-                  Text(
-                    'request_detail.doctor_response.follow_up_needed'.tr(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'request_detail.doctor_response.follow_up_needed'.tr(),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
                   ),
                 ],
               ),

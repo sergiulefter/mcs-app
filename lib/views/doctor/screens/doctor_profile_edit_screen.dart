@@ -422,11 +422,18 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SectionHeader(title: 'doctor.profile_edit.education_section'.tr()),
-            TextButton.icon(
-              onPressed: _showAddEducationDialog,
-              icon: const Icon(Icons.add, size: 18),
-              label: Text('doctor.profile_edit.add_education'.tr()),
+            Expanded(
+              child: SectionHeader(title: 'doctor.profile_edit.education_section'.tr()),
+            ),
+            Flexible(
+              child: TextButton.icon(
+                onPressed: _showAddEducationDialog,
+                icon: const Icon(Icons.add, size: 18),
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text('doctor.profile_edit.add_education'.tr()),
+                ),
+              ),
             ),
           ],
         ),

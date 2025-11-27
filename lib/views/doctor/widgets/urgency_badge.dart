@@ -18,11 +18,11 @@ class UrgencyBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       ),
       child: Text(
         _urgencyLabel(urgency),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: color,
               fontWeight: FontWeight.w700,
             ),
@@ -43,9 +43,10 @@ class UrgencyBadge extends StatelessWidget {
 
   Color _urgencyColor(BuildContext context, String urgency) {
     final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     switch (urgency) {
       case 'urgent':
-        return AppTheme.warningOrange;
+        return semantic.warning;
       case 'emergency':
         return colorScheme.error;
       default:

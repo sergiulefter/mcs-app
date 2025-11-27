@@ -203,6 +203,7 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
       focusedDay: _focusedDay,
       locale: context.locale.languageCode,
       calendarFormat: _calendarFormat,
+      availableGestures: AvailableGestures.horizontalSwipe,
       availableCalendarFormats: const {
         CalendarFormat.month: 'Month',
         CalendarFormat.week: 'Week',
@@ -385,13 +386,10 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
               width: 1.5,
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.spacing8,
-              vertical: AppTheme.spacing8,
-            ),
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   '${day.day}',
@@ -401,37 +399,16 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
                             isSelected ? FontWeight.w700 : FontWeight.w600,
                       ),
                 ),
-                if (isVacation)
+                if (isVacation || (events.isNotEmpty && !isVacation))
                   Padding(
-                    padding: const EdgeInsets.only(top: AppTheme.spacing4),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppTheme.spacing8,
-                        vertical: AppTheme.spacing2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colorScheme.tertiary.withValues(alpha: 0.2),
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusSmall),
-                      ),
-                      child: Text(
-                        'doctor.calendar.vacation_badge'.tr(),
-                        style:
-                            Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: colorScheme.tertiary,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                      ),
-                    ),
-                  ),
-                if (events.isNotEmpty && !isVacation)
-                  Padding(
-                    padding: const EdgeInsets.only(top: AppTheme.spacing4),
+                    padding: const EdgeInsets.only(top: 2),
                     child: Container(
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: colorScheme.primary,
+                        color: isVacation
+                            ? colorScheme.tertiary
+                            : colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -538,9 +515,10 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
 
   Color _urgencyColor(BuildContext context, String urgency) {
     final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     switch (urgency) {
       case 'urgent':
-        return AppTheme.warningOrange;
+        return semantic.warning;
       case 'emergency':
         return colorScheme.error;
       default:

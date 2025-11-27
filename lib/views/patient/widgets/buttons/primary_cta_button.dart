@@ -51,7 +51,7 @@ class PrimaryCTAButton extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: subtitle != null ? AppTheme.buttonHeight + 24 : AppTheme.buttonHeight,
+      height: subtitle != null ? AppTheme.buttonHeight + 36 : AppTheme.buttonHeight,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -104,7 +104,7 @@ class PrimaryCTAButton extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: fgColor.withValues(alpha: 0.9),
                           ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],

@@ -35,12 +35,15 @@ class ConsultationCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildStatusBadge(context),
-                  Text(
-                    DateFormat('MMM d, yyyy').format(consultation.createdAt),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                  Flexible(child: _buildStatusBadge(context)),
+                  Flexible(
+                    child: Text(
+                      DateFormat('MMM d, yyyy').format(consultation.createdAt),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),

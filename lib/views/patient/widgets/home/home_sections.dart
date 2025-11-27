@@ -257,9 +257,10 @@ class _HelpCenterActionCard extends StatelessWidget {
                 ]
               : null,
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Icon at top-left
             Container(
               padding: const EdgeInsets.all(AppTheme.spacing12),
               decoration: BoxDecoration(
@@ -275,73 +276,61 @@ class _HelpCenterActionCard extends StatelessWidget {
                 color: tertiary,
               ),
             ),
-            const SizedBox(width: AppTheme.spacing16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  FittedBox(
-                    alignment: Alignment.centerLeft,
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'home.help_center'.tr(),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                      maxLines: 1,
-                      softWrap: false,
-                    ),
+            const SizedBox(height: AppTheme.spacing16),
+            // Title
+            Text(
+              'home.help_center'.tr(),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
                   ),
-                  const SizedBox(height: AppTheme.spacing8),
-                  Text(
-                    'home.help_center_desc'.tr(),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          height: 1.3,
-                        ),
-                  ),
-                  const SizedBox(height: AppTheme.spacing12),
-                  Wrap(
-                    spacing: AppTheme.spacing8,
-                    runSpacing: AppTheme.spacing8,
-                    children: const [
-                      _SupportPill(
-                        icon: Icons.chat_bubble_outline,
-                        label: 'Live chat',
-                      ),
-                      _SupportPill(
-                        icon: Icons.call_outlined,
-                        label: 'Call back',
-                      ),
-                      _SupportPill(
-                        icon: Icons.article_outlined,
-                        label: 'FAQ',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
-            const SizedBox(width: AppTheme.spacing16),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                FilledButton.icon(
-                  onPressed: onTap,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.surface,
-                    foregroundColor: tertiary,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacing16,
-                      vertical: AppTheme.spacing8,
-                    ),
-                    side: BorderSide(color: tertiary.withValues(alpha: 0.3)),
+            const SizedBox(height: AppTheme.spacing8),
+            // Description
+            Text(
+              'home.help_center_desc'.tr(),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.3,
                   ),
-                  icon: const Icon(Icons.arrow_outward_rounded),
-                  label: const Text('Open'),
+            ),
+            const SizedBox(height: AppTheme.spacing12),
+            // Pills - now full width available
+            Wrap(
+              spacing: AppTheme.spacing8,
+              runSpacing: AppTheme.spacing8,
+              children: const [
+                _SupportPill(
+                  icon: Icons.chat_bubble_outline,
+                  label: 'Live chat',
+                ),
+                _SupportPill(
+                  icon: Icons.call_outlined,
+                  label: 'Call back',
+                ),
+                _SupportPill(
+                  icon: Icons.article_outlined,
+                  label: 'FAQ',
                 ),
               ],
+            ),
+            const SizedBox(height: AppTheme.spacing16),
+            // Button at bottom-right
+            Align(
+              alignment: Alignment.centerRight,
+              child: FilledButton.icon(
+                onPressed: onTap,
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.surface,
+                  foregroundColor: tertiary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacing16,
+                    vertical: AppTheme.spacing8,
+                  ),
+                  side: BorderSide(color: tertiary.withValues(alpha: 0.3)),
+                ),
+                icon: const Icon(Icons.arrow_outward_rounded),
+                label: const Text('Open'),
+              ),
             ),
           ],
         ),
@@ -417,11 +406,14 @@ class ActiveConsultationsSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'home.active_consultations'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+            Expanded(
+              child: Text(
+                'home.active_consultations'.tr(),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             if (hasConsultations && onViewAll != null)
               TextButton(

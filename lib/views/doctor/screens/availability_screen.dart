@@ -236,11 +236,18 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SectionHeader(title: 'doctor.availability.vacation_section'.tr()),
-            TextButton.icon(
-              onPressed: _showAddVacationDialog,
-              icon: const Icon(Icons.add, size: 18),
-              label: Text('doctor.availability.add_vacation'.tr()),
+            Expanded(
+              child: SectionHeader(title: 'doctor.availability.vacation_section'.tr()),
+            ),
+            Flexible(
+              child: TextButton.icon(
+                onPressed: _showAddVacationDialog,
+                icon: const Icon(Icons.add, size: 18),
+                label: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text('doctor.availability.add_vacation'.tr()),
+                ),
+              ),
             ),
           ],
         ),

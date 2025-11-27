@@ -10,10 +10,14 @@ import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
 import 'package:mcs_app/views/admin/widgets/multi_select_chip_field.dart';
 
-/// Screen for admin to create new doctor accounts.
-/// Creates Firebase Auth user + Firestore documents for doctors.
+/// Screen for admin to create new doctor accounts or edit existing ones.
+/// In create mode: Creates Firebase Auth user + Firestore documents for doctors.
+/// In edit mode: Updates the existing doctor's Firestore document.
 class CreateDoctorScreen extends StatefulWidget {
-  const CreateDoctorScreen({super.key});
+  /// Optional doctor to edit. If null, the screen is in "create" mode.
+  final DoctorModel? doctorToEdit;
+
+  const CreateDoctorScreen({super.key, this.doctorToEdit});
 
   @override
   State<CreateDoctorScreen> createState() => _CreateDoctorScreenState();
@@ -22,6 +26,9 @@ class CreateDoctorScreen extends StatefulWidget {
 class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _adminService = AdminService();
+
+  /// Whether we are editing an existing doctor (true) or creating a new one (false)
+  bool get _isEditMode => widget.doctorToEdit != null;
 
   // Section 1: Basic Information
   final _fullNameController = TextEditingController();
@@ -45,6 +52,31 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
   // Available languages
   final List<String> _availableLanguages = ['RO', 'EN', 'FR', 'DE', 'HU', 'RU'];
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill form if editing an existing doctor
+    if (_isEditMode) {
+      _populateFormWithDoctor(widget.doctorToEdit!);
+    }
+  }
+
+  /// Populate form fields with existing doctor data for edit mode
+  void _populateFormWithDoctor(DoctorModel doctor) {
+    _fullNameController.text = doctor.fullName;
+    _emailController.text = doctor.email;
+    // Note: DoctorModel doesn't have phone field, so we skip it
+    _selectedSpecialty = doctor.specialty;
+    _experienceYearsController.text = doctor.experienceYears > 0
+        ? doctor.experienceYears.toString()
+        : '';
+    _priceController.text = doctor.consultationPrice > 0
+        ? doctor.consultationPrice.toString()
+        : '';
+    _selectedLanguages = List<String>.from(doctor.languages);
+    _initiallyAvailable = doctor.isAvailable;
+  }
 
   @override
   void dispose() {
@@ -167,7 +199,13 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       return;
     }
 
-    // Get admin email
+    // For edit mode, we don't need admin password - just update
+    if (_isEditMode) {
+      await _handleUpdate();
+      return;
+    }
+
+    // Create mode: Get admin email
     final adminEmail = FirebaseAuth.instance.currentUser?.email;
     if (adminEmail == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -278,11 +316,67 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
     });
   }
 
+  /// Handle updating an existing doctor (edit mode)
+  Future<void> _handleUpdate() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Parse optional fields
+      final experienceText = _experienceYearsController.text.trim();
+      final priceText = _priceController.text.trim();
+
+      // Build update data map (only editable fields)
+      final updateData = <String, dynamic>{
+        'fullName': _fullNameController.text.trim(),
+        'specialty': _selectedSpecialty!.name,
+        'experienceYears': experienceText.isNotEmpty ? int.parse(experienceText) : 0,
+        'consultationPrice': priceText.isNotEmpty ? double.parse(priceText) : 0,
+        'languages': _selectedLanguages,
+        'isAvailable': _initiallyAvailable,
+      };
+
+      // Update doctor in Firestore
+      await _adminService.updateDoctor(widget.doctorToEdit!.uid, updateData);
+
+      if (mounted) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('admin.edit_doctor.success'.tr()),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+          ),
+        );
+
+        // Navigate back to doctor management
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('admin.edit_doctor.error'.tr()),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('admin.create_doctor.title'.tr()),
+        title: Text(_isEditMode
+            ? 'admin.edit_doctor.title'.tr()
+            : 'admin.create_doctor.title'.tr()),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -356,21 +450,25 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           ),
           child: Icon(
-            Icons.person_add_outlined,
+            _isEditMode ? Icons.edit_outlined : Icons.person_add_outlined,
             size: AppTheme.iconXLarge,
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
         const SizedBox(height: AppTheme.spacing24),
         Text(
-          'admin.create_doctor.title'.tr(),
+          _isEditMode
+              ? 'admin.edit_doctor.title'.tr()
+              : 'admin.create_doctor.title'.tr(),
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
         ),
         const SizedBox(height: AppTheme.spacing8),
         Text(
-          'admin.create_doctor.subtitle'.tr(),
+          _isEditMode
+              ? 'admin.edit_doctor.subtitle'.tr()
+              : 'admin.create_doctor.subtitle'.tr(),
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).hintColor,
               ),
@@ -416,49 +514,79 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           textCapitalization: TextCapitalization.words,
           validator: Validators.validateName,
         ),
-        const SizedBox(height: AppTheme.spacing16),
 
-        // Email
-        AppTextField(
-          label: 'admin.create_doctor.field_email'.tr(),
-          hintText: 'admin.create_doctor.field_email_hint'.tr(),
-          controller: _emailController,
-          prefixIcon: Icons.email_outlined,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          validator: Validators.validateEmail,
-        ),
-        const SizedBox(height: AppTheme.spacing16),
+        // Email - only show in create mode (email can't be changed)
+        if (!_isEditMode) ...[
+          const SizedBox(height: AppTheme.spacing16),
+          AppTextField(
+            label: 'admin.create_doctor.field_email'.tr(),
+            hintText: 'admin.create_doctor.field_email_hint'.tr(),
+            controller: _emailController,
+            prefixIcon: Icons.email_outlined,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            validator: Validators.validateEmail,
+          ),
+        ],
 
-        // Password
-        AppTextField(
-          label: 'admin.create_doctor.field_password'.tr(),
-          hintText: 'admin.create_doctor.field_password_hint'.tr(),
-          controller: _passwordController,
-          prefixIcon: Icons.lock_outlined,
-          suffixIcon: _obscurePassword
-              ? Icons.visibility_outlined
-              : Icons.visibility_off_outlined,
-          onSuffixIconTap: _togglePasswordVisibility,
-          obscureText: _obscurePassword,
-          keyboardType: TextInputType.visiblePassword,
-          textInputAction: TextInputAction.next,
-          validator: Validators.validatePassword,
-        ),
-        const SizedBox(height: AppTheme.spacing16),
+        // In edit mode, show email as read-only info
+        if (_isEditMode) ...[
+          const SizedBox(height: AppTheme.spacing16),
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacing16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.email_outlined,
+                  size: 20,
+                  color: Theme.of(context).hintColor,
+                ),
+                const SizedBox(width: AppTheme.spacing12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'admin.create_doctor.field_email'.tr(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Theme.of(context).hintColor,
+                            ),
+                      ),
+                      const SizedBox(height: AppTheme.spacing4),
+                      Text(
+                        _emailController.text,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
 
-        // Phone (optional)
-        AppTextField(
-          label: 'admin.create_doctor.field_phone'.tr(),
-          hintText: 'admin.create_doctor.field_phone_hint'.tr(),
-          controller: _phoneController,
-          prefixIcon: Icons.phone_outlined,
-          keyboardType: TextInputType.phone,
-          textInputAction: TextInputAction.next,
-          isOptional: true,
-          optionalText: 'profile.optional'.tr(),
-          validator: Validators.validatePhone,
-        ),
+        // Password - only show in create mode
+        if (!_isEditMode) ...[
+          const SizedBox(height: AppTheme.spacing16),
+          AppTextField(
+            label: 'admin.create_doctor.field_password'.tr(),
+            hintText: 'admin.create_doctor.field_password_hint'.tr(),
+            controller: _passwordController,
+            prefixIcon: Icons.lock_outlined,
+            suffixIcon: _obscurePassword
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+            onSuffixIconTap: _togglePasswordVisibility,
+            obscureText: _obscurePassword,
+            keyboardType: TextInputType.visiblePassword,
+            textInputAction: TextInputAction.next,
+            validator: Validators.validatePassword,
+          ),
+        ],
       ],
     );
   }
@@ -599,7 +727,9 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
                 color: Theme.of(context).colorScheme.onPrimary,
               ),
             )
-          : Text('admin.create_doctor.submit'.tr()),
+          : Text(_isEditMode
+              ? 'admin.edit_doctor.submit'.tr()
+              : 'admin.create_doctor.submit'.tr()),
     );
   }
 }

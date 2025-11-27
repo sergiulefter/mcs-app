@@ -31,19 +31,21 @@ class StatusChip extends StatelessWidget {
   }
 
   Color _statusColor(BuildContext context, String status) {
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     switch (status) {
       case 'pending':
-        return AppTheme.warningOrange;
+        return semantic.warning;
       case 'in_review':
-        return Theme.of(context).colorScheme.primary;
+        return colorScheme.primary;
       case 'info_requested':
-        return AppTheme.warningOrange;
+        return semantic.warning;
       case 'completed':
-        return Theme.of(context).colorScheme.secondary;
+        return colorScheme.secondary;
       case 'cancelled':
-        return Theme.of(context).colorScheme.error;
+        return colorScheme.error;
       default:
-        return Theme.of(context).colorScheme.onSurfaceVariant;
+        return colorScheme.onSurfaceVariant;
     }
   }
 

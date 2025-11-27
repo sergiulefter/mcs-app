@@ -705,15 +705,23 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              TextButton(
-                onPressed: onEdit,
-                child: Text('create_request.step3.edit_button'.tr()),
+              Flexible(
+                child: TextButton(
+                  onPressed: onEdit,
+                  child: Text(
+                    'create_request.step3.edit_button'.tr(),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
           ),

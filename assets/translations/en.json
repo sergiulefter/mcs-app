@@ -388,7 +388,10 @@
     "success": "Success",
     "warning": "Warning",
     "info": "Info",
-    "yes": "Yes"
+    "yes": "Yes",
+    "no": "No",
+    "retry": "Retry",
+    "refresh": "Refresh"
   },
   "validation": {
     "required_field": "This field is required",
@@ -470,6 +473,74 @@
         "specialty_required": "Please select a specialty",
         "languages_required": "Please select at least one language"
       }
+    },
+    "edit_doctor": {
+      "title": "Edit Doctor",
+      "subtitle": "Update doctor information",
+      "submit": "Save Changes",
+      "success": "Doctor information updated successfully",
+      "error": "Failed to update doctor. Please try again."
+    },
+    "manage_doctors": {
+      "title": "Manage Doctors",
+      "subtitle": "View, edit, and manage doctor accounts"
+    },
+    "manage_users": {
+      "title": "Manage Users",
+      "subtitle": "View and manage patient accounts"
+    },
+    "system_settings": {
+      "title": "System Settings",
+      "subtitle": "Configure application settings",
+      "coming_soon_title": "Coming Soon",
+      "coming_soon_description": "System settings and configuration features are currently under development.",
+      "planned_features": "Planned Features",
+      "feature_app_config": "Application configuration options",
+      "feature_maintenance": "Maintenance mode controls",
+      "feature_notifications": "Push notification settings",
+      "feature_analytics": "Analytics and reporting tools"
+    },
+    "statistics": "Statistics",
+    "stats_error": "Failed to load statistics. Please try again.",
+    "stats": {
+      "patients": "Patients",
+      "doctors": "Doctors",
+      "consultations": "Consultations",
+      "pending": "Pending"
+    },
+    "doctors": {
+      "search_hint": "Search by name, email, or specialty",
+      "filter_all": "All",
+      "filter_available": "Available",
+      "filter_unavailable": "Unavailable",
+      "results_count": "{count} doctors found",
+      "empty_title": "No doctors found",
+      "empty_subtitle": "Try adjusting your search or filters.",
+      "error_loading": "Failed to load doctors. Please try again.",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "years": "years",
+      "edit": "Edit",
+      "delete": "Delete",
+      "delete_title": "Delete Doctor",
+      "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "delete_success": "Doctor deleted successfully",
+      "delete_error": "Failed to delete doctor. Please try again."
+    },
+    "users": {
+      "search_hint": "Search by name or email",
+      "results_count": "{count} users found",
+      "empty_title": "No users found",
+      "empty_subtitle": "Try adjusting your search.",
+      "error_loading": "Failed to load users. Please try again.",
+      "profile_complete": "Profile complete",
+      "profile_incomplete": "Profile incomplete",
+      "joined": "Joined",
+      "delete": "Delete",
+      "delete_title": "Delete User",
+      "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
+      "delete_success": "User deleted successfully",
+      "delete_error": "Failed to delete user. Please try again."
     }
   },
   "doctor": {

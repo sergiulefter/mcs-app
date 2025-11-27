@@ -263,19 +263,19 @@ class InfoRequestModel {
 extension ConsultationColors on ConsultationModel {
   Color getStatusColor(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final semantic = Theme.of(context).extension<AppSemanticColors>();
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
 
     switch (status) {
       case 'pending':
-        return semantic?.warning ?? colorScheme.primary;
+        return semantic.warning;
       case 'in_review':
         return colorScheme.primary;
       case 'info_requested':
-        return semantic?.warning ?? AppTheme.warningOrange;
+        return semantic.warning;
       case 'completed':
-        return semantic?.success ?? colorScheme.secondary;
+        return semantic.success;
       case 'cancelled':
-        return semantic?.error ?? colorScheme.error;
+        return semantic.error;
       default:
         return colorScheme.onSurfaceVariant;
     }

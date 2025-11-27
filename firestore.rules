@@ -37,8 +37,8 @@ service cloud.firestore {
       // Allow update only if user owns the document or is admin
       allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
 
-      // Prevent deletion for now (can be enabled later if needed)
-      allow delete: if false;
+      // Only admins can delete user documents
+      allow delete: if isAdmin();
     }
 
     // Doctors collection - read for all authenticated users, write for admins or self

@@ -388,7 +388,10 @@
     "success": "Succes",
     "warning": "Avertisment",
     "info": "Informație",
-    "yes": "Da"
+    "yes": "Da",
+    "no": "Nu",
+    "retry": "Reîncearcă",
+    "refresh": "Actualizează"
   },
   "validation": {
     "required_field": "Acest câmp este obligatoriu",
@@ -470,6 +473,74 @@
         "specialty_required": "Te rugăm să selectezi o specialitate",
         "languages_required": "Te rugăm să selectezi cel puțin o limbă"
       }
+    },
+    "edit_doctor": {
+      "title": "Editează Medic",
+      "subtitle": "Actualizează informațiile medicului",
+      "submit": "Salvează Modificările",
+      "success": "Informațiile medicului au fost actualizate cu succes",
+      "error": "Actualizarea medicului a eșuat. Te rugăm să încerci din nou."
+    },
+    "manage_doctors": {
+      "title": "Gestionare Medici",
+      "subtitle": "Vizualizează, editează și gestionează conturile medicilor"
+    },
+    "manage_users": {
+      "title": "Gestionare Utilizatori",
+      "subtitle": "Vizualizează și gestionează conturile pacienților"
+    },
+    "system_settings": {
+      "title": "Setări Sistem",
+      "subtitle": "Configurează setările aplicației",
+      "coming_soon_title": "În Curând",
+      "coming_soon_description": "Setările și configurația sistemului sunt în curs de dezvoltare.",
+      "planned_features": "Funcționalități Planificate",
+      "feature_app_config": "Opțiuni de configurare a aplicației",
+      "feature_maintenance": "Controale mod mentenanță",
+      "feature_notifications": "Setări notificări push",
+      "feature_analytics": "Instrumente de analiză și raportare"
+    },
+    "statistics": "Statistici",
+    "stats_error": "Încărcarea statisticilor a eșuat. Te rugăm să încerci din nou.",
+    "stats": {
+      "patients": "Pacienți",
+      "doctors": "Medici",
+      "consultations": "Consultații",
+      "pending": "Așteptare"
+    },
+    "doctors": {
+      "search_hint": "Caută după nume, email sau specialitate",
+      "filter_all": "Toate",
+      "filter_available": "Disponibili",
+      "filter_unavailable": "Indisponibili",
+      "results_count": "{count} medici găsiți",
+      "empty_title": "Niciun medic găsit",
+      "empty_subtitle": "Încearcă să ajustezi căutarea sau filtrele.",
+      "error_loading": "Încărcarea medicilor a eșuat. Te rugăm să încerci din nou.",
+      "available": "Disponibil",
+      "unavailable": "Indisponibil",
+      "years": "ani",
+      "edit": "Editează",
+      "delete": "Șterge",
+      "delete_title": "Șterge Medicul",
+      "delete_message": "Ești sigur că vrei să ștergi pe {name}? Această acțiune nu poate fi anulată.",
+      "delete_success": "Medicul a fost șters cu succes",
+      "delete_error": "Ștergerea medicului a eșuat. Te rugăm să încerci din nou."
+    },
+    "users": {
+      "search_hint": "Caută după nume sau email",
+      "results_count": "{count} utilizatori găsiți",
+      "empty_title": "Niciun utilizator găsit",
+      "empty_subtitle": "Încearcă să ajustezi căutarea.",
+      "error_loading": "Încărcarea utilizatorilor a eșuat. Te rugăm să încerci din nou.",
+      "profile_complete": "Profil complet",
+      "profile_incomplete": "Profil incomplet",
+      "joined": "Înregistrat",
+      "delete": "Șterge",
+      "delete_title": "Șterge Utilizatorul",
+      "delete_message": "Ești sigur că vrei să ștergi pe {name}? Această acțiune nu poate fi anulată.",
+      "delete_success": "Utilizatorul a fost șters cu succes",
+      "delete_error": "Ștergerea utilizatorului a eșuat. Te rugăm să încerci din nou."
     }
   },
   "doctor": {
@@ -491,7 +562,7 @@
       "stats_title": "Statisticile Tale",
       "stats": {
         "total": "Total",
-        "pending": "În Așteptare",
+        "pending": "Așteptare",
         "in_review": "În Evaluare",
         "completed": "Finalizate"
       },

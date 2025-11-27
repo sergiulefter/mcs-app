@@ -98,28 +98,31 @@ class HelpCenterScreen extends StatelessWidget {
               ),
         ),
         const SizedBox(height: AppTheme.spacing16),
-        Row(
-          children: [
-            Expanded(
-              child: _SupportOptionCard(
-                icon: Icons.mail_outline,
-                title: 'help_center.contact_email'.tr(),
-                description: 'help_center.contact_email_value'.tr(),
-                color: Theme.of(context).colorScheme.primary,
-                onTap: () => _showSnack(context, 'help_center.contact_email_value'.tr()),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _SupportOptionCard(
+                  icon: Icons.mail_outline,
+                  title: 'help_center.contact_email'.tr(),
+                  description: 'help_center.contact_email_value'.tr(),
+                  color: Theme.of(context).colorScheme.primary,
+                  onTap: () => _showSnack(context, 'help_center.contact_email_value'.tr()),
+                ),
               ),
-            ),
-            const SizedBox(width: AppTheme.spacing16),
-            Expanded(
-              child: _SupportOptionCard(
-                icon: Icons.forum_outlined,
-                title: 'help_center.contact_chat'.tr(),
-                description: 'help_center.contact_chat_desc'.tr(),
-                color: Theme.of(context).colorScheme.secondary,
-                onTap: () => _showSnack(context, 'help_center.coming_soon'.tr()),
+              const SizedBox(width: AppTheme.spacing16),
+              Expanded(
+                child: _SupportOptionCard(
+                  icon: Icons.forum_outlined,
+                  title: 'help_center.contact_chat'.tr(),
+                  description: 'help_center.contact_chat_desc'.tr(),
+                  color: Theme.of(context).colorScheme.secondary,
+                  onTap: () => _showSnack(context, 'help_center.coming_soon'.tr()),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: AppTheme.spacing16),
         _SupportOptionCard(

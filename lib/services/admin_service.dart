@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/doctor_model.dart';
+import '../models/user_model.dart';
 import 'doctor_service.dart';
 
 /// Service for admin-specific operations
@@ -8,6 +9,11 @@ class AdminService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final DoctorService _doctorService = DoctorService();
+
+  // Collection references
+  static const String _usersCollection = 'users';
+  static const String _doctorsCollection = 'doctors';
+  static const String _consultationsCollection = 'consultations';
 
   /// Create a new doctor account with Firebase Auth and Firestore documents
   ///
@@ -79,10 +85,167 @@ class AdminService {
 
   /// Get the user type of a user by UID
   Future<String?> getUserType(String uid) async {
-    final userDoc = await _firestore.collection('users').doc(uid).get();
+    final userDoc = await _firestore.collection(_usersCollection).doc(uid).get();
     if (!userDoc.exists) return null;
 
     final data = userDoc.data();
     return data?['userType'] as String?;
+  }
+
+  // ============================================
+  // STATISTICS METHODS
+  // ============================================
+
+  /// Get dashboard statistics for admin panel
+  /// Returns a map with counts for patients, doctors, consultations, etc.
+  Future<Map<String, int>> getStatistics() async {
+    try {
+      // Fetch all counts in parallel for better performance
+      final results = await Future.wait([
+        _getPatientCount(),
+        _getDoctorCount(),
+        _getConsultationCounts(),
+      ]);
+
+      final patientCount = results[0] as int;
+      final doctorCount = results[1] as int;
+      final consultationCounts = results[2] as Map<String, int>;
+
+      return {
+        'totalPatients': patientCount,
+        'totalDoctors': doctorCount,
+        'totalConsultations': consultationCounts['total'] ?? 0,
+        'pendingConsultations': consultationCounts['pending'] ?? 0,
+        'inReviewConsultations': consultationCounts['in_review'] ?? 0,
+        'completedConsultations': consultationCounts['completed'] ?? 0,
+      };
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<int> _getPatientCount() async {
+    final snapshot = await _firestore
+        .collection(_usersCollection)
+        .where('userType', isEqualTo: 'patient')
+        .count()
+        .get();
+    return snapshot.count ?? 0;
+  }
+
+  Future<int> _getDoctorCount() async {
+    final snapshot = await _firestore
+        .collection(_doctorsCollection)
+        .count()
+        .get();
+    return snapshot.count ?? 0;
+  }
+
+  Future<Map<String, int>> _getConsultationCounts() async {
+    // Get total count
+    final totalSnapshot = await _firestore
+        .collection(_consultationsCollection)
+        .count()
+        .get();
+
+    // Get pending count
+    final pendingSnapshot = await _firestore
+        .collection(_consultationsCollection)
+        .where('status', isEqualTo: 'pending')
+        .count()
+        .get();
+
+    // Get in_review count
+    final inReviewSnapshot = await _firestore
+        .collection(_consultationsCollection)
+        .where('status', isEqualTo: 'in_review')
+        .count()
+        .get();
+
+    // Get completed count
+    final completedSnapshot = await _firestore
+        .collection(_consultationsCollection)
+        .where('status', isEqualTo: 'completed')
+        .count()
+        .get();
+
+    return {
+      'total': totalSnapshot.count ?? 0,
+      'pending': pendingSnapshot.count ?? 0,
+      'in_review': inReviewSnapshot.count ?? 0,
+      'completed': completedSnapshot.count ?? 0,
+    };
+  }
+
+  // ============================================
+  // USER MANAGEMENT METHODS
+  // ============================================
+
+  /// Fetch all patients (users with userType == 'patient')
+  Future<List<UserModel>> fetchAllPatients() async {
+    try {
+      final snapshot = await _firestore
+          .collection(_usersCollection)
+          .where('userType', isEqualTo: 'patient')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Delete a user (patient) - hard delete from Firestore
+  /// Note: Firebase Auth account deletion requires Admin SDK or Cloud Function
+  /// For MVP, we delete the Firestore document only
+  Future<void> deleteUser(String uid) async {
+    try {
+      // Delete user document from Firestore
+      await _firestore.collection(_usersCollection).doc(uid).delete();
+
+      // Note: To fully delete the user, you would need:
+      // 1. A Cloud Function with Admin SDK to delete from Firebase Auth
+      // 2. Or disable the user via custom claims
+      // For MVP, the Firestore doc deletion is sufficient
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // ============================================
+  // DOCTOR MANAGEMENT METHODS
+  // ============================================
+
+  /// Fetch all doctors
+  Future<List<DoctorModel>> fetchAllDoctors() async {
+    return _doctorService.fetchAllDoctors();
+  }
+
+  /// Update a doctor's profile
+  Future<void> updateDoctor(String uid, Map<String, dynamic> data) async {
+    try {
+      await _firestore.collection(_doctorsCollection).doc(uid).update(data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Delete a doctor - hard delete from Firestore
+  /// Note: Firebase Auth account deletion requires Admin SDK or Cloud Function
+  Future<void> deleteDoctor(String uid) async {
+    try {
+      // Delete doctor document from Firestore
+      await _firestore.collection(_doctorsCollection).doc(uid).delete();
+
+      // Note: To fully delete the doctor, you would need:
+      // 1. A Cloud Function with Admin SDK to delete from Firebase Auth
+      // 2. Consider also deleting/anonymizing their consultations
+      // For MVP, the Firestore doc deletion is sufficient
+    } catch (e) {
+      rethrow;
+    }
   }
 }

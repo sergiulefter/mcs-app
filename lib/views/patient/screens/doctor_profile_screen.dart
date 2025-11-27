@@ -117,22 +117,15 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             children: [
               _Badge(
                 icon: doctor.isCurrentlyAvailable
-                    ? Icons.check_circle_outline
+                    ? Icons.circle
                     : Icons.access_time,
+                iconSize: doctor.isCurrentlyAvailable ? 12 : AppTheme.iconSmall,
                 iconColor: doctor.isCurrentlyAvailable
                     ? Theme.of(context).colorScheme.secondary
                     : Theme.of(context).colorScheme.onSurfaceVariant,
                 label: doctor.isCurrentlyAvailable
                     ? 'doctor_profile.available_now'.tr()
                     : 'doctor_profile.unavailable'.tr(),
-              ),
-              const SizedBox(width: AppTheme.spacing8),
-              _Badge(
-                icon: Icons.work_outline,
-                iconColor: Theme.of(context).colorScheme.primary,
-                label: 'doctor_profile.years_experience'.tr(
-                  namedArgs: {'years': doctor.experienceYears.toString()},
-                ),
               ),
             ],
           ),
@@ -149,6 +142,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       borderColor: Theme.of(context).dividerColor,
       showShadow: false,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: _InfoColumn(
@@ -176,7 +170,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           ),
           Expanded(
             child: _InfoColumn(
-              icon: Icons.school_outlined,
+              icon: Icons.badge_outlined,
               label: 'doctor_profile.experience'.tr(),
               value: 'doctor_profile.years'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
             ),
@@ -575,11 +569,13 @@ class _Badge extends StatelessWidget {
     required this.label,
     this.icon,
     this.iconColor,
+    this.iconSize = AppTheme.iconSmall,
   });
 
   final String label;
   final IconData? icon;
   final Color? iconColor;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -598,7 +594,7 @@ class _Badge extends StatelessWidget {
           if (icon != null)
             Icon(
               icon,
-              size: AppTheme.iconSmall,
+              size: iconSize,
               color: iconColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           if (icon != null) const SizedBox(width: AppTheme.spacing4),
@@ -627,31 +623,56 @@ class _InfoColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          size: AppTheme.iconMedium,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+    // Calculate minimum height for 2 lines of labelSmall text
+    final labelStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        );
+    final labelLineHeight =
+        (labelStyle?.fontSize ?? 11) * (labelStyle?.height ?? 1.2);
+    final twoLineLabelHeight = labelLineHeight * 2 + 4; // 2 lines + padding
+
+    // Calculate minimum height for 2 lines of bodyMedium text (for value)
+    final valueStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+        );
+    final valueLineHeight =
+        (valueStyle?.fontSize ?? 14) * (valueStyle?.height ?? 1.4);
+    final twoLineValueHeight = valueLineHeight * 2 + 4; // 2 lines + padding
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: AppTheme.iconMedium,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(height: AppTheme.spacing8),
+          SizedBox(
+            height: twoLineLabelHeight,
+            child: Center(
+              child: Text(
+                label,
+                style: labelStyle,
+                textAlign: TextAlign.center,
               ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppTheme.spacing4),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacing4),
+          SizedBox(
+            height: twoLineValueHeight,
+            child: Center(
+              child: Text(
+                value,
+                style: valueStyle,
+                textAlign: TextAlign.center,
               ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
