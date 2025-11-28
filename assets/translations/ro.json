@@ -106,6 +106,10 @@
     "results_title": "Specialiști disponibili",
     "results_count": "{count} medici",
     "view_profile": "Vezi profilul",
+    "available_now": "Disponibil acum",
+    "unavailable": "Indisponibil",
+    "verified": "Profil verificat",
+    "price_format": "{price} RON / consultație",
     "availability_badge": {
       "available": "Disponibil acum",
       "unavailable": "Indisponibil"
@@ -114,11 +118,30 @@
       "available": "Acceptă cereri pentru a doua opinie",
       "unavailable": "Evaluează consultațiile existente"
     },
+    "sort": {
+      "label": "Sortează după",
+      "availability": "Disponibilitate",
+      "experience": "Experiență",
+      "price_asc": "Preț (crescător)",
+      "price_desc": "Preț (descrescător)",
+      "name": "Nume"
+    },
+    "experience": {
+      "new": "Nou în practică",
+      "years_5": "5+ ani experiență",
+      "years_10": "10+ ani experiență",
+      "years_15": "15+ ani experiență"
+    },
     "filters": {
       "title": "Filtre",
       "clear": "Șterge filtrele",
       "specialty": "Specialitate",
       "all_specialties": "Toate specialitățile",
+      "experience": "Experiență",
+      "experience_0_5": "< 5 ani",
+      "experience_5_10": "5-10 ani",
+      "experience_10_15": "10-15 ani",
+      "experience_15_plus": "15+ ani",
       "availability": "Disponibilitate",
       "available_now": "Afișează doar medicii disponibili",
       "active_count": "{count} active"

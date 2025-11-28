@@ -119,20 +119,17 @@ class _ConsultationCardState extends State<ConsultationCard> {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing4,
+        vertical: AppTheme.spacing8,
       ),
       decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-        border: Border.all(
-          color: badgeColor.withValues(alpha: 0.3),
-        ),
+        color: badgeColor.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       ),
       child: Text(
         statusText,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: badgeColor,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
       ),
     );

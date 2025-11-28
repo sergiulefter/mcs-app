@@ -565,8 +565,9 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
               ],
               const SizedBox(height: AppTheme.spacing16),
 
-              // Follow-up badge
+              // Follow-up section
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
                     Icons.refresh_outlined,
@@ -574,36 +575,38 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                     color: colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: AppTheme.spacing8),
-                  Text(
-                    'request_detail.doctor_response.follow_up_needed'.tr(),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                  ),
-                  const SizedBox(width: AppTheme.spacing12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacing12,
-                      vertical: AppTheme.spacing4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: (response.followUpNeeded
-                              ? colorScheme.secondary
-                              : colorScheme.error)
-                          .withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-                    ),
+                  Expanded(
                     child: Text(
-                      response.followUpNeeded ? 'common.yes'.tr() : 'common.no'.tr(),
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: response.followUpNeeded
-                                ? colorScheme.secondary
-                                : colorScheme.error,
-                            fontWeight: FontWeight.w700,
+                      'request_detail.doctor_response.follow_up_needed'.tr(),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
                           ),
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: AppTheme.spacing8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacing12,
+                  vertical: AppTheme.spacing4,
+                ),
+                decoration: BoxDecoration(
+                  color: (response.followUpNeeded
+                          ? colorScheme.secondary
+                          : colorScheme.error)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                ),
+                child: Text(
+                  response.followUpNeeded ? 'common.yes'.tr() : 'common.no'.tr(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: response.followUpNeeded
+                            ? colorScheme.secondary
+                            : colorScheme.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
               ),
             ],
           ),

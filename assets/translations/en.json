@@ -106,6 +106,10 @@
     "results_title": "Available Specialists",
     "results_count": "{count} doctors",
     "view_profile": "View profile",
+    "available_now": "Available now",
+    "unavailable": "Unavailable",
+    "verified": "Verified profile",
+    "price_format": "{price} RON / consultation",
     "availability_badge": {
       "available": "Available now",
       "unavailable": "Not available"
@@ -114,11 +118,30 @@
       "available": "Accepting second opinion requests",
       "unavailable": "Currently reviewing existing consultations"
     },
+    "sort": {
+      "label": "Sort by",
+      "availability": "Availability",
+      "experience": "Experience",
+      "price_asc": "Price (low to high)",
+      "price_desc": "Price (high to low)",
+      "name": "Name"
+    },
+    "experience": {
+      "new": "New practitioner",
+      "years_5": "5+ years experience",
+      "years_10": "10+ years experience",
+      "years_15": "15+ years experience"
+    },
     "filters": {
       "title": "Filters",
       "clear": "Clear filters",
       "specialty": "Specialty",
       "all_specialties": "All specialties",
+      "experience": "Experience",
+      "experience_0_5": "< 5 years",
+      "experience_5_10": "5-10 years",
+      "experience_10_15": "10-15 years",
+      "experience_15_plus": "15+ years",
       "availability": "Availability",
       "available_now": "Only show available doctors",
       "active_count": "{count} active"

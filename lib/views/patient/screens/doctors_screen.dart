@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:mcs_app/models/doctor_model.dart';
-import 'package:mcs_app/services/doctor_service.dart';
+import 'package:provider/provider.dart';
+import 'package:mcs_app/controllers/doctors_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/cards/doctor_card.dart';
+import 'package:mcs_app/views/patient/widgets/cards/doctor_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_search_bar.dart';
@@ -20,88 +21,13 @@ class DoctorsScreen extends StatefulWidget {
 
 class _DoctorsScreenState extends State<DoctorsScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final DoctorService _doctorService = DoctorService();
-
-  List<DoctorModel> _allDoctors = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-
-  Set<String> _selectedSpecialties = {};
-  Set<String> _selectedExperienceRanges = {};
-  bool _availableOnly = false;
-
-  bool get _hasActiveFilters =>
-      _selectedSpecialties.isNotEmpty ||
-      _selectedExperienceRanges.isNotEmpty ||
-      _availableOnly;
 
   @override
   void initState() {
     super.initState();
-    _loadDoctors();
-  }
-
-  Future<void> _loadDoctors() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DoctorsController>().prime();
     });
-
-    try {
-      final doctors = await _doctorService.fetchAllDoctors();
-      setState(() {
-        _allDoctors = doctors;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  List<String> get _specialtyOptions {
-    final specialties = _allDoctors
-        .map((d) => d.specialty.toString().split('.').last)
-        .toSet()
-        .toList()
-      ..sort();
-    return ['all', ...specialties];
-  }
-
-  List<DoctorModel> get _filteredDoctors {
-    final searchQuery = _searchController.text.toLowerCase();
-    return _allDoctors.where((doctor) {
-      final specialtyKey = doctor.specialty.toString().split('.').last;
-      final matchesSearch = searchQuery.isEmpty ||
-          doctor.fullName.toLowerCase().contains(searchQuery) ||
-          specialtyKey.toLowerCase().contains(searchQuery);
-      final matchesSpecialty = _selectedSpecialties.isEmpty ||
-          _selectedSpecialties.contains(specialtyKey);
-      final matchesExperience =
-          _selectedExperienceRanges.isEmpty ||
-              _selectedExperienceRanges.any(
-                (range) => _experienceMatchesRange(doctor.experienceYears, range),
-              );
-      final matchesAvailability = !_availableOnly || doctor.isCurrentlyAvailable;
-      return matchesSearch && matchesSpecialty && matchesExperience && matchesAvailability;
-    }).toList();
-  }
-
-  bool _experienceMatchesRange(int years, String rangeKey) {
-    switch (rangeKey) {
-      case '0_5':
-        return years < 5;
-      case '5_10':
-        return years >= 5 && years < 10;
-      case '10_15':
-        return years >= 10 && years < 15;
-      case '15_plus':
-        return years >= 15;
-      default:
-        return true;
-    }
   }
 
   @override
@@ -112,20 +38,39 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<DoctorsController>();
+
     return Scaffold(
       body: SafeArea(
-        child: _isLoading
-            ? _buildLoadingState(context)
-            : _errorMessage != null
+        child: controller.isLoading && !controller.hasPrimed
+            ? _buildLoadingState(context, controller)
+            : controller.error != null && !controller.hasPrimed
                 ? _buildErrorState(context)
-                : _buildContent(context),
+                : _buildContent(context, controller),
       ),
     );
   }
 
-  Widget _buildLoadingState(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(),
+  Widget _buildLoadingState(
+      BuildContext context, DoctorsController controller) {
+    return ListView(
+      padding: AppTheme.screenPadding,
+      children: [
+        _buildHeader(context),
+        const SizedBox(height: AppTheme.sectionSpacing),
+        _buildSearchField(context, controller),
+        const SizedBox(height: AppTheme.spacing16),
+        _buildSortAndFilterRow(context, controller),
+        const SizedBox(height: AppTheme.sectionSpacing),
+        // Skeleton cards
+        ...List.generate(
+          4,
+          (index) => const Padding(
+            padding: EdgeInsets.only(bottom: AppTheme.spacing20),
+            child: DoctorCardSkeleton(),
+          ),
+        ),
+      ],
     );
   }
 
@@ -140,7 +85,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               padding: const EdgeInsets.all(AppTheme.spacing16),
               backgroundColor:
                   Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-              borderColor: Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
+              borderColor:
+                  Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
               showShadow: false,
               child: Icon(
                 Icons.error_outline,
@@ -163,7 +109,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             ),
             const SizedBox(height: AppTheme.spacing24),
             ElevatedButton.icon(
-              onPressed: _loadDoctors,
+              onPressed: () => context.read<DoctorsController>().fetchDoctors(),
               icon: const Icon(Icons.refresh),
               label: Text('common.retry'.tr()),
               style: ElevatedButton.styleFrom(
@@ -176,19 +122,19 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
-    final filteredDoctors = _filteredDoctors;
+  Widget _buildContent(BuildContext context, DoctorsController controller) {
+    final filteredDoctors = controller.filteredDoctors;
 
     return RefreshIndicator(
-      onRefresh: _loadDoctors,
+      onRefresh: () => context.read<DoctorsController>().refresh(),
       child: ListView(
         padding: AppTheme.screenPadding,
         children: [
           _buildHeader(context),
           const SizedBox(height: AppTheme.sectionSpacing),
-          _buildSearchField(context),
+          _buildSearchField(context, controller),
           const SizedBox(height: AppTheme.spacing16),
-          _buildFilterActions(context),
+          _buildSortAndFilterRow(context, controller),
           const SizedBox(height: AppTheme.sectionSpacing),
           _buildResultsHeader(context, filteredDoctors.length),
           const SizedBox(height: AppTheme.spacing16),
@@ -196,23 +142,15 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             _buildEmptyState(context)
           else
             ...filteredDoctors.map((doctor) {
-              final availabilityLabel = doctor.isCurrentlyAvailable
-                  ? 'doctors.availability_badge.available'.tr()
-                  : 'doctors.availability_badge.unavailable'.tr();
-
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppTheme.spacing20),
                 child: DoctorCard(
                   doctor: doctor,
-                  availabilityLabel: availabilityLabel,
-                  availabilityColor: doctor.isCurrentlyAvailable
-                      ? Theme.of(context).colorScheme.secondary
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
-                  viewProfileLabel: 'doctors.view_profile'.tr(),
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => DoctorProfileScreen(doctor: doctor),
+                        builder: (context) =>
+                            DoctorProfileScreen(doctor: doctor),
                       ),
                     );
                   },
@@ -230,7 +168,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       children: [
         Text(
           'doctors.title'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith( 
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w700,
               ),
         ),
@@ -243,55 +181,60 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     );
   }
 
-  Widget _buildSearchField(BuildContext context) {
+  Widget _buildSearchField(
+      BuildContext context, DoctorsController controller) {
+    // Sync text controller with controller state if needed
+    if (_searchController.text != controller.searchQuery) {
+      _searchController.text = controller.searchQuery;
+    }
+
     return AppSearchBar(
       controller: _searchController,
       hintText: 'doctors.search_hint'.tr(),
-      onChanged: (_) => setState(() {}),
+      onChanged: (value) =>
+          context.read<DoctorsController>().setSearchQuery(value),
     );
   }
 
-  Widget _buildFilterActions(BuildContext context) {
-    int activeCount = 0;
-    if (_selectedSpecialties.isNotEmpty) activeCount++;
-    if (_selectedExperienceRanges.isNotEmpty) activeCount++;
-    if (_availableOnly) activeCount++;
-
+  Widget _buildSortAndFilterRow(
+      BuildContext context, DoctorsController controller) {
     return Row(
       children: [
+        // Sort dropdown
         Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => _openFiltersSheet(context),
-            icon: const Icon(Icons.filter_alt_outlined),
-            label: Text(
-              activeCount > 0
-                  ? 'doctors.filters.active_count'
-                      .tr(namedArgs: {'count': activeCount.toString()})
-                  : 'doctors.filters.title'.tr(),
-            ),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppTheme.spacing16,
-                horizontal: AppTheme.spacing16,
-              ),
-            ),
+          child: _SortDropdown(
+            selectedSort: controller.selectedSort,
+            onSortChanged: (sort) =>
+                context.read<DoctorsController>().setSortOption(sort),
           ),
         ),
-        if (_hasActiveFilters) ...[
-          const SizedBox(width: AppTheme.spacing12),
-          TextButton(
-            onPressed: _resetFilters,
-            child: Text('doctors.filters.clear'.tr()),
+        const SizedBox(width: AppTheme.spacing12),
+        // Filter button
+        _FilterButton(
+          activeCount: controller.activeFilterCount,
+          onTap: () => _openFiltersSheet(context, controller),
+        ),
+        if (controller.hasActiveFilters) ...[
+          const SizedBox(width: AppTheme.spacing8),
+          IconButton(
+            onPressed: () => context.read<DoctorsController>().clearFilters(),
+            icon: const Icon(Icons.close, size: 20),
+            tooltip: 'doctors.filters.clear'.tr(),
+            style: IconButton.styleFrom(
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+            ),
           ),
         ],
       ],
     );
   }
 
-  Future<void> _openFiltersSheet(BuildContext context) async {
-    var tempSelectedSpecialties = {..._selectedSpecialties};
-    var tempSelectedExperienceRanges = {..._selectedExperienceRanges};
-    var tempAvailableOnly = _availableOnly;
+  Future<void> _openFiltersSheet(
+      BuildContext context, DoctorsController controller) async {
+    var tempSelectedSpecialties = {...controller.selectedSpecialties};
+    var tempSelectedExperienceRanges = {...controller.selectedExperienceRanges};
+    var tempAvailableOnly = controller.availableOnly;
 
     await showModalBottomSheet(
       context: context,
@@ -342,6 +285,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         const SizedBox(height: AppTheme.spacing16),
                         _buildFiltersContent(
                           context,
+                          controller: controller,
                           selectedSpecialties: tempSelectedSpecialties,
                           selectedExperienceRanges: tempSelectedExperienceRanges,
                           availableOnly: tempAvailableOnly,
@@ -349,7 +293,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                             setModalState(() {
                               if (value == 'all') {
                                 tempSelectedSpecialties.clear();
-                              } else if (tempSelectedSpecialties.contains(value)) {
+                              } else if (tempSelectedSpecialties
+                                  .contains(value)) {
                                 tempSelectedSpecialties.remove(value);
                               } else {
                                 tempSelectedSpecialties.add(value);
@@ -382,11 +327,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                     tempSelectedExperienceRanges.clear();
                                     tempAvailableOnly = false;
                                   });
-                                  setState(() {
-                                    _selectedSpecialties.clear();
-                                    _selectedExperienceRanges.clear();
-                                    _availableOnly = false;
-                                  });
+                                  this
+                                      .context
+                                      .read<DoctorsController>()
+                                      .clearFilters();
                                   Navigator.of(sheetContext).pop();
                                 },
                                 child: FittedBox(
@@ -399,13 +343,15 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  setState(() {
-                                    _selectedSpecialties =
-                                        {...tempSelectedSpecialties};
-                                    _selectedExperienceRanges =
-                                        {...tempSelectedExperienceRanges};
-                                    _availableOnly = tempAvailableOnly;
-                                  });
+                                  this
+                                      .context
+                                      .read<DoctorsController>()
+                                      .applyFilters(
+                                        specialties: tempSelectedSpecialties,
+                                        experienceRanges:
+                                            tempSelectedExperienceRanges,
+                                        availableOnly: tempAvailableOnly,
+                                      );
                                   Navigator.of(sheetContext).pop();
                                 },
                                 child: Text('common.apply'.tr()),
@@ -427,6 +373,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
   Widget _buildFiltersContent(
     BuildContext context, {
+    required DoctorsController controller,
     required Set<String> selectedSpecialties,
     required Set<String> selectedExperienceRanges,
     required bool availableOnly,
@@ -442,10 +389,11 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         Wrap(
           spacing: AppTheme.spacing12,
           runSpacing: AppTheme.spacing12,
-          children: _specialtyOptions.map((specialty) {
+          children: controller.availableSpecialties.map((specialty) {
             final isAll = specialty == 'all';
-            final isSelected =
-                isAll ? selectedSpecialties.isEmpty : selectedSpecialties.contains(specialty);
+            final isSelected = isAll
+                ? selectedSpecialties.isEmpty
+                : selectedSpecialties.contains(specialty);
             final label = isAll
                 ? 'doctors.filters.all_specialties'.tr()
                 : 'specialties.$specialty'.tr();
@@ -458,16 +406,19 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           }).toList(),
         ),
         const SizedBox(height: AppTheme.spacing24),
-        SectionHeader(title: 'Experience'),
+        SectionHeader(title: 'doctors.filters.experience'.tr()),
         const SizedBox(height: AppTheme.spacing12),
         Wrap(
           spacing: AppTheme.spacing12,
           runSpacing: AppTheme.spacing12,
           children: [
-            {'key': '0_5', 'label': '< 5 years'},
-            {'key': '5_10', 'label': '5-10 years'},
-            {'key': '10_15', 'label': '10-15 years'},
-            {'key': '15_plus', 'label': '15+ years'},
+            {'key': '0_5', 'label': 'doctors.filters.experience_0_5'.tr()},
+            {'key': '5_10', 'label': 'doctors.filters.experience_5_10'.tr()},
+            {'key': '10_15', 'label': 'doctors.filters.experience_10_15'.tr()},
+            {
+              'key': '15_plus',
+              'label': 'doctors.filters.experience_15_plus'.tr()
+            },
           ].map((range) {
             final key = range['key']!;
             final isSelected = selectedExperienceRanges.contains(key);
@@ -525,16 +476,217 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       icon: Icons.search_off_outlined,
       title: 'doctors.empty_state_title'.tr(),
       subtitle: 'doctors.empty_state_subtitle'.tr(),
-              iconColor: Theme.of(context).colorScheme.primary,
+      iconColor: Theme.of(context).colorScheme.primary,
     );
   }
+}
 
-  void _resetFilters() {
-    setState(() {
-      _selectedSpecialties.clear();
-      _selectedExperienceRanges.clear();
-      _availableOnly = false;
-    });
+class _SortDropdown extends StatefulWidget {
+  const _SortDropdown({
+    required this.selectedSort,
+    required this.onSortChanged,
+  });
+
+  final String selectedSort;
+  final ValueChanged<String> onSortChanged;
+
+  @override
+  State<_SortDropdown> createState() => _SortDropdownState();
+}
+
+class _SortDropdownState extends State<_SortDropdown> {
+  bool _isOpen = false;
+  bool _isPressed = false;
+  final MenuController _menuController = MenuController();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final sortOptions = [
+      {'key': 'availability', 'label': 'doctors.sort.availability'.tr()},
+      {'key': 'experience', 'label': 'doctors.sort.experience'.tr()},
+      {'key': 'price_asc', 'label': 'doctors.sort.price_asc'.tr()},
+      {'key': 'price_desc', 'label': 'doctors.sort.price_desc'.tr()},
+      {'key': 'name', 'label': 'doctors.sort.name'.tr()},
+    ];
+
+    final selectedLabel =
+        sortOptions.firstWhere((o) => o['key'] == widget.selectedSort)['label']!;
+
+    return MenuAnchor(
+      controller: _menuController,
+      onOpen: () => setState(() => _isOpen = true),
+      onClose: () => setState(() => _isOpen = false),
+      style: MenuStyle(
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          ),
+        ),
+      ),
+      menuChildren: sortOptions.map((option) {
+        final isSelected = option['key'] == widget.selectedSort;
+        return MenuItemButton(
+          onPressed: () {
+            widget.onSortChanged(option['key']!);
+            _menuController.close();
+          },
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  option['label']!,
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                    color: isSelected ? colorScheme.primary : null,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check,
+                  size: 18,
+                  color: colorScheme.primary,
+                ),
+            ],
+          ),
+        );
+      }).toList(),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: () {
+          if (_menuController.isOpen) {
+            _menuController.close();
+          } else {
+            _menuController.open();
+          }
+        },
+        child: AnimatedScale(
+          scale: _isPressed ? 0.97 : 1.0,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeOutCubic,
+          child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacing16,
+            vertical: AppTheme.spacing12,
+          ),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLow,
+            border: Border.all(color: Theme.of(context).dividerColor),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.sort,
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+              Expanded(
+                child: Text(
+                  selectedLabel,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              AnimatedRotation(
+                turns: _isOpen ? 0.5 : 0,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                child: Icon(
+                  Icons.keyboard_arrow_down,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ),
+      ),
+    );
   }
+}
 
+class _FilterButton extends StatefulWidget {
+  const _FilterButton({
+    required this.activeCount,
+    required this.onTap,
+  });
+
+  final int activeCount;
+  final VoidCallback onTap;
+
+  @override
+  State<_FilterButton> createState() => _FilterButtonState();
+}
+
+class _FilterButtonState extends State<_FilterButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _isPressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.spacing12),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: widget.activeCount > 0
+                  ? colorScheme.primary
+                  : Theme.of(context).dividerColor,
+            ),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            color: widget.activeCount > 0
+                ? colorScheme.primary.withValues(alpha: 0.08)
+                : colorScheme.surfaceContainerLow,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.tune,
+                size: 20,
+                color: widget.activeCount > 0
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+              ),
+              if (widget.activeCount > 0) ...[
+                const SizedBox(width: AppTheme.spacing4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    widget.activeCount.toString(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

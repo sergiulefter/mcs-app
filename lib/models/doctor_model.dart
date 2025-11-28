@@ -91,6 +91,21 @@ class DoctorModel {
   /// Check if doctor profile is complete (has bio and education)
   bool get isProfileComplete => bio.isNotEmpty && education.isNotEmpty;
 
+  /// Get experience tier for badge display
+  /// Returns: 'new', '5+', '10+', or '15+'
+  String get experienceTier {
+    if (experienceYears >= 15) return '15+';
+    if (experienceYears >= 10) return '10+';
+    if (experienceYears >= 5) return '5+';
+    return 'new';
+  }
+
+  /// Get first/primary education institution for card preview
+  String? get topEducation {
+    if (education.isEmpty) return null;
+    return education.first.institution;
+  }
+
   /// Get formatted experience string
   String get experienceLabel => '$experienceYears ${experienceYears == 1 ? 'year' : 'years'} experience';
 

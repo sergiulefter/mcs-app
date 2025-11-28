@@ -25,7 +25,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 ///   },
 /// )
 /// ```
-class AppDropdownField extends StatelessWidget {
+class AppDropdownField extends StatefulWidget {
   /// The label text displayed above the field.
   final String label;
 
@@ -75,65 +75,182 @@ class AppDropdownField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label Row
-        Row(
-          children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            if (isOptional) ...[
-              const SizedBox(width: AppTheme.spacing8),
-              Text(
-                optionalText ?? '(Optional)',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(),
-              ),
-            ],
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        // Dropdown Field
-        DropdownButtonFormField<String>(
-          initialValue: value,
-          decoration: InputDecoration(
-            hintText: hintText,
-            prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                  )
-                : null,
-          ),
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(_getItemDisplayText(item)),
-            );
-          }).toList(),
-          onChanged: onChanged,
-          validator: validator,
-        ),
-      ],
-    );
-  }
+  State<AppDropdownField> createState() => _AppDropdownFieldState();
+}
+
+class _AppDropdownFieldState extends State<AppDropdownField> {
+  bool _isPressed = false;
+  bool _isOpen = false;
+  final MenuController _menuController = MenuController();
 
   String _getItemDisplayText(String item) {
     // Use custom builder if provided
-    if (itemTextBuilder != null) {
-      return itemTextBuilder!(item);
+    if (widget.itemTextBuilder != null) {
+      return widget.itemTextBuilder!(item);
     }
 
     // Use translation prefix if provided
-    if (translationPrefix != null) {
-      return '$translationPrefix.$item'.tr();
+    if (widget.translationPrefix != null) {
+      return '${widget.translationPrefix}.$item'.tr();
     }
 
     // Return raw item
     return item;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return FormField<String>(
+      initialValue: widget.value,
+      validator: widget.validator,
+      builder: (FormFieldState<String> state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Label Row
+            Row(
+              children: [
+                Text(
+                  widget.label,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                if (widget.isOptional) ...[
+                  const SizedBox(width: AppTheme.spacing8),
+                  Text(
+                    widget.optionalText ?? '(Optional)',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacing8),
+            // Custom Dropdown with MenuAnchor for open/close callbacks
+            MenuAnchor(
+              controller: _menuController,
+              onOpen: () => setState(() => _isOpen = true),
+              onClose: () => setState(() => _isOpen = false),
+              style: MenuStyle(
+                shape: WidgetStatePropertyAll(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  ),
+                ),
+              ),
+              menuChildren: widget.items.map((item) {
+                final isSelected = item == widget.value;
+                return MenuItemButton(
+                  onPressed: () {
+                    state.didChange(item);
+                    widget.onChanged(item);
+                    _menuController.close();
+                  },
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _getItemDisplayText(item),
+                          style: TextStyle(
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w400,
+                            color: isSelected ? colorScheme.primary : null,
+                          ),
+                        ),
+                      ),
+                      if (isSelected)
+                        Icon(
+                          Icons.check,
+                          size: 18,
+                          color: colorScheme.primary,
+                        ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              child: GestureDetector(
+                onTapDown: (_) => setState(() => _isPressed = true),
+                onTapUp: (_) => setState(() => _isPressed = false),
+                onTapCancel: () => setState(() => _isPressed = false),
+                onTap: () {
+                  if (_menuController.isOpen) {
+                    _menuController.close();
+                  } else {
+                    _menuController.open();
+                  }
+                },
+                child: AnimatedScale(
+                  scale: _isPressed ? 0.97 : 1.0,
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeOutCubic,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacing16,
+                      vertical: AppTheme.spacing12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerLow,
+                      border: Border.all(
+                        color: state.hasError
+                            ? colorScheme.error
+                            : Theme.of(context).dividerColor,
+                      ),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                    ),
+                    child: Row(
+                      children: [
+                        if (widget.prefixIcon != null) ...[
+                          Icon(
+                            widget.prefixIcon,
+                            size: 20,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: AppTheme.spacing8),
+                        ],
+                        Expanded(
+                          child: Text(
+                            widget.value != null
+                                ? _getItemDisplayText(widget.value!)
+                                : widget.hintText,
+                            style:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: widget.value == null
+                                          ? colorScheme.onSurfaceVariant
+                                          : null,
+                                    ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        AnimatedRotation(
+                          turns: _isOpen ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeOutCubic,
+                          child: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Error text
+            if (state.hasError) ...[
+              const SizedBox(height: AppTheme.spacing8),
+              Text(
+                state.errorText!,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.error,
+                    ),
+              ),
+            ],
+          ],
+        );
+      },
+    );
   }
 }
