@@ -165,7 +165,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
             ElevatedButton.icon(
               onPressed: _loadDoctors,
               icon: const Icon(Icons.refresh),
-              label: Text('doctors.retry_button'.tr()),
+              label: Text('common.retry'.tr()),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(200, 56),
               ),

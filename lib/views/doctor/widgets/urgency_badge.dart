@@ -33,11 +33,11 @@ class UrgencyBadge extends StatelessWidget {
   String _urgencyLabel(String urgency) {
     switch (urgency) {
       case 'urgent':
-        return 'doctor.requests.urgency.urgent'.tr();
+        return 'common.urgency.urgent'.tr();
       case 'emergency':
-        return 'doctor.requests.urgency.emergency'.tr();
+        return 'common.urgency.emergency'.tr();
       default:
-        return 'doctor.requests.urgency.normal'.tr();
+        return 'common.urgency.normal'.tr();
     }
   }
 

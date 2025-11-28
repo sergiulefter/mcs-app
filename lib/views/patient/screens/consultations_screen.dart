@@ -100,7 +100,7 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
             const SizedBox(height: AppTheme.spacing24),
             ElevatedButton(
               onPressed: _fetchConsultations,
-              child: Text('consultations.retry_button'.tr()),
+              child: Text('common.retry'.tr()),
             ),
           ],
         ),
@@ -261,11 +261,11 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     final colorScheme = Theme.of(context).colorScheme;
 
     final statuses = [
-      {'key': 'all', 'label': 'consultations.filter.all'.tr()},
-      {'key': 'pending', 'label': 'consultations.filter.pending'.tr()},
-      {'key': 'in_review', 'label': 'consultations.filter.in_review'.tr()},
-      {'key': 'completed', 'label': 'consultations.filter.completed'.tr()},
-      {'key': 'cancelled', 'label': 'consultations.filter.cancelled'.tr()},
+      {'key': 'all', 'label': 'common.all'.tr()},
+      {'key': 'pending', 'label': 'consultations.status.pending'.tr()},
+      {'key': 'in_review', 'label': 'consultations.status.in_review'.tr()},
+      {'key': 'completed', 'label': 'consultations.status.completed'.tr()},
+      {'key': 'cancelled', 'label': 'consultations.status.cancelled'.tr()},
     ];
 
     return SafeArea(

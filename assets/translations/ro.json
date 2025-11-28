@@ -11,8 +11,6 @@
     "continue_button": "Continuă"
   },
   "onboarding": {
-    "skip": "Omite",
-    "next": "Următorul",
     "get_started": "Începe",
     "slide1_title": "Opinii Medicale de Expert",
     "slide1_description": "Conectează-te cu specialiști medicali verificați pentru a doua opinie profesională asupra diagnosticului tău",
@@ -128,8 +126,7 @@
     "empty_state_title": "Niciun medic nu se potrivește cu filtrele",
     "empty_state_subtitle": "Ajustează filtrele sau caută o altă specialitate.",
     "error_loading_title": "Eroare la încărcarea medicilor",
-    "error_loading_subtitle": "Nu s-au putut încărca medicii. Te rog încearcă din nou.",
-    "retry_button": "Reîncearcă"
+    "error_loading_subtitle": "Nu s-au putut încărca medicii. Te rog încearcă din nou."
   },
   "specialties": {
     "cardiology": "Cardiologie",
@@ -190,7 +187,6 @@
     "detail_coming_soon": "Funcția de detalii consultație vine în curând",
     "error_title": "Eroare la Încărcarea Consultațiilor",
     "error_subtitle": "Nu s-au putut încărca consultațiile. Te rog încearcă din nou.",
-    "retry_button": "Reîncearcă",
     "empty_state_title": "Nicio Consultație Încă",
     "empty_state_subtitle": "Cererile tale de consultație vor apărea aici după ce le trimiți.",
     "empty_state_filtered_title": "Nicio Consultație Găsită",
@@ -225,13 +221,6 @@
       "in_review": "În Evaluare",
       "completed": "Finalizată",
       "cancelled": "Anulată"
-    },
-    "filter": {
-      "all": "Toate",
-      "pending": "În Așteptare",
-      "in_review": "În Evaluare",
-      "completed": "Finalizate",
-      "cancelled": "Anulate"
     }
   },
   "request_detail": {
@@ -241,11 +230,6 @@
     "description_label": "Descriere",
     "created_at": "Creată",
     "updated_at": "Actualizată",
-    "urgency": {
-      "normal": "Normal",
-      "urgent": "Urgent",
-      "emergency": "Urgență"
-    },
     "timeline": {
       "title": "Cronologie status",
       "created": "Creată",
@@ -282,7 +266,6 @@
     "title": "Solicită Consultație",
     "step_indicator": "Pasul {current} din {total}",
     "continue_button": "Continuă",
-    "skip_button": "Omite",
     "submit_button": "Trimite Cererea",
     "success_message": "Cererea de consultație a fost trimisă cu succes",
     "error_message": "Eroare la trimiterea cererii. Te rog încearcă din nou.",
@@ -304,16 +287,12 @@
       "title": "Revizuire & Trimitere",
       "subtitle": "Te rugăm să revizuiești cererea de consultație",
       "request_details": "Detalii Cerere",
-      "edit_button": "Editează",
       "accept_terms": "Sunt de acord cu Termenii și Condițiile",
       "terms_text": "Prin trimiterea acestei cereri, ești de acord cu Termenii și Condițiile și Politica de Confidențialitate. Această consultație este doar în scop informativ și nu înlocuiește îngrijirea medicală directă."
     },
     "urgency": {
-      "normal": "Normală",
       "normal_desc": "Timp standard de evaluare",
-      "urgent": "Urgentă",
       "urgent_desc": "Prioritate mai rapidă",
-      "emergency": "Urgență",
       "emergency_desc": "Prioritate maximă"
     },
     "validation": {
@@ -419,7 +398,17 @@
     "yes": "Da",
     "no": "Nu",
     "retry": "Reîncearcă",
-    "refresh": "Actualizează"
+    "refresh": "Actualizează",
+    "all": "Toate",
+    "urgency": {
+      "normal": "Normal",
+      "urgent": "Urgent",
+      "emergency": "Urgență"
+    },
+    "availability": {
+      "available": "Disponibil",
+      "unavailable": "Indisponibil"
+    }
   },
   "validation": {
     "required_field": "Acest câmp este obligatoriu",

@@ -121,7 +121,7 @@ class AdminDoctorCard extends StatelessWidget {
                 TextButton.icon(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_outlined, size: 18),
-                  label: Text('admin.doctors.edit'.tr()),
+                  label: Text('common.edit'.tr()),
                 ),
                 const SizedBox(width: AppTheme.spacing8),
                 TextButton.icon(
@@ -132,7 +132,7 @@ class AdminDoctorCard extends StatelessWidget {
                     color: colorScheme.error,
                   ),
                   label: Text(
-                    'admin.doctors.delete'.tr(),
+                    'common.delete'.tr(),
                     style: TextStyle(color: colorScheme.error),
                   ),
                 ),

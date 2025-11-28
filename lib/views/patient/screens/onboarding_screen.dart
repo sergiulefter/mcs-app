@@ -113,7 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: TextButton(
           onPressed: _completeOnboarding,
           child: Text(
-            'onboarding.skip'.tr(),
+            'common.skip'.tr(),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -191,7 +191,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Text(
                 _currentPage == _slides.length - 1
                     ? 'onboarding.get_started'.tr()
-                    : 'onboarding.next'.tr(),
+                    : 'common.next'.tr(),
               ),
             ),
           ),

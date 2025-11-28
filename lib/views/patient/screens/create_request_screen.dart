@@ -437,7 +437,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         _buildUrgencyOption(
           value: 'normal',
           icon: Icons.schedule,
-          title: 'create_request.urgency.normal'.tr(),
+          title: 'common.urgency.normal'.tr(),
           description: 'create_request.urgency.normal_desc'.tr(),
           color: Theme.of(context).colorScheme.primary,
         ),
@@ -445,7 +445,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         _buildUrgencyOption(
           value: 'urgent',
           icon: Icons.priority_high,
-          title: 'create_request.urgency.urgent'.tr(),
+          title: 'common.urgency.urgent'.tr(),
           description: 'create_request.urgency.urgent_desc'.tr(),
           color: semanticColors?.warning ??
               Theme.of(context).colorScheme.tertiary,
@@ -454,7 +454,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         _buildUrgencyOption(
           value: 'emergency',
           icon: Icons.emergency,
-          title: 'create_request.urgency.emergency'.tr(),
+          title: 'common.urgency.emergency'.tr(),
           description: 'create_request.urgency.emergency_desc'.tr(),
           color:
               semanticColors?.error ?? Theme.of(context).colorScheme.error,
@@ -590,7 +590,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
                   ),
-                  child: Text('create_request.skip_button'.tr()),
+                  child: Text('common.skip'.tr()),
                 ),
               ),
               const SizedBox(width: AppTheme.spacing16),
@@ -772,7 +772,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                 child: TextButton(
                   onPressed: onEdit,
                   child: Text(
-                    'create_request.step3.edit_button'.tr(),
+                    'common.edit'.tr(),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -795,16 +795,16 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       case 'urgent':
         badgeColor = semanticColors?.warning ??
             Theme.of(context).colorScheme.tertiary;
-        badgeText = 'create_request.urgency.urgent'.tr();
+        badgeText = 'common.urgency.urgent'.tr();
         break;
       case 'emergency':
         badgeColor =
             semanticColors?.error ?? Theme.of(context).colorScheme.error;
-        badgeText = 'create_request.urgency.emergency'.tr();
+        badgeText = 'common.urgency.emergency'.tr();
         break;
       default:
         badgeColor = Theme.of(context).colorScheme.primary;
-        badgeText = 'create_request.urgency.normal'.tr();
+        badgeText = 'common.urgency.normal'.tr();
     }
 
     return Container(

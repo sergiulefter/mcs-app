@@ -11,8 +11,6 @@
     "continue_button": "Continue"
   },
   "onboarding": {
-    "skip": "Skip",
-    "next": "Next",
     "get_started": "Get Started",
     "slide1_title": "Expert Medical Opinions",
     "slide1_description": "Connect with verified medical specialists for professional second opinions on your diagnosis",
@@ -128,8 +126,7 @@
     "empty_state_title": "No doctors match your filters",
     "empty_state_subtitle": "Adjust your filters or try searching for another specialty.",
     "error_loading_title": "Error loading doctors",
-    "error_loading_subtitle": "Unable to load doctors. Please try again.",
-    "retry_button": "Retry"
+    "error_loading_subtitle": "Unable to load doctors. Please try again."
   },
   "specialties": {
     "cardiology": "Cardiology",
@@ -190,19 +187,11 @@
     "detail_coming_soon": "Consultation details feature coming soon",
     "error_title": "Error Loading Consultations",
     "error_subtitle": "Unable to load consultations. Please try again.",
-    "retry_button": "Retry",
     "empty_state_title": "No Consultations Yet",
     "empty_state_subtitle": "Your consultation requests will appear here once you submit them.",
     "empty_state_filtered_title": "No Consultations Found",
     "empty_state_filtered_subtitle": "No consultations match the selected filter.",
     "status": {
-      "pending": "Pending",
-      "in_review": "In Review",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    },
-    "filter": {
-      "all": "All",
       "pending": "Pending",
       "in_review": "In Review",
       "completed": "Completed",
@@ -241,11 +230,6 @@
     "description_label": "Description",
     "created_at": "Created",
     "updated_at": "Updated",
-    "urgency": {
-      "normal": "Normal",
-      "urgent": "Urgent",
-      "emergency": "Emergency"
-    },
     "timeline": {
       "title": "Status Timeline",
       "created": "Created",
@@ -282,7 +266,6 @@
     "title": "Request Consultation",
     "step_indicator": "Step {current} of {total}",
     "continue_button": "Continue",
-    "skip_button": "Skip",
     "submit_button": "Submit Request",
     "success_message": "Consultation request submitted successfully",
     "error_message": "Error submitting request. Please try again.",
@@ -304,16 +287,12 @@
       "title": "Review & Submit",
       "subtitle": "Please review your consultation request",
       "request_details": "Request Details",
-      "edit_button": "Edit",
       "accept_terms": "I agree to the Terms and Conditions",
       "terms_text": "By submitting this request, you agree to the Terms and Conditions and Privacy Policy. This consultation is for informational purposes only and does not replace direct medical care."
     },
     "urgency": {
-      "normal": "Normal",
       "normal_desc": "Standard review time",
-      "urgent": "Urgent",
       "urgent_desc": "Faster priority",
-      "emergency": "Emergency",
       "emergency_desc": "Highest priority"
     },
     "validation": {
@@ -419,7 +398,17 @@
     "yes": "Yes",
     "no": "No",
     "retry": "Retry",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "all": "All",
+    "urgency": {
+      "normal": "Normal",
+      "urgent": "Urgent",
+      "emergency": "Emergency"
+    },
+    "availability": {
+      "available": "Available",
+      "unavailable": "Unavailable"
+    }
   },
   "validation": {
     "required_field": "This field is required",

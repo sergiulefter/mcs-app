@@ -91,7 +91,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: Text('admin.users.delete'.tr()),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),

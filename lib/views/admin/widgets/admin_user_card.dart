@@ -127,7 +127,7 @@ class AdminUserCard extends StatelessWidget {
                     color: colorScheme.error,
                   ),
                   label: Text(
-                    'admin.users.delete'.tr(),
+                    'common.delete'.tr(),
                     style: TextStyle(color: colorScheme.error),
                   ),
                 ),

@@ -109,7 +109,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: Text('admin.doctors.delete'.tr()),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
