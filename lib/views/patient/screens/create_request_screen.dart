@@ -35,6 +35,11 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   String _urgency = 'normal'; // normal, urgent, emergency
   bool _termsAccepted = false;
 
+  // Inline error messages
+  String? _titleError;
+  String? _descriptionError;
+  String? _termsError;
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -73,15 +78,26 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   bool _validateStep1() {
+    bool isValid = true;
+
+    setState(() {
+      _titleError = null;
+      _descriptionError = null;
+    });
+
     if (_title.trim().length < 10) {
-      _showError('create_request.validation.title_too_short'.tr());
-      return false;
+      setState(() {
+        _titleError = 'create_request.validation.title_too_short'.tr();
+      });
+      isValid = false;
     }
     if (_description.trim().length < 50) {
-      _showError('create_request.validation.description_too_short'.tr());
-      return false;
+      setState(() {
+        _descriptionError = 'create_request.validation.description_too_short'.tr();
+      });
+      isValid = false;
     }
-    return true;
+    return isValid;
   }
 
   void _showError(String message) {
@@ -107,8 +123,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   Future<void> _submitRequest() async {
+    setState(() {
+      _termsError = null;
+    });
+
     if (!_termsAccepted) {
-      _showError('create_request.validation.accept_terms'.tr());
+      setState(() {
+        _termsError = 'create_request.validation.accept_terms'.tr();
+      });
       return;
     }
 
@@ -340,9 +362,15 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             const SizedBox(height: AppTheme.spacing8),
             TextField(
               maxLength: 100,
-              onChanged: (value) => setState(() => _title = value),
+              onChanged: (value) {
+                setState(() {
+                  _title = value;
+                  if (_titleError != null) _titleError = null;
+                });
+              },
               decoration: InputDecoration(
                 hintText: 'create_request.step1.title_hint'.tr(),
+                errorText: _titleError,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
@@ -359,9 +387,15 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             TextField(
               maxLength: 1000,
               maxLines: 6,
-              onChanged: (value) => setState(() => _description = value),
+              onChanged: (value) {
+                setState(() {
+                  _description = value;
+                  if (_descriptionError != null) _descriptionError = null;
+                });
+              },
               decoration: InputDecoration(
                 hintText: 'create_request.step1.description_hint'.tr(),
+                errorText: _descriptionError,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
@@ -632,6 +666,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           SurfaceCard(
             padding: AppTheme.cardPadding,
             backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderColor: _termsError != null
+                ? Theme.of(context).colorScheme.error
+                : null,
             showShadow: false,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -640,8 +677,12 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   children: [
                     Checkbox(
                       value: _termsAccepted,
-                      onChanged: (value) =>
-                          setState(() => _termsAccepted = value ?? false),
+                      onChanged: (value) {
+                        setState(() {
+                          _termsAccepted = value ?? false;
+                          if (_termsError != null) _termsError = null;
+                        });
+                      },
                     ),
                     Expanded(
                       child: Text(
@@ -660,6 +701,19 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         ),
                   ),
                 ),
+                if (_termsError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: AppTheme.spacing48,
+                      top: AppTheme.spacing8,
+                    ),
+                    child: Text(
+                      _termsError!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                    ),
+                  ),
               ],
             ),
           ),

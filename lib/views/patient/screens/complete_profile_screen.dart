@@ -23,6 +23,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   DateTime? _selectedDateOfBirth;
   String? _selectedGender;
 
+  // Inline error messages
+  String? _dateOfBirthError;
+
   // Keys for translation (biological sex for medical purposes)
   final List<String> _sexKeys = [
     'male',
@@ -57,57 +60,65 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Future<void> _handleCompleteProfile() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedDateOfBirth == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('validation.select_date_of_birth'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-        return;
-      }
+    // Clear previous errors
+    setState(() {
+      _dateOfBirthError = null;
+    });
 
-      if (_selectedGender == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('validation.select_gender'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-        return;
-      }
+    // Validate form and custom fields
+    bool hasError = false;
 
-      final authController = context.read<AuthController>();
+    if (!_formKey.currentState!.validate()) {
+      hasError = true;
+    }
 
-      // Get the current language from EasyLocalization (already set at signup)
-      final currentLanguage = context.locale.languageCode;
+    if (_selectedDateOfBirth == null) {
+      setState(() {
+        _dateOfBirthError = 'validation.select_date_of_birth'.tr();
+      });
+      hasError = true;
+    }
 
-      final success = await authController.completeUserProfile(
-        displayName: _nameController.text.trim(),
-        dateOfBirth: _selectedDateOfBirth!,
-        gender: _selectedGender!,
-        phone: _phoneController.text.trim().isEmpty
-            ? null
-            : _phoneController.text.trim(),
-        preferredLanguage: currentLanguage,
+    // Gender validation is handled by the dropdown's validator
+    if (_selectedGender == null) {
+      // Trigger form validation to show dropdown error
+      _formKey.currentState!.validate();
+      hasError = true;
+    }
+
+    if (hasError) {
+      return;
+    }
+
+    final authController = context.read<AuthController>();
+
+    // Get the current language from EasyLocalization (already set at signup)
+    final currentLanguage = context.locale.languageCode;
+
+    final success = await authController.completeUserProfile(
+      displayName: _nameController.text.trim(),
+      dateOfBirth: _selectedDateOfBirth!,
+      gender: _selectedGender!,
+      phone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+      preferredLanguage: currentLanguage,
+    );
+
+    if (success && mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const MainShell(initialIndex: 3),
+        ),
       );
-
-        if (success && mounted) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const MainShell(initialIndex: 3),
-            ),
-          );
-        } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text(authController.errorMessage ?? 'errors.profile_save_failed'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(authController.errorMessage ?? 'errors.profile_save_failed'.tr()),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 
@@ -178,10 +189,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   onDateSelected: (date) {
                     setState(() {
                       _selectedDateOfBirth = date;
+                      if (_dateOfBirthError != null) _dateOfBirthError = null;
                     });
                   },
                   firstDate: DateTime(now.year - 120),
                   lastDate: DateTime(now.year - 18),
+                  errorText: _dateOfBirthError,
                 ),
                 const SizedBox(height: AppTheme.spacing16),
 

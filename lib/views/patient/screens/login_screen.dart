@@ -25,6 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _isPrefetching = false;
 
+  // Inline error messages from Firebase auth
+  String? _emailError;
+  String? _passwordError;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -33,6 +37,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    // Clear previous auth errors before validation
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
+
     if (_formKey.currentState!.validate()) {
       final authController = context.read<AuthController>();
       final consultationsController = context.read<ConsultationsController>();
@@ -75,12 +85,24 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } else if (mounted) {
         setState(() => _isPrefetching = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authController.errorMessage ?? 'Login failed'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+
+        // Map Firebase error to appropriate field
+        final errorCode = authController.errorCode;
+        final errorMessage = authController.errorMessage ?? 'auth.login_failed'.tr();
+
+        setState(() {
+          if (errorCode == 'wrong-password' || errorCode == 'invalid-credential') {
+            _passwordError = errorMessage;
+          } else if (errorCode == 'user-not-found' || errorCode == 'invalid-email') {
+            _emailError = errorMessage;
+          } else {
+            // For other errors, show under email field as general error
+            _emailError = errorMessage;
+          }
+        });
+
+        // Trigger form revalidation to show the inline error
+        _formKey.currentState!.validate();
       }
     }
   }
@@ -171,7 +193,17 @@ class _LoginScreenState extends State<LoginScreen> {
       prefixIcon: Icons.email_outlined,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
-      validator: Validators.validateEmail,
+      validator: (value) {
+        // Show Firebase auth error if present
+        if (_emailError != null) return _emailError;
+        return Validators.validateEmail(value);
+      },
+      onChanged: (_) {
+        // Clear auth error when user starts typing
+        if (_emailError != null) {
+          setState(() => _emailError = null);
+        }
+      },
     );
   }
 
@@ -192,7 +224,17 @@ class _LoginScreenState extends State<LoginScreen> {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _handleLogin(),
-      validator: Validators.validatePassword,
+      validator: (value) {
+        // Show Firebase auth error if present
+        if (_passwordError != null) return _passwordError;
+        return Validators.validatePassword(value);
+      },
+      onChanged: (_) {
+        // Clear auth error when user starts typing
+        if (_passwordError != null) {
+          setState(() => _passwordError = null);
+        }
+      },
     );
   }
 

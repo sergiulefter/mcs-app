@@ -117,7 +117,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: colorScheme.outline.withValues(alpha: 0.4)),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [

@@ -50,6 +50,11 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
   bool _isSubmitting = false;
   String? _languagesError;
 
+  // Inline error messages for Firebase auth errors
+  String? _emailError;
+  String? _passwordError;
+  String? _specialtyError;
+
   // Available languages
   final List<String> _availableLanguages = ['RO', 'EN', 'FR', 'DE', 'HU', 'RU'];
 
@@ -178,6 +183,13 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
   }
 
   Future<void> _handleSubmit() async {
+    // Clear previous errors
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+      _specialtyError = null;
+    });
+
     // Validate form fields
     if (!_formKey.currentState!.validate()) {
       return;
@@ -185,12 +197,9 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
     // Validate specialty selection
     if (_selectedSpecialty == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('admin.create_doctor.validation.specialty_required'.tr()),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+      setState(() {
+        _specialtyError = 'admin.create_doctor.validation.specialty_required'.tr();
+      });
       return;
     }
 
@@ -270,26 +279,42 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       }
     } catch (e) {
       if (mounted) {
-        String errorMessage = 'admin.create_doctor.error_generic'.tr();
+        // Map Firebase Auth errors to appropriate fields
+        final errorString = e.toString();
 
-        // Handle specific Firebase Auth errors
-        if (e.toString().contains('email-already-in-use')) {
-          errorMessage = 'admin.create_doctor.error_email_exists'.tr();
-        } else if (e.toString().contains('weak-password')) {
-          errorMessage = 'admin.create_doctor.error_weak_password'.tr();
-        } else if (e.toString().contains('invalid-email')) {
-          errorMessage = 'admin.create_doctor.error_invalid_email'.tr();
-        } else if (e.toString().contains('wrong-password') ||
-            e.toString().contains('invalid-credential')) {
-          errorMessage = 'admin.create_doctor.error_wrong_admin_password'.tr();
+        if (errorString.contains('email-already-in-use')) {
+          setState(() {
+            _emailError = 'admin.create_doctor.error_email_exists'.tr();
+          });
+          _formKey.currentState!.validate();
+        } else if (errorString.contains('invalid-email')) {
+          setState(() {
+            _emailError = 'admin.create_doctor.error_invalid_email'.tr();
+          });
+          _formKey.currentState!.validate();
+        } else if (errorString.contains('weak-password')) {
+          setState(() {
+            _passwordError = 'admin.create_doctor.error_weak_password'.tr();
+          });
+          _formKey.currentState!.validate();
+        } else if (errorString.contains('wrong-password') ||
+            errorString.contains('invalid-credential')) {
+          // Admin password error - show in SnackBar since it's in a dialog
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('admin.create_doctor.error_wrong_admin_password'.tr()),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        } else {
+          // Generic error - show in SnackBar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('admin.create_doctor.error_generic'.tr()),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
       }
     } finally {
       if (mounted) {
@@ -313,6 +338,9 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       _selectedLanguages = ['RO'];
       _initiallyAvailable = false;
       _languagesError = null;
+      _emailError = null;
+      _passwordError = null;
+      _specialtyError = null;
     });
   }
 
@@ -525,7 +553,15 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
             prefixIcon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
-            validator: Validators.validateEmail,
+            validator: (value) {
+              if (_emailError != null) return _emailError;
+              return Validators.validateEmail(value);
+            },
+            onChanged: (_) {
+              if (_emailError != null) {
+                setState(() => _emailError = null);
+              }
+            },
           ),
         ],
 
@@ -584,7 +620,15 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
             obscureText: _obscurePassword,
             keyboardType: TextInputType.visiblePassword,
             textInputAction: TextInputAction.next,
-            validator: Validators.validatePassword,
+            validator: (value) {
+              if (_passwordError != null) return _passwordError;
+              return Validators.validatePassword(value);
+            },
+            onChanged: (_) {
+              if (_passwordError != null) {
+                setState(() => _passwordError = null);
+              }
+            },
           ),
         ],
       ],
@@ -609,9 +653,11 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
               _selectedSpecialty = value != null
                   ? MedicalSpecialtyExtension.fromString(value)
                   : null;
+              if (_specialtyError != null) _specialtyError = null;
             });
           },
           validator: (value) {
+            if (_specialtyError != null) return _specialtyError;
             if (value == null || value.isEmpty) {
               return 'admin.create_doctor.validation.specialty_required'.tr();
             }

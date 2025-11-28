@@ -23,6 +23,10 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  // Inline error messages from Firebase auth
+  String? _emailError;
+  String? _passwordError;
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -33,6 +37,12 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
+    // Clear previous auth errors before validation
+    setState(() {
+      _emailError = null;
+      _passwordError = null;
+    });
+
     if (_formKey.currentState!.validate()) {
       final authController = context.read<AuthController>();
 
@@ -51,12 +61,23 @@ class _SignupScreenState extends State<SignupScreen> {
           MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
         );
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authController.errorMessage ?? 'errors.signup_failed'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        // Map Firebase error to appropriate field
+        final errorCode = authController.errorCode;
+        final errorMessage = authController.errorMessage ?? 'errors.signup_failed'.tr();
+
+        setState(() {
+          if (errorCode == 'email-already-in-use' || errorCode == 'invalid-email') {
+            _emailError = errorMessage;
+          } else if (errorCode == 'weak-password') {
+            _passwordError = errorMessage;
+          } else {
+            // For other errors, show under email field as general error
+            _emailError = errorMessage;
+          }
+        });
+
+        // Trigger form revalidation to show the inline error
+        _formKey.currentState!.validate();
       }
     }
   }
@@ -100,7 +121,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   prefixIcon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  validator: Validators.validateEmail,
+                  validator: (value) {
+                    if (_emailError != null) return _emailError;
+                    return Validators.validateEmail(value);
+                  },
+                  onChanged: (_) {
+                    if (_emailError != null) {
+                      setState(() => _emailError = null);
+                    }
+                  },
                 ),
                 const SizedBox(height: AppTheme.spacing16),
 
@@ -194,6 +223,11 @@ class _SignupScreenState extends State<SignupScreen> {
           controller: _passwordController,
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.next,
+          onChanged: (_) {
+            if (_passwordError != null) {
+              setState(() => _passwordError = null);
+            }
+          },
           decoration: InputDecoration(
             hintText: 'auth.create_password_hint'.tr(),
             prefixIcon: const Icon(
@@ -212,7 +246,10 @@ class _SignupScreenState extends State<SignupScreen> {
               },
             ),
           ),
-          validator: Validators.validatePassword,
+          validator: (value) {
+            if (_passwordError != null) return _passwordError;
+            return Validators.validatePassword(value);
+          },
         ),
       ],
     );

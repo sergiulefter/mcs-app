@@ -11,11 +11,13 @@ class AuthController extends ChangeNotifier {
   UserModel? _currentUser;
   bool _isLoading = false;
   String? _errorMessage;
+  String? _errorCode;
   bool _authStateInitialized = false;
 
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get errorCode => _errorCode;
   bool get isAuthenticated => _currentUser != null;
   bool get authStateInitialized => _authStateInitialized;
 
@@ -53,6 +55,7 @@ class AuthController extends ChangeNotifier {
   }) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorCode = null;
     notifyListeners();
 
     try {
@@ -66,11 +69,13 @@ class AuthController extends ChangeNotifier {
       notifyListeners();
       return true;
     } on FirebaseAuthException catch (e) {
+      _errorCode = e.code;
       _errorMessage = _handleAuthException(e);
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
+      _errorCode = 'unknown';
       _errorMessage = 'An unexpected error occurred: $e';
       _isLoading = false;
       notifyListeners();
@@ -85,6 +90,7 @@ class AuthController extends ChangeNotifier {
   }) async {
     _isLoading = true;
     _errorMessage = null;
+    _errorCode = null;
     notifyListeners();
 
     try {
@@ -96,11 +102,13 @@ class AuthController extends ChangeNotifier {
       notifyListeners();
       return true;
     } on FirebaseAuthException catch (e) {
+      _errorCode = e.code;
       _errorMessage = _handleAuthException(e);
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
+      _errorCode = 'unknown';
       _errorMessage = 'An unexpected error occurred: $e';
       _isLoading = false;
       notifyListeners();
