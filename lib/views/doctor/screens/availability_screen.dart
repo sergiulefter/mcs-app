@@ -354,11 +354,14 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      '${dateFormat.format(vacation.startDate)} - ${dateFormat.format(vacation.endDate)}',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                    Expanded(
+                      child: Text(
+                        '${dateFormat.format(vacation.startDate)} - ${dateFormat.format(vacation.endDate)}',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     const SizedBox(width: AppTheme.spacing8),
                     Container(

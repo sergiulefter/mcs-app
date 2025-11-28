@@ -28,34 +28,38 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: ListView(
-                padding: AppTheme.screenPadding,
-                children: [
-                  _buildHeader(context, doctor),
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildQuickInfo(context, doctor),
-                  if (doctor.bio.isNotEmpty) ...[
-                    const SizedBox(height: AppTheme.sectionSpacing),
-                    _buildBioSection(context, doctor),
-                  ],
-                  if (doctor.education.isNotEmpty) ...[
-                    const SizedBox(height: AppTheme.sectionSpacing),
-                    _buildEducationSection(context, doctor),
-                  ],
-                  if (doctor.subspecialties.isNotEmpty) ...[
-                    const SizedBox(height: AppTheme.sectionSpacing),
-                    _buildSubspecialtiesSection(context, doctor),
-                  ],
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildAvailabilitySection(context, doctor),
-                  const SizedBox(height: AppTheme.spacing32),
-                ],
+            ListView(
+              padding: AppTheme.screenPadding.copyWith(
+                bottom: AppTheme.screenPadding.bottom + 100,
               ),
+              children: [
+                _buildHeader(context, doctor),
+                const SizedBox(height: AppTheme.sectionSpacing),
+                _buildQuickInfo(context, doctor),
+                if (doctor.bio.isNotEmpty) ...[
+                  const SizedBox(height: AppTheme.sectionSpacing),
+                  _buildBioSection(context, doctor),
+                ],
+                if (doctor.education.isNotEmpty) ...[
+                  const SizedBox(height: AppTheme.sectionSpacing),
+                  _buildEducationSection(context, doctor),
+                ],
+                if (doctor.subspecialties.isNotEmpty) ...[
+                  const SizedBox(height: AppTheme.sectionSpacing),
+                  _buildSubspecialtiesSection(context, doctor),
+                ],
+                const SizedBox(height: AppTheme.sectionSpacing),
+                _buildAvailabilitySection(context, doctor),
+              ],
             ),
-            _buildRequestButton(context, doctor),
+            Positioned(
+              left: AppTheme.spacing16,
+              right: AppTheme.spacing16,
+              bottom: AppTheme.spacing16,
+              child: _buildRequestButton(context, doctor),
+            ),
           ],
         ),
       ),
@@ -414,6 +418,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
   Widget _buildRequestButton(BuildContext context, DoctorModel doctor) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
     final activeOrUpcomingVacations = doctor.vacationPeriods
         .where((vac) => vac.isActive() || vac.startDate.isAfter(now))
@@ -434,91 +439,100 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.all(AppTheme.spacing32),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
+    if (doctor.isCurrentlyAvailable) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: isDark ? 0.4 : 0.3),
+              blurRadius: 16,
+              spreadRadius: 0,
+              offset: const Offset(0, 6),
+            ),
+            BoxShadow(
+              color: colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.15),
+              blurRadius: 6,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        boxShadow: Theme.of(context).brightness == Brightness.light
-            ? [
-                BoxShadow(
-                  color: Theme.of(context).shadowColor.withValues(alpha: 0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, -4),
-                ),
-              ]
-            : null,
-      ),
-      child: doctor.isCurrentlyAvailable
-          ? ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CreateRequestScreen(
-                      doctor: doctor,
-                    ),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.medical_services_outlined),
-              label: Text('doctor_profile.request_consultation'.tr()),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
-                minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => CreateRequestScreen(
+                  doctor: doctor,
                 ),
               ),
-            )
-          : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (startDate != null && endDate != null)
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurface,
-                          ),
-                      children: [
-                        TextSpan(text: 'doctor_profile.on_vacation_prefix'.tr()),
-                        TextSpan(
-                          text: ' $startDate ',
-                          style: TextStyle(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        TextSpan(text: 'doctor_profile.on_vacation_to'.tr()),
-                        TextSpan(
-                          text: ' $endDate',
-                          style: TextStyle(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
+            );
+          },
+          icon: const Icon(Icons.medical_services_outlined),
+          label: Text('doctor_profile.request_consultation'.tr()),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
+            minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Doctor unavailable - show vacation info
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (startDate != null && endDate != null)
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
+                children: [
+                  TextSpan(text: 'doctor_profile.on_vacation_prefix'.tr()),
+                  TextSpan(
+                    text: ' $startDate ',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                if (unavailableReason != null) ...[
-                  const SizedBox(height: AppTheme.spacing8),
-                  Text(
-                    unavailableReason,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                    textAlign: TextAlign.center,
+                  TextSpan(text: 'doctor_profile.on_vacation_to'.tr()),
+                  TextSpan(
+                    text: ' $endDate',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
-              ],
+              ),
             ),
+          if (unavailableReason != null) ...[
+            const SizedBox(height: AppTheme.spacing8),
+            Text(
+              unavailableReason,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ],
+      ),
     );
   }
   String _initialsFromName(String name) {

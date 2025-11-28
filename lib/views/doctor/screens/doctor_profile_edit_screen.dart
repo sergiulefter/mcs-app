@@ -144,8 +144,11 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
 
     setState(() => _isSaving = true);
 
+    // Check if profile was incomplete before this save
+    final wasProfileIncomplete = _doctor != null && !_doctor!.isProfileComplete;
+
     try {
-      final updateData = {
+      final updateData = <String, dynamic>{
         'bio': _bioController.text.trim(),
         'consultationPrice': double.tryParse(_priceController.text) ?? 0.0,
         'experienceYears': int.tryParse(_experienceController.text) ?? 0,
@@ -153,6 +156,13 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
         'subspecialties': _selectedSubspecialties,
         'education': _educationEntries.map((e) => e.toMap()).toList(),
       };
+
+      // If completing profile for the first time, auto-set availability to true
+      final willBeComplete =
+          _bioController.text.trim().isNotEmpty && _educationEntries.isNotEmpty;
+      if (wasProfileIncomplete && willBeComplete) {
+        updateData['isAvailable'] = true;
+      }
 
       await _doctorService.updateDoctorProfile(userId, updateData);
 
