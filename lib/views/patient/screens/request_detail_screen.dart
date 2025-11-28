@@ -6,7 +6,8 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
+import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
+import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/doctor/widgets/urgency_badge.dart';
 import 'doctor_profile_screen.dart';
 
@@ -32,295 +33,249 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     super.initState();
     _doctorService = DoctorService();
     if (widget.consultation.doctorId != null) {
-      _doctorFuture = _doctorService.fetchDoctorById(widget.consultation.doctorId!);
+      _doctorFuture =
+          _doctorService.fetchDoctorById(widget.consultation.doctorId!);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final consultation = widget.consultation;
-    final colorScheme = Theme.of(context).colorScheme;
-    final semantic = Theme.of(context).extension<AppSemanticColors>();
+    final statusColor = consultation.getStatusColor(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('request_detail.title'.tr()),
+        actions: [
+          // Cancel action in app bar for pending requests
+          if (consultation.status == 'pending')
+            TextButton(
+              onPressed: _isProcessing ? null : () => _showCancelDialog(context),
+              child: Text(
+                'request_detail.cancel_request'.tr(),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: AppTheme.screenPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildStatusHeader(context, consultation, colorScheme, semantic),
-            const SizedBox(height: AppTheme.sectionSpacing),
-            _buildSectionCard(
-              context,
-              title: 'request_detail.request_info'.tr(),
+            // Prominent colored header
+            _buildHeader(context, consultation, statusColor),
+
+            // Content with padding
+            Padding(
+              padding: AppTheme.screenPadding,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildLabelValue(
-                    context,
-                    label: 'request_detail.title_label'.tr(),
-                    value: consultation.title,
-                  ),
-                  const SizedBox(height: AppTheme.spacing12),
-                  _buildLabelValue(
-                    context,
-                    label: 'request_detail.description_label'.tr(),
-                    value: consultation.description,
-                  ),
-                  const SizedBox(height: AppTheme.spacing12),
-                  _buildLabelValue(
-                    context,
-                    label: 'request_detail.created_at'.tr(),
-                    value: DateFormat.yMMMMd().format(consultation.createdAt),
-                  ),
-                  const SizedBox(height: AppTheme.spacing12),
-                  _buildLabelValue(
-                    context,
-                    label: 'request_detail.updated_at'.tr(),
-                    value: DateFormat.yMMMMd().format(consultation.updatedAt),
-                  ),
+                  // Timeline stepper
+                  _buildTimelineStepper(context, consultation),
+                  const SizedBox(height: AppTheme.sectionSpacing),
+
+                  // Description section (no card)
+                  _buildDescriptionSection(context, consultation),
+
+                  // Doctor response (if exists) - emphasized card
+                  if (consultation.doctorResponse != null) ...[
+                    const SizedBox(height: AppTheme.sectionSpacing),
+                    _buildDoctorResponse(context),
+                  ],
+
+                  // Attachments (only if has attachments)
+                  if (consultation.attachments.isNotEmpty) ...[
+                    const SizedBox(height: AppTheme.sectionSpacing),
+                    _buildAttachmentsSection(context, consultation),
+                  ],
+
+                  const SizedBox(height: AppTheme.sectionSpacing),
                 ],
               ),
             ),
-            const SizedBox(height: AppTheme.sectionSpacing),
-            _buildTimelineSection(context, consultation, colorScheme),
-            const SizedBox(height: AppTheme.sectionSpacing),
-            _buildDoctorSection(context),
-            if (consultation.doctorResponse != null) ...[
-              const SizedBox(height: AppTheme.sectionSpacing),
-              _buildDoctorResponse(context),
-            ],
-            const SizedBox(height: AppTheme.sectionSpacing),
-            _buildAttachmentsPlaceholder(context),
-            const SizedBox(height: AppTheme.sectionSpacing),
           ],
         ),
       ),
-      bottomNavigationBar: _buildActionButtons(context, consultation),
     );
   }
 
-  Widget _buildStatusHeader(
+  Widget _buildHeader(
     BuildContext context,
     ConsultationModel consultation,
-    ColorScheme colorScheme,
-    AppSemanticColors? semantic,
+    Color statusColor,
   ) {
-    final statusColor = consultation.getStatusColor(context);
     final statusText = 'consultations.status.${consultation.status}'.tr();
 
     return Container(
-      padding: AppTheme.cardPadding,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppTheme.spacing12,
-              vertical: AppTheme.spacing8,
-            ),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            ),
-            child: Text(
-              statusText,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-          ),
-          const SizedBox(width: AppTheme.spacing12),
-          UrgencyBadge(urgency: consultation.urgency),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionCard(
-    BuildContext context, {
-    required String title,
-    required Widget child,
-  }) {
-    return Container(
       width: double.infinity,
-      padding: AppTheme.cardPadding,
+      padding: const EdgeInsets.all(AppTheme.spacing24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        border: Border.all(color: Theme.of(context).dividerColor),
+        color: statusColor.withValues(alpha: 0.08),
+        border: Border(
+          bottom: BorderSide(
+            color: statusColor.withValues(alpha: 0.2),
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Status and urgency badges
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacing12,
+                  vertical: AppTheme.spacing8,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                ),
+                child: Text(
+                  statusText,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: statusColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing12),
+              UrgencyBadge(urgency: consultation.urgency),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacing20),
+
+          // Title as headline
           Text(
-            title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
+            consultation.title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
           ),
           const SizedBox(height: AppTheme.spacing12),
-          child,
+
+          // Doctor info inline (clickable)
+          _buildDoctorInline(context),
+          const SizedBox(height: AppTheme.spacing12),
+
+          // Created date
+          Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: AppTheme.iconSmall,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+              Text(
+                '${'request_detail.created_at'.tr()}: ${DateFormat.yMMMMd().format(consultation.createdAt)}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildLabelValue(
-    BuildContext context, {
-    required String label,
-    required String value,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing4),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTimelineSection(
-    BuildContext context,
-    ConsultationModel consultation,
-    ColorScheme colorScheme,
-  ) {
-    final items = [
-      _TimelineItem(
-        label: 'request_detail.timeline.created'.tr(),
-        date: consultation.createdAt,
-        color: colorScheme.primary,
-      ),
-      _TimelineItem(
-        label: 'request_detail.timeline.updated'.tr(),
-        date: consultation.updatedAt,
-        color: colorScheme.secondary,
-      ),
-      if (consultation.completedAt != null)
-        _TimelineItem(
-          label: 'request_detail.timeline.completed'.tr(),
-          date: consultation.completedAt!,
-          color: colorScheme.primary,
-        ),
-    ];
-
-    return _buildSectionCard(
-      context,
-      title: 'request_detail.timeline.title'.tr(),
-      child: Column(
-        children: items
-            .map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: item.color,
-                        borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.spacing12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.label,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                          const SizedBox(height: AppTheme.spacing4),
-                          Text(
-                            DateFormat.yMMMMd().format(item.date),
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+  Widget _buildDoctorInline(BuildContext context) {
+    if (_doctorFuture == null) {
+      return Row(
+        children: [
+          Icon(
+            Icons.person_outline,
+            size: AppTheme.iconSmall,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: AppTheme.spacing8),
+          Text(
+            'request_detail.doctor.unassigned_title'.tr(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontStyle: FontStyle.italic,
                 ),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  Widget _buildDoctorSection(BuildContext context) {
-    if (_doctorFuture == null) return const SizedBox.shrink();
+          ),
+        ],
+      );
+    }
 
     return FutureBuilder<DoctorModel?>(
       future: _doctorFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildSectionCard(
-            context,
-            title: 'request_detail.doctor.title'.tr(),
-            child: const Center(child: CircularProgressIndicator()),
+          return Row(
+            children: [
+              SizedBox(
+                width: AppTheme.iconSmall,
+                height: AppTheme.iconSmall,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+              Text(
+                'common.loading'.tr(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ],
           );
         }
 
         if (!snapshot.hasData || snapshot.data == null) {
-          return _buildSectionCard(
-            context,
-            title: 'request_detail.doctor.title'.tr(),
-            child: AppEmptyState(
-              icon: Icons.medical_services_outlined,
-              title: 'request_detail.doctor.unassigned_title'.tr(),
-              subtitle: 'request_detail.doctor.unassigned_subtitle'.tr(),
-              iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+          return Row(
+            children: [
+              Icon(
+                Icons.person_outline,
+                size: AppTheme.iconSmall,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+              Text(
+                'request_detail.doctor.unassigned_title'.tr(),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ],
           );
         }
 
         final doctor = snapshot.data!;
-        return _buildSectionCard(
-          context,
-          title: 'request_detail.doctor.title'.tr(),
-          child: InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => DoctorProfileScreen(doctor: doctor),
-                ),
-              );
-            },
+        return InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => DoctorProfileScreen(doctor: doctor),
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing4),
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 28,
+                  radius: 16,
                   backgroundColor:
                       Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                  child: Icon(
-                    Icons.person_outline,
-                    color: Theme.of(context).colorScheme.primary,
-                    size: AppTheme.iconLarge,
+                  child: Text(
+                    doctor.fullName.isNotEmpty
+                        ? doctor.fullName[0].toUpperCase()
+                        : '?',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
                   ),
                 ),
                 const SizedBox(width: AppTheme.spacing12),
@@ -330,15 +285,15 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                     children: [
                       Text(
                         doctor.fullName,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
                             ),
                       ),
-                      const SizedBox(height: AppTheme.spacing4),
                       Text(
                         'specialties.${doctor.specialty.name}'.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color:
+                                  Theme.of(context).colorScheme.onSurfaceVariant,
                             ),
                       ),
                     ],
@@ -346,7 +301,8 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                 ),
                 Icon(
                   Icons.chevron_right,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  size: AppTheme.iconMedium,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ],
             ),
@@ -356,134 +312,353 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     );
   }
 
+  Widget _buildTimelineStepper(
+    BuildContext context,
+    ConsultationModel consultation,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Define timeline steps based on consultation status
+    final steps = <_TimelineStep>[
+      _TimelineStep(
+        label: 'request_detail.timeline.created'.tr(),
+        date: consultation.createdAt,
+        isCompleted: true,
+      ),
+      _TimelineStep(
+        label: 'request_detail.timeline.in_review'.tr(),
+        date: consultation.status == 'in_review' ||
+                consultation.status == 'completed'
+            ? consultation.updatedAt
+            : null,
+        isCompleted:
+            consultation.status == 'in_review' || consultation.status == 'completed',
+      ),
+      _TimelineStep(
+        label: 'request_detail.timeline.completed'.tr(),
+        date: consultation.completedAt,
+        isCompleted: consultation.status == 'completed',
+      ),
+    ];
+
+    // Handle cancelled status
+    if (consultation.status == 'cancelled') {
+      steps[1] = _TimelineStep(
+        label: 'request_detail.timeline.cancelled'.tr(),
+        date: consultation.updatedAt,
+        isCompleted: true,
+        isCancelled: true,
+      );
+      steps.removeAt(2);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'request_detail.timeline.title'.tr()),
+        const SizedBox(height: AppTheme.spacing16),
+        Row(
+          children: steps.asMap().entries.expand((entry) {
+            final index = entry.key;
+            final step = entry.value;
+            final isLast = index == steps.length - 1;
+
+            return [
+              // Step circle and label
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: step.isCompleted
+                            ? (step.isCancelled
+                                ? colorScheme.error
+                                : colorScheme.primary)
+                            : colorScheme.surfaceContainerHighest,
+                        shape: BoxShape.circle,
+                        border: step.isCompleted
+                            ? null
+                            : Border.all(
+                                color: colorScheme.outline,
+                                width: 2,
+                              ),
+                      ),
+                      child: step.isCompleted
+                          ? Icon(
+                              step.isCancelled ? Icons.close : Icons.check,
+                              size: 18,
+                              color: colorScheme.onPrimary,
+                            )
+                          : null,
+                    ),
+                    const SizedBox(height: AppTheme.spacing8),
+                    Text(
+                      step.label,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            fontWeight:
+                                step.isCompleted ? FontWeight.w600 : FontWeight.w400,
+                            color: step.isCompleted
+                                ? (step.isCancelled
+                                    ? colorScheme.error
+                                    : colorScheme.onSurface)
+                                : colorScheme.onSurfaceVariant,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (step.date != null) ...[
+                      const SizedBox(height: AppTheme.spacing2),
+                      Text(
+                        DateFormat('MMM d').format(step.date!),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              // Connector line (except for last step)
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    height: 2,
+                    margin: const EdgeInsets.only(bottom: 40),
+                    color: steps[index + 1].isCompleted
+                        ? (steps[index + 1].isCancelled
+                            ? colorScheme.error.withValues(alpha: 0.5)
+                            : colorScheme.primary.withValues(alpha: 0.5))
+                        : colorScheme.outline.withValues(alpha: 0.3),
+                  ),
+                ),
+            ];
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescriptionSection(
+    BuildContext context,
+    ConsultationModel consultation,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'request_detail.description_label'.tr()),
+        const SizedBox(height: AppTheme.spacing12),
+        Text(
+          consultation.description,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                height: 1.6,
+              ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDoctorResponse(BuildContext context) {
     final response = widget.consultation.doctorResponse!;
-    return _buildSectionCard(
-      context,
-      title: 'request_detail.doctor_response.title'.tr(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            DateFormat.yMMMMd().format(response.respondedAt),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          ),
-          const SizedBox(height: AppTheme.spacing8),
-          Text(
-            response.text,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          if (response.recommendations != null &&
-              response.recommendations!.isNotEmpty) ...[
-            const SizedBox(height: AppTheme.spacing12),
-            _buildLabelValue(
-              context,
-              label: 'request_detail.doctor_response.recommendations_label'.tr(),
-              value: response.recommendations ?? '',
-            ),
-          ],
-          const SizedBox(height: AppTheme.spacing12),
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: AppTheme.spacing12,
-            runSpacing: AppTheme.spacing8,
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'request_detail.doctor_response.title'.tr()),
+        const SizedBox(height: AppTheme.spacing16),
+        SurfaceCard(
+          padding: AppTheme.cardPadding,
+          backgroundColor: colorScheme.secondary.withValues(alpha: 0.05),
+          borderColor: colorScheme.secondary.withValues(alpha: 0.2),
+          showShadow: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Response header with icon
               Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.refresh_outlined,
-                    size: AppTheme.iconSmall,
-                    color: Theme.of(context).colorScheme.primary,
+                  Container(
+                    padding: const EdgeInsets.all(AppTheme.spacing8),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                    ),
+                    child: Icon(
+                      Icons.medical_information_outlined,
+                      size: AppTheme.iconMedium,
+                      color: colorScheme.secondary,
+                    ),
                   ),
-                  const SizedBox(width: AppTheme.spacing8),
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        'request_detail.doctor_response.follow_up_needed'.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
+                  const SizedBox(width: AppTheme.spacing12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'request_detail.doctor_response.from_doctor'.tr(),
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          DateFormat.yMMMMd().format(response.respondedAt),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTheme.spacing12,
-                  vertical: AppTheme.spacing8,
-                ),
-                decoration: BoxDecoration(
-                  color: (response.followUpNeeded
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).colorScheme.error)
-                      .withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-                ),
-                child: Text(
-                  response.followUpNeeded
-                      ? 'common.yes'.tr()
-                      : 'common.no'.tr(),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: response.followUpNeeded
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).colorScheme.error,
-                        fontWeight: FontWeight.w700,
+              const SizedBox(height: AppTheme.spacing16),
+
+              // Response text
+              Text(
+                response.text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.6,
+                    ),
+              ),
+
+              // Recommendations (if present)
+              if (response.recommendations != null &&
+                  response.recommendations!.isNotEmpty) ...[
+                const SizedBox(height: AppTheme.spacing16),
+                Container(
+                  padding: const EdgeInsets.all(AppTheme.spacing12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.lightbulb_outline,
+                            size: AppTheme.iconSmall,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: AppTheme.spacing8),
+                          Text(
+                            'request_detail.doctor_response.recommendations_label'
+                                .tr(),
+                            style:
+                                Theme.of(context).textTheme.labelLarge?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: AppTheme.spacing8),
+                      Text(
+                        response.recommendations!,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
                 ),
+              ],
+              const SizedBox(height: AppTheme.spacing16),
+
+              // Follow-up badge
+              Row(
+                children: [
+                  Icon(
+                    Icons.refresh_outlined,
+                    size: AppTheme.iconSmall,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppTheme.spacing8),
+                  Text(
+                    'request_detail.doctor_response.follow_up_needed'.tr(),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                  ),
+                  const SizedBox(width: AppTheme.spacing12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacing12,
+                      vertical: AppTheme.spacing4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: (response.followUpNeeded
+                              ? colorScheme.secondary
+                              : colorScheme.error)
+                          .withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                    ),
+                    child: Text(
+                      response.followUpNeeded ? 'common.yes'.tr() : 'common.no'.tr(),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: response.followUpNeeded
+                                ? colorScheme.secondary
+                                : colorScheme.error,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildAttachmentsPlaceholder(BuildContext context) {
-    return _buildSectionCard(
-      context,
-      title: 'request_detail.attachments.title'.tr(),
-      child: AppEmptyState(
-        icon: Icons.attach_file_outlined,
-        title: 'request_detail.attachments.placeholder_title'.tr(),
-        subtitle: 'request_detail.attachments.placeholder_subtitle'.tr(),
-        iconColor: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
-    );
-  }
-
-  Widget? _buildActionButtons(
+  Widget _buildAttachmentsSection(
     BuildContext context,
     ConsultationModel consultation,
   ) {
-    // Show cancel button for pending consultations
-    if (consultation.status == 'pending') {
-      return Container(
-        padding: const EdgeInsets.all(AppTheme.spacing32),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          border: Border(
-            top: BorderSide(color: Theme.of(context).dividerColor),
-          ),
-        ),
-        child: OutlinedButton.icon(
-          onPressed: _isProcessing ? null : () => _showCancelDialog(context),
-          icon: const Icon(Icons.cancel_outlined),
-          label: Text('request_detail.cancel_request'.tr()),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Theme.of(context).colorScheme.error,
-            side: BorderSide(color: Theme.of(context).colorScheme.error),
-            minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
-          ),
-        ),
-      );
-    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'request_detail.attachments.title'.tr()),
+        const SizedBox(height: AppTheme.spacing16),
+        SurfaceCard(
+          padding: AppTheme.cardPadding,
+          borderColor: Theme.of(context).dividerColor,
+          showShadow: false,
+          child: Column(
+            children: consultation.attachments.map((attachment) {
+              // Choose icon based on attachment type
+              final icon = switch (attachment.type) {
+                'image' => Icons.image_outlined,
+                'pdf' => Icons.picture_as_pdf_outlined,
+                _ => Icons.insert_drive_file_outlined,
+              };
 
-    return null;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppTheme.spacing8),
+                child: Row(
+                  children: [
+                    Icon(
+                      icon,
+                      size: AppTheme.iconMedium,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: AppTheme.spacing12),
+                    Expanded(
+                      child: Text(
+                        attachment.name,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
   }
 
   Future<void> _showCancelDialog(BuildContext context) async {
@@ -553,14 +728,16 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
   }
 }
 
-class _TimelineItem {
+class _TimelineStep {
   final String label;
-  final DateTime date;
-  final Color color;
+  final DateTime? date;
+  final bool isCompleted;
+  final bool isCancelled;
 
-  _TimelineItem({
+  _TimelineStep({
     required this.label,
-    required this.date,
-    required this.color,
+    this.date,
+    required this.isCompleted,
+    this.isCancelled = false,
   });
 }

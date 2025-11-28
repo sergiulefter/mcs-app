@@ -223,9 +223,10 @@
     },
     "timeline": {
       "title": "Status Timeline",
-      "created": "Request created",
-      "updated": "Last updated",
-      "completed": "Completed"
+      "created": "Created",
+      "in_review": "In Review",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     },
     "doctor": {
       "title": "Assigned Doctor",
@@ -234,6 +235,7 @@
     },
     "doctor_response": {
       "title": "Doctor Response",
+      "from_doctor": "Medical Opinion",
       "response_label": "Response",
       "recommendations_label": "Recommendations",
       "follow_up_needed": "Follow-up needed?",

@@ -190,7 +190,8 @@ class HelpCenterScreen extends StatelessWidget {
               ),
               trailing: AnimatedRotation(
                 turns: isExpanded ? 0.25 : 0,
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
                 child: Icon(
                   Icons.chevron_right,
                   color: isExpanded

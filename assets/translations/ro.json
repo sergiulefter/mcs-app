@@ -223,9 +223,10 @@
     },
     "timeline": {
       "title": "Cronologie status",
-      "created": "Cerere creată",
-      "updated": "Ultima actualizare",
-      "completed": "Finalizată"
+      "created": "Creată",
+      "in_review": "În analiză",
+      "completed": "Finalizată",
+      "cancelled": "Anulată"
     },
     "doctor": {
       "title": "Medic atriubuit",
@@ -234,6 +235,7 @@
     },
     "doctor_response": {
       "title": "Răspuns medic",
+      "from_doctor": "Opinie medicală",
       "response_label": "Răspuns",
       "recommendations_label": "Recomandări",
       "follow_up_needed": "Este nevoie de o consultație ulterioară?",

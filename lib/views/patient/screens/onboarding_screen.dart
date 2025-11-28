@@ -61,8 +61,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _nextPage() {
     if (_currentPage < _slides.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
       );
     } else {
       _completeOnboarding();
@@ -202,7 +202,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildDot(int index) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
       margin: const EdgeInsets.symmetric(horizontal: AppTheme.spacing4),
       width: _currentPage == index ? 24 : 8,
       height: 8,

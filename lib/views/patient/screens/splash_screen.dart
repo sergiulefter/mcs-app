@@ -111,12 +111,16 @@ class _SplashScreenState extends State<SplashScreen> {
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) => const MainShell(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
           return FadeTransition(
-            opacity: animation,
+            opacity: curvedAnimation,
             child: child,
           );
         },
-        transitionDuration: AppConstants.mediumDuration,
+        transitionDuration: AppConstants.longDuration,
       ),
     );
   }
@@ -127,12 +131,16 @@ class _SplashScreenState extends State<SplashScreen> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             const AdminDashboardScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
           return FadeTransition(
-            opacity: animation,
+            opacity: curvedAnimation,
             child: child,
           );
         },
-        transitionDuration: AppConstants.mediumDuration,
+        transitionDuration: AppConstants.longDuration,
       ),
     );
   }
@@ -143,12 +151,16 @@ class _SplashScreenState extends State<SplashScreen> {
         pageBuilder: (context, animation, secondaryAnimation) =>
             const DoctorMainShell(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
           return FadeTransition(
-            opacity: animation,
+            opacity: curvedAnimation,
             child: child,
           );
         },
-        transitionDuration: AppConstants.mediumDuration,
+        transitionDuration: AppConstants.longDuration,
       ),
     );
   }
@@ -171,12 +183,16 @@ class _SplashScreenState extends State<SplashScreen> {
           return const LoginScreen();
         },
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final curvedAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+          );
           return FadeTransition(
-            opacity: animation,
+            opacity: curvedAnimation,
             child: child,
           );
         },
-        transitionDuration: AppConstants.mediumDuration,
+        transitionDuration: AppConstants.longDuration,
       ),
     );
   }

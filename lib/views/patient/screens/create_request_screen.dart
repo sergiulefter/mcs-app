@@ -58,8 +58,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       });
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
       );
     }
   }
@@ -71,8 +71,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       });
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
       );
     }
   }
