@@ -142,11 +142,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_outlined),
-            onPressed: _loadStatistics,
-            tooltip: 'common.refresh'.tr(),
-          ),
-          IconButton(
             icon: const Icon(Icons.logout_outlined),
             onPressed: () => _handleSignOut(context),
             tooltip: 'admin.sign_out'.tr(),
