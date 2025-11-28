@@ -207,7 +207,32 @@
       "in_review": "In Review",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "segments": {
+      "active": "Active",
+      "completed": "Completed",
+      "all": "All"
+    },
+    "actions": {
+      "response_available": "Response available",
+      "action_required": "Action required",
+      "attachments_count": "{count} attachments"
+    },
+    "time": {
+      "just_now": "Just now",
+      "hours_ago": "{count}h ago",
+      "yesterday": "Yesterday",
+      "days_ago": "{count}d ago"
+    },
+    "empty": {
+      "active_title": "No active consultations",
+      "active_subtitle": "All caught up! Your active requests will appear here.",
+      "completed_title": "No completed consultations",
+      "completed_subtitle": "Your completed consultations will appear here.",
+      "browse_doctors": "Browse Doctors"
+    },
+    "filter_title": "Filter Options",
+    "filter_status": "Status"
   },
   "request_detail": {
     "title": "Consultation Details",
@@ -385,6 +410,7 @@
     "apply": "Apply",
     "confirm": "Confirm",
     "close": "Close",
+    "clear": "Clear",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",

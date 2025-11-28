@@ -195,6 +195,31 @@
     "empty_state_subtitle": "Cererile tale de consultație vor apărea aici după ce le trimiți.",
     "empty_state_filtered_title": "Nicio Consultație Găsită",
     "empty_state_filtered_subtitle": "Nicio consultație nu se potrivește cu filtrul selectat.",
+    "segments": {
+      "active": "Active",
+      "completed": "Finalizate",
+      "all": "Toate"
+    },
+    "actions": {
+      "response_available": "Răspuns disponibil",
+      "action_required": "Acțiune necesară",
+      "attachments_count": "{count} atașamente"
+    },
+    "time": {
+      "just_now": "Chiar acum",
+      "hours_ago": "acum {count}h",
+      "yesterday": "Ieri",
+      "days_ago": "acum {count}z"
+    },
+    "empty": {
+      "active_title": "Nicio Consultație Activă",
+      "active_subtitle": "Nu ai consultații în așteptare sau în evaluare în prezent.",
+      "completed_title": "Nicio Consultație Finalizată",
+      "completed_subtitle": "Consultațiile tale finalizate vor apărea aici.",
+      "browse_doctors": "Explorează Medicii"
+    },
+    "filter_title": "Filtrează Consultațiile",
+    "filter_status": "După Status",
     "status": {
       "pending": "În Așteptare",
       "in_review": "În Evaluare",
@@ -385,6 +410,7 @@
     "apply": "Aplică",
     "confirm": "Confirmă",
     "close": "Închide",
+    "clear": "Șterge",
     "loading": "Se încarcă...",
     "error": "Eroare",
     "success": "Succes",

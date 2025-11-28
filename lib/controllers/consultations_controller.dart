@@ -12,12 +12,25 @@ class ConsultationsController extends ChangeNotifier {
   String? _loadedUserId;
   bool _hasPrimedForUser = false;
   String _selectedStatus = 'all'; // 'all' | 'pending' | 'in_review' | 'completed' | 'cancelled'
+  String _selectedSegment = 'active'; // 'active' | 'completed' | 'all'
 
   List<ConsultationModel> get consultations => _consultations;
   bool get isLoading => _isLoading;
   String? get error => _error;
   String get selectedStatus => _selectedStatus;
+  String get selectedSegment => _selectedSegment;
   bool get hasPrimedForUser => _hasPrimedForUser;
+
+  // Computed counts for segment badges
+  int get activeCount => _consultations
+      .where((c) => c.status == 'pending' || c.status == 'in_review')
+      .length;
+
+  int get completedCount =>
+      _consultations.where((c) => c.status == 'completed').length;
+
+  int get cancelledCount =>
+      _consultations.where((c) => c.status == 'cancelled').length;
   bool hasDataForUser(String userId) =>
       _hasPrimedForUser && _loadedUserId == userId;
 
@@ -103,6 +116,27 @@ class ConsultationsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Set segment filter (active | completed | all)
+  void setSegmentFilter(String segment) {
+    _selectedSegment = segment;
+    notifyListeners();
+  }
+
+  // Get consultations filtered by segment
+  List<ConsultationModel> get segmentFilteredConsultations {
+    switch (_selectedSegment) {
+      case 'active':
+        return _consultations
+            .where((c) => c.status == 'pending' || c.status == 'in_review')
+            .toList();
+      case 'completed':
+        return _consultations.where((c) => c.status == 'completed').toList();
+      case 'all':
+      default:
+        return _consultations;
+    }
+  }
+
   // Refresh consultations
   Future<void> refresh(String userId) async {
     await fetchUserConsultations(userId);
@@ -116,6 +150,7 @@ class ConsultationsController extends ChangeNotifier {
     _hasPrimedForUser = false;
     _error = null;
     _selectedStatus = 'all';
+    _selectedSegment = 'active';
     notifyListeners();
   }
 
