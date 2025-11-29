@@ -517,10 +517,8 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     switch (urgency) {
-      case 'urgent':
+      case 'priority':
         return semantic.warning;
-      case 'emergency':
-        return colorScheme.error;
       default:
         return colorScheme.primary;
     }

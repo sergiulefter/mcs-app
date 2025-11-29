@@ -280,9 +280,9 @@
       "terms_text": "By submitting this request, you agree to the Terms and Conditions and Privacy Policy. This consultation is for informational purposes only and does not replace direct medical care."
     },
     "urgency": {
-      "normal_desc": "Standard review time",
-      "urgent_desc": "Faster priority",
-      "emergency_desc": "Highest priority"
+      "standard_desc": "Standard review time",
+      "priority_desc": "Faster priority review",
+      "priority_fee": "+{fee} RON"
     },
     "validation": {
       "title_too_short": "Title must be at least 10 characters",
@@ -399,9 +399,8 @@
     "years": "years",
     "years_format": "{years} years",
     "urgency": {
-      "routine": "Routine",
-      "urgent": "Urgent",
-      "critical": "Critical"
+      "standard": "Standard",
+      "priority": "Priority"
     },
     "availability": {
       "available": "Available",
@@ -651,7 +650,10 @@
       "validation": {
         "required": "Message is required",
         "min_length": "Message must be at least 100 characters",
-        "max_length": "Message must be under 500 characters"
+        "max_length": "Message must be under 500 characters",
+        "question_required": "Question is required",
+        "question_too_short": "Question must be at least 10 characters",
+        "question_too_long": "Question must be under 200 characters"
       }
     },
     "calendar": {

@@ -93,7 +93,7 @@ class DevDataSeeder {
     required int count,
   }) async {
     final statuses = ['pending', 'in_review', 'completed', 'cancelled'];
-    final urgencies = ['normal', 'urgent', 'emergency'];
+    final urgencies = ['normal', 'priority'];
     final titles = [
       'Follow-up on chest pain',
       'Review MRI results',

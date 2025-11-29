@@ -9,4 +9,7 @@ class AppConstants {
   static const Duration shortDuration = Duration(milliseconds: 250);  // Micro-animations
   static const Duration mediumDuration = Duration(milliseconds: 350); // Page slides
   static const Duration longDuration = Duration(milliseconds: 400);   // Prominent transitions
+
+  // Pricing
+  static const double priorityFee = 100.0; // RON - extra fee for priority consultations
 }

@@ -82,7 +82,7 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
                 const SizedBox(height: AppTheme.spacing16),
 
                 // Patient info row
-                _buildPatientRow(context, patientName, patientEmail),
+                _buildPatientRow(context, patientName, patientEmail, consultation.createdAt),
 
                 // Action indicator (if applicable)
                 _buildActionIndicator(context, consultation),
@@ -100,21 +100,11 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
         // Status badge
         _buildStatusBadge(context, consultation),
 
-        // Urgency badge (only for urgent/emergency)
-        if (consultation.urgency != 'normal') ...[
+        // Urgency badge (only for priority)
+        if (consultation.urgency == 'priority') ...[
           const SizedBox(width: AppTheme.spacing8),
           UrgencyBadge(urgency: consultation.urgency),
         ],
-
-        const Spacer(),
-
-        // Relative time
-        Text(
-          _formatRelativeTime(consultation.createdAt),
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
       ],
     );
   }
@@ -126,16 +116,16 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
 
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
+        horizontal: AppTheme.spacing8,
+        vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        color: badgeColor.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
       ),
       child: Text(
         statusText,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: badgeColor,
               fontWeight: FontWeight.w700,
             ),
@@ -144,7 +134,7 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
   }
 
   Widget _buildPatientRow(
-      BuildContext context, String patientName, String? patientEmail) {
+      BuildContext context, String patientName, String? patientEmail, DateTime createdAt) {
     return Row(
       children: [
         Container(
@@ -186,6 +176,14 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
             ],
           ),
         ),
+        // Relative time
+        Text(
+          _formatRelativeTime(createdAt),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(width: AppTheme.spacing4),
         Icon(
           Icons.chevron_right,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -203,11 +201,13 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     IconData? icon;
     String? text;
     Color? color;
+    bool isProminent = false;
 
     if (consultation.status == 'pending') {
       icon = Icons.fiber_new_outlined;
       text = 'doctor.requests.actions.new_request'.tr();
       color = semantic?.warning ?? colorScheme.error;
+      isProminent = true; // Make "New" badge more visible
     } else if (consultation.status == 'info_requested') {
       icon = Icons.hourglass_empty;
       text = 'doctor.requests.actions.awaiting_patient'.tr();
@@ -227,6 +227,42 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
       return const SizedBox.shrink();
     }
 
+    // Prominent badge style for new requests
+    if (isProminent) {
+      return Padding(
+        padding: const EdgeInsets.only(top: AppTheme.spacing12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacing12,
+            vertical: AppTheme.spacing8,
+          ),
+          decoration: BoxDecoration(
+            color: color!.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: AppTheme.iconMedium,
+                color: color,
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+              Text(
+                text,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Regular style for other indicators
     return Padding(
       padding: const EdgeInsets.only(top: AppTheme.spacing12),
       child: Row(

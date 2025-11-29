@@ -280,9 +280,9 @@
       "terms_text": "Prin trimiterea acestei cereri, ești de acord cu Termenii și Condițiile și Politica de Confidențialitate. Această consultație este doar în scop informativ și nu înlocuiește îngrijirea medicală directă."
     },
     "urgency": {
-      "normal_desc": "Timp standard de evaluare",
-      "urgent_desc": "Prioritate mai rapidă",
-      "emergency_desc": "Prioritate maximă"
+      "standard_desc": "Timp standard de evaluare",
+      "priority_desc": "Evaluare cu prioritate mai rapidă",
+      "priority_fee": "+{fee} RON"
     },
     "validation": {
       "title_too_short": "Titlul trebuie să aibă cel puțin 10 caractere",
@@ -399,9 +399,8 @@
     "years": "ani",
     "years_format": "{years} ani",
     "urgency": {
-      "routine": "Rutină",
-      "urgent": "Urgent",
-      "critical": "Critic"
+      "standard": "Standard",
+      "priority": "Prioritate"
     },
     "availability": {
       "available": "Disponibil",
@@ -651,7 +650,10 @@
       "validation": {
         "required": "Mesajul este obligatoriu",
         "min_length": "Mesajul trebuie să aibă cel puțin 100 de caractere",
-        "max_length": "Mesajul trebuie să aibă sub 500 de caractere"
+        "max_length": "Mesajul trebuie să aibă sub 500 de caractere",
+        "question_required": "Întrebarea este obligatorie",
+        "question_too_short": "Întrebarea trebuie să aibă cel puțin 10 caractere",
+        "question_too_long": "Întrebarea trebuie să aibă sub 200 de caractere"
       }
     },
     "calendar": {

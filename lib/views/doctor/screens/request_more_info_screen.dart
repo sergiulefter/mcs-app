@@ -44,11 +44,12 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
         title: Text('doctor.request_more_info.title'.tr()),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: AppTheme.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AppTextField(
                   label: 'doctor.request_more_info.message_label'.tr(),
@@ -81,84 +82,79 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                   ),
                 ),
                 const SizedBox(height: AppTheme.sectionSpacing),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'doctor.request_more_info.questions_title'.tr(),
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
-                  ),
+                Text(
+                  'doctor.request_more_info.questions_title'.tr(),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: AppTheme.spacing12),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: _questionControllers.length,
-                    separatorBuilder: (context, _) =>
-                        const SizedBox(height: AppTheme.spacing12),
-                    itemBuilder: (context, index) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: AppTextField(
-                              label: '${'doctor.request_more_info.question_label'.tr()} ${index + 1}',
-                              controller: _questionControllers[index],
-                              hintText: 'doctor.request_more_info.question_hint'.tr(),
-                              focusNode: _questionFocusNodes[index],
-                              onChanged: (_) => setState(() {}),
-                              maxLines: 2,
-                              validator: (value) {
-                                final text = value?.trim() ?? '';
-                                if (text.isEmpty) {
-                                  return 'doctor.request_more_info.validation.question_required'.tr();
-                                }
-                                if (text.length < _questionMin) {
-                                  return 'doctor.request_more_info.validation.question_too_short'.tr();
-                                }
-                                if (text.length > _questionMax) {
-                                  return 'doctor.request_more_info.validation.question_too_long'.tr();
-                                }
-                                return null;
-                              },
-                            ),
+                // Questions list (no longer in Expanded ListView)
+                ...List.generate(_questionControllers.length, (index) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: index < _questionControllers.length - 1
+                          ? AppTheme.spacing12
+                          : 0,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: AppTextField(
+                            label: '${'doctor.request_more_info.question_label'.tr()} ${index + 1}',
+                            controller: _questionControllers[index],
+                            hintText: 'doctor.request_more_info.question_hint'.tr(),
+                            focusNode: _questionFocusNodes[index],
+                            onChanged: (_) => setState(() {}),
+                            maxLines: 2,
+                            validator: (value) {
+                              final text = value?.trim() ?? '';
+                              if (text.isEmpty) {
+                                return 'doctor.request_more_info.validation.question_required'.tr();
+                              }
+                              if (text.length < _questionMin) {
+                                return 'doctor.request_more_info.validation.question_too_short'.tr();
+                              }
+                              if (text.length > _questionMax) {
+                                return 'doctor.request_more_info.validation.question_too_long'.tr();
+                              }
+                              return null;
+                            },
                           ),
-                          const SizedBox(width: AppTheme.spacing8),
-                          if (_questionControllers.length > 1)
-                            IconButton(
-                              tooltip: 'common.delete'.tr(),
-                              onPressed: () {
-                                setState(() {
-                                  _questionControllers.removeAt(index).dispose();
-                                  _questionFocusNodes.removeAt(index).dispose();
-                                });
-                              },
-                              icon: const Icon(Icons.remove_circle_outline),
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+                        ),
+                        const SizedBox(width: AppTheme.spacing8),
+                        if (_questionControllers.length > 1)
+                          IconButton(
+                            tooltip: 'common.delete'.tr(),
+                            onPressed: () {
+                              setState(() {
+                                _questionControllers.removeAt(index).dispose();
+                                _questionFocusNodes.removeAt(index).dispose();
+                              });
+                            },
+                            icon: const Icon(Icons.remove_circle_outline),
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                      ],
+                    ),
+                  );
+                }),
                 const SizedBox(height: AppTheme.spacing12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _questionControllers.add(TextEditingController());
-                        _questionFocusNodes.add(FocusNode());
-                      });
-                      // Move focus to the newly added field.
-                      Future.delayed(const Duration(milliseconds: 100), () {
-                        _questionFocusNodes.last.requestFocus();
-                      });
-                    },
-                    icon: const Icon(Icons.add),
-                    label: Text('doctor.request_more_info.add_question'.tr()),
-                  ),
+                TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _questionControllers.add(TextEditingController());
+                      _questionFocusNodes.add(FocusNode());
+                    });
+                    // Move focus to the newly added field.
+                    Future.delayed(const Duration(milliseconds: 100), () {
+                      _questionFocusNodes.last.requestFocus();
+                    });
+                  },
+                  icon: const Icon(Icons.add),
+                  label: Text('doctor.request_more_info.add_question'.tr()),
                 ),
                 const SizedBox(height: AppTheme.spacing16),
                 SizedBox(

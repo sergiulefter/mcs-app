@@ -7,6 +7,7 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'consultations_screen.dart';
 
@@ -32,7 +33,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   // Form data
   String _title = '';
   String _description = '';
-  String _urgency = 'normal'; // normal, urgent, emergency
+  String _urgency = 'normal'; // normal, priority
   bool _termsAccepted = false;
 
   // Inline error messages
@@ -437,27 +438,19 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         _buildUrgencyOption(
           value: 'normal',
           icon: Icons.schedule,
-          title: 'common.urgency.routine'.tr(),
-          description: 'create_request.urgency.normal_desc'.tr(),
+          title: 'common.urgency.standard'.tr(),
+          description: 'create_request.urgency.standard_desc'.tr(),
           color: Theme.of(context).colorScheme.primary,
         ),
         const SizedBox(height: AppTheme.spacing12),
         _buildUrgencyOption(
-          value: 'urgent',
+          value: 'priority',
           icon: Icons.priority_high,
-          title: 'common.urgency.urgent'.tr(),
-          description: 'create_request.urgency.urgent_desc'.tr(),
+          title: 'common.urgency.priority'.tr(),
+          description: 'create_request.urgency.priority_desc'.tr(),
           color: semanticColors?.warning ??
               Theme.of(context).colorScheme.tertiary,
-        ),
-        const SizedBox(height: AppTheme.spacing12),
-        _buildUrgencyOption(
-          value: 'emergency',
-          icon: Icons.emergency,
-          title: 'common.urgency.critical'.tr(),
-          description: 'create_request.urgency.emergency_desc'.tr(),
-          color:
-              semanticColors?.error ?? Theme.of(context).colorScheme.error,
+          extraFee: AppConstants.priorityFee,
         ),
       ],
     );
@@ -469,6 +462,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     required String title,
     required String description,
     required Color color,
+    double? extraFee,
   }) {
     final isSelected = _urgency == value;
 
@@ -505,11 +499,39 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      if (extraFee != null) ...[
+                        const SizedBox(width: AppTheme.spacing8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppTheme.spacing8,
+                            vertical: AppTheme.spacing4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.15),
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusSmall),
+                          ),
+                          child: Text(
+                            'create_request.urgency.priority_fee'.tr(
+                              namedArgs: {'fee': extraFee.toInt().toString()},
+                            ),
+                            style:
+                                Theme.of(context).textTheme.labelSmall?.copyWith(
+                                      color: color,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                          ),
                         ),
+                      ],
+                    ],
                   ),
                   Text(
                     description,
@@ -792,19 +814,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     String badgeText;
 
     switch (_urgency) {
-      case 'urgent':
+      case 'priority':
         badgeColor = semanticColors?.warning ??
             Theme.of(context).colorScheme.tertiary;
-        badgeText = 'common.urgency.urgent'.tr();
-        break;
-      case 'emergency':
-        badgeColor =
-            semanticColors?.error ?? Theme.of(context).colorScheme.error;
-        badgeText = 'common.urgency.critical'.tr();
+        badgeText = 'common.urgency.priority'.tr();
         break;
       default:
         badgeColor = Theme.of(context).colorScheme.primary;
-        badgeText = 'common.urgency.routine'.tr();
+        badgeText = 'common.urgency.standard'.tr();
     }
 
     return Container(

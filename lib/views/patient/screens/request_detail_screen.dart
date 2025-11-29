@@ -46,19 +46,6 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('request_detail.title'.tr()),
-        actions: [
-          // Cancel action in app bar for pending requests
-          if (consultation.status == 'pending')
-            TextButton(
-              onPressed: _isProcessing ? null : () => _showCancelDialog(context),
-              child: Text(
-                'request_detail.cancel_request'.tr(),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ),
-            ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -90,6 +77,37 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                   if (consultation.attachments.isNotEmpty) ...[
                     const SizedBox(height: AppTheme.sectionSpacing),
                     _buildAttachmentsSection(context, consultation),
+                  ],
+
+                  // Cancel button for pending requests
+                  if (consultation.status == 'pending') ...[
+                    const SizedBox(height: AppTheme.sectionSpacing),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _isProcessing ? null : () => _showCancelDialog(context),
+                        icon: _isProcessing
+                            ? SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              )
+                            : const Icon(Icons.cancel_outlined),
+                        label: Text('request_detail.cancel_request'.tr()),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                          side: BorderSide(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppTheme.spacing16,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
 
                   const SizedBox(height: AppTheme.sectionSpacing),

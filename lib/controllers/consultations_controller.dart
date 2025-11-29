@@ -23,7 +23,10 @@ class ConsultationsController extends ChangeNotifier {
 
   // Computed counts for segment badges
   int get activeCount => _consultations
-      .where((c) => c.status == 'pending' || c.status == 'in_review')
+      .where((c) =>
+          c.status == 'pending' ||
+          c.status == 'in_review' ||
+          c.status == 'info_requested')
       .length;
 
   int get completedCount =>
@@ -127,7 +130,10 @@ class ConsultationsController extends ChangeNotifier {
     switch (_selectedSegment) {
       case 'active':
         return _consultations
-            .where((c) => c.status == 'pending' || c.status == 'in_review')
+            .where((c) =>
+                c.status == 'pending' ||
+                c.status == 'in_review' ||
+                c.status == 'info_requested')
             .toList();
       case 'completed':
         return _consultations.where((c) => c.status == 'completed').toList();

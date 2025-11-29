@@ -280,9 +280,16 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
   Widget _buildActions(BuildContext context, ConsultationModel consultation) {
     final controller = context.read<DoctorConsultationsController>();
 
+    // Only show Start Review for pending consultations
     final canStartReview = consultation.status == 'pending';
-    final canRequestMoreInfo = consultation.status != 'completed';
-    final canWriteResponse = consultation.status != 'completed';
+    // Only show response actions after review has started (in_review or info_requested)
+    final isReviewStarted = consultation.status == 'in_review' ||
+        consultation.status == 'info_requested';
+
+    // Don't show actions section for completed consultations
+    if (consultation.status == 'completed' || consultation.status == 'cancelled') {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,8 +336,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
               label: Text('doctor.requests.detail.start_review'.tr()),
             ),
           ),
-        const SizedBox(height: AppTheme.spacing12),
-        if (canRequestMoreInfo)
+        if (isReviewStarted) ...[
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
@@ -351,8 +357,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
               label: Text('doctor.requests.detail.request_more_info'.tr()),
             ),
           ),
-        const SizedBox(height: AppTheme.spacing12),
-        if (canWriteResponse)
+          const SizedBox(height: AppTheme.spacing12),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -373,6 +378,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
               label: Text('doctor.requests.detail.write_response'.tr()),
             ),
           ),
+        ],
       ],
     );
   }

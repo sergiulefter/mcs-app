@@ -14,7 +14,7 @@ class ConsultationModel {
   final String patientId;
   final String? doctorId; // Optional - can be null if not yet assigned
   final String status; // "pending" | "in_review" | "info_requested" | "completed" | "cancelled"
-  final String urgency; // "normal" | "urgent" | "emergency"
+  final String urgency; // "normal" | "priority"
   final String title;
   final String description;
   final List<AttachmentModel> attachments;

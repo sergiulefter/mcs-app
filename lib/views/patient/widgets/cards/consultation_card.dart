@@ -92,21 +92,11 @@ class _ConsultationCardState extends State<ConsultationCard> {
         // Status badge
         _buildStatusBadge(context, consultation),
 
-        // Urgency badge (only for urgent/emergency)
-        if (consultation.urgency != 'normal') ...[
+        // Urgency badge (only for priority)
+        if (consultation.urgency == 'priority') ...[
           const SizedBox(width: AppTheme.spacing8),
           UrgencyBadge(urgency: consultation.urgency),
         ],
-
-        const Spacer(),
-
-        // Relative time
-        Text(
-          _formatRelativeTime(consultation.createdAt),
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
       ],
     );
   }
@@ -178,6 +168,14 @@ class _ConsultationCardState extends State<ConsultationCard> {
             ],
           ),
         ),
+        // Relative time
+        Text(
+          _formatRelativeTime(consultation.createdAt),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(width: AppTheme.spacing4),
         Icon(
           Icons.chevron_right,
           color: Theme.of(context).colorScheme.onSurfaceVariant,

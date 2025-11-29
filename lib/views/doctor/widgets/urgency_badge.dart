@@ -13,16 +13,16 @@ class UrgencyBadge extends StatelessWidget {
     final color = _urgencyColor(context, urgency);
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
+        horizontal: AppTheme.spacing8,
+        vertical: 6,
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
       ),
       child: Text(
         _urgencyLabel(urgency),
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: color,
               fontWeight: FontWeight.w700,
             ),
@@ -32,12 +32,10 @@ class UrgencyBadge extends StatelessWidget {
 
   String _urgencyLabel(String urgency) {
     switch (urgency) {
-      case 'urgent':
-        return 'common.urgency.urgent'.tr();
-      case 'emergency':
-        return 'common.urgency.critical'.tr();
+      case 'priority':
+        return 'common.urgency.priority'.tr();
       default:
-        return 'common.urgency.routine'.tr();
+        return 'common.urgency.standard'.tr();
     }
   }
 
@@ -45,10 +43,8 @@ class UrgencyBadge extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     switch (urgency) {
-      case 'urgent':
+      case 'priority':
         return semantic.warning;
-      case 'emergency':
-        return colorScheme.error;
       default:
         return colorScheme.primary;
     }
