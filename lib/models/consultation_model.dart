@@ -225,20 +225,31 @@ class DoctorResponseModel {
 
 // Info request model
 class InfoRequestModel {
+  final String id;
   final String message;
   final List<String> questions;
   final String doctorId;
   final DateTime requestedAt;
+  final List<String>? answers;
+  final String? additionalInfo;
+  final DateTime? respondedAt;
 
   InfoRequestModel({
+    required this.id,
     required this.message,
     required this.questions,
     required this.doctorId,
     required this.requestedAt,
+    this.answers,
+    this.additionalInfo,
+    this.respondedAt,
   });
+
+  bool get isAnswered => answers != null && answers!.isNotEmpty;
 
   factory InfoRequestModel.fromMap(Map<String, dynamic> map) {
     return InfoRequestModel(
+      id: map['id'] ?? '',
       message: map['message'] ?? '',
       questions: (map['questions'] as List<dynamic>?)
               ?.map((e) => e.toString())
@@ -246,16 +257,49 @@ class InfoRequestModel {
           [],
       doctorId: map['doctorId'] ?? '',
       requestedAt: _parseDate(map['requestedAt']),
+      answers: (map['answers'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList(),
+      additionalInfo: map['additionalInfo'],
+      respondedAt: map['respondedAt'] != null
+          ? _parseDate(map['respondedAt'])
+          : null,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'message': message,
       'questions': questions,
       'doctorId': doctorId,
       'requestedAt': Timestamp.fromDate(requestedAt),
+      if (answers != null) 'answers': answers,
+      if (additionalInfo != null) 'additionalInfo': additionalInfo,
+      if (respondedAt != null) 'respondedAt': Timestamp.fromDate(respondedAt!),
     };
+  }
+
+  InfoRequestModel copyWith({
+    String? id,
+    String? message,
+    List<String>? questions,
+    String? doctorId,
+    DateTime? requestedAt,
+    List<String>? answers,
+    String? additionalInfo,
+    DateTime? respondedAt,
+  }) {
+    return InfoRequestModel(
+      id: id ?? this.id,
+      message: message ?? this.message,
+      questions: questions ?? this.questions,
+      doctorId: doctorId ?? this.doctorId,
+      requestedAt: requestedAt ?? this.requestedAt,
+      answers: answers ?? this.answers,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+      respondedAt: respondedAt ?? this.respondedAt,
+    );
   }
 }
 

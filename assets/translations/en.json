@@ -244,12 +244,37 @@
       "placeholder_title": "File uploads coming soon",
       "placeholder_subtitle": "You can submit this request without attachments for now."
     },
+    "info_request": {
+      "title": "Information Requested",
+      "pending_response": "The doctor needs more information from you",
+      "respond_button": "Respond to Doctor"
+    },
     "cancel_request": "Cancel Request",
     "cancel_dialog_title": "Cancel Consultation Request?",
     "cancel_dialog_message": "Are you sure you want to cancel this consultation request? This action cannot be undone.",
     "cancel_confirm": "Yes, Cancel Request",
     "cancel_success": "Consultation request cancelled successfully",
     "cancel_error": "Failed to cancel request. Please try again."
+  },
+  "info_response": {
+    "title": "Respond to Doctor",
+    "doctor_message_title": "Doctor's Message",
+    "questions_title": "Questions ({count})",
+    "question_label": "Question",
+    "your_answer": "Your Answer",
+    "answer_hint": "Enter your response...",
+    "additional_info_title": "Additional Information",
+    "additional_info_label": "Additional Message",
+    "additional_info_hint": "Any other details for the doctor...",
+    "attachments_title": "Attachments",
+    "attachments_coming_soon": "File upload coming soon",
+    "submit": "Submit Response",
+    "success": "Your response has been sent to the doctor",
+    "error": "Failed to send response. Please try again.",
+    "validation": {
+      "answer_required": "Please provide an answer",
+      "answer_too_short": "Answer must be at least 10 characters"
+    }
   },
   "create_request": {
     "title": "Request Consultation",

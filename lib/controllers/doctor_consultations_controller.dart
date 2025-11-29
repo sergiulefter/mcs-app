@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/user_model.dart';
+import 'package:uuid/uuid.dart';
 
 /// Controller for doctor-side consultation management.
 /// Handles live Firestore stream, status updates, responses, and info requests.
@@ -205,6 +206,7 @@ class DoctorConsultationsController extends ChangeNotifier {
     required List<String> questions,
   }) async {
     final infoRequest = InfoRequestModel(
+      id: const Uuid().v4(),
       message: message,
       questions: questions,
       doctorId: _doctorId ?? '',

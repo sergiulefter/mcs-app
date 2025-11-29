@@ -10,6 +10,7 @@ import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/doctor/widgets/urgency_badge.dart';
 import 'doctor_profile_screen.dart';
+import 'respond_to_info_screen.dart';
 
 class RequestDetailScreen extends StatefulWidget {
   const RequestDetailScreen({
@@ -66,6 +67,13 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
 
                   // Description section (no card)
                   _buildDescriptionSection(context, consultation),
+
+                  // Info request section (if status is info_requested)
+                  if (consultation.status == 'info_requested' &&
+                      consultation.infoRequests.isNotEmpty) ...[
+                    const SizedBox(height: AppTheme.sectionSpacing),
+                    _buildInfoRequestSection(context, consultation),
+                  ],
 
                   // Doctor response (if exists) - emphasized card
                   if (consultation.doctorResponse != null) ...[
@@ -472,6 +480,94 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 height: 1.6,
               ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRequestSection(
+    BuildContext context,
+    ConsultationModel consultation,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppSemanticColors>();
+    final warningColor = semantic?.warning ?? colorScheme.tertiary;
+
+    // Get the latest unanswered info request
+    final latestRequest = consultation.infoRequests.lastWhere(
+      (r) => !r.isAnswered,
+      orElse: () => consultation.infoRequests.last,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'request_detail.info_request.title'.tr()),
+        const SizedBox(height: AppTheme.spacing16),
+        SurfaceCard(
+          padding: AppTheme.cardPadding,
+          backgroundColor: warningColor.withValues(alpha: 0.08),
+          borderColor: warningColor.withValues(alpha: 0.3),
+          showShadow: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.help_outline,
+                    color: warningColor,
+                    size: AppTheme.iconMedium,
+                  ),
+                  const SizedBox(width: AppTheme.spacing12),
+                  Expanded(
+                    child: Text(
+                      'request_detail.info_request.pending_response'.tr(),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacing12),
+              Text(
+                latestRequest.message.length > 150
+                    ? '${latestRequest.message.substring(0, 150)}...'
+                    : latestRequest.message,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: AppTheme.spacing8),
+              Text(
+                '${latestRequest.questions.length} ${latestRequest.questions.length == 1 ? 'question' : 'questions'}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+              ),
+              const SizedBox(height: AppTheme.spacing16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RespondToInfoScreen(
+                          consultation: consultation,
+                          infoRequest: latestRequest,
+                        ),
+                      ),
+                    );
+                    if (result == true && mounted) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  icon: const Icon(Icons.reply_outlined),
+                  label: Text('request_detail.info_request.respond_button'.tr()),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

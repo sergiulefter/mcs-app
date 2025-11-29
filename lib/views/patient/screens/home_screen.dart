@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Get active consultations (pending or in_review) for display
     final activeConsultations = consultations
-        .where((c) => c.status == 'pending' || c.status == 'in_review')
+        .where((c) => c.status == 'pending' || c.status == 'in_review' || c.status == 'info_requested')
         .take(3)
         .toList();
 

@@ -244,12 +244,37 @@
       "placeholder_title": "Încărcarea fișierelor va fi disponibilă în curând",
       "placeholder_subtitle": "Poți trimite cererea fără atașamente momentan."
     },
+    "info_request": {
+      "title": "Informații Solicitate",
+      "pending_response": "Doctorul are nevoie de mai multe informații de la tine",
+      "respond_button": "Răspunde Doctorului"
+    },
     "cancel_request": "Anulează cererea",
     "cancel_dialog_title": "Anulezi cererea de consultație?",
     "cancel_dialog_message": "Ești sigur că vrei să anulezi această cerere de consultație? Această acțiune nu poate fi anulată.",
     "cancel_confirm": "Da, anulează cererea",
     "cancel_success": "Cererea de consultație a fost anulată cu succes",
     "cancel_error": "Anularea cererii a eșuat. Te rugăm să încerci din nou."
+  },
+  "info_response": {
+    "title": "Răspunde Doctorului",
+    "doctor_message_title": "Mesajul Doctorului",
+    "questions_title": "Întrebări ({count})",
+    "question_label": "Întrebarea",
+    "your_answer": "Răspunsul Tău",
+    "answer_hint": "Scrie răspunsul tău...",
+    "additional_info_title": "Informații Suplimentare",
+    "additional_info_label": "Mesaj Suplimentar",
+    "additional_info_hint": "Alte detalii pentru doctor...",
+    "attachments_title": "Atașamente",
+    "attachments_coming_soon": "Încărcarea fișierelor va fi disponibilă în curând",
+    "submit": "Trimite Răspunsul",
+    "success": "Răspunsul tău a fost trimis doctorului",
+    "error": "Nu s-a putut trimite răspunsul. Te rugăm să încerci din nou.",
+    "validation": {
+      "answer_required": "Te rugăm să furnizezi un răspuns",
+      "answer_too_short": "Răspunsul trebuie să aibă cel puțin 10 caractere"
+    }
   },
   "create_request": {
     "title": "Solicită Consultație",

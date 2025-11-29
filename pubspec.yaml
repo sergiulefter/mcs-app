@@ -52,6 +52,7 @@ dependencies:
 
   # Localization
   easy_localization: ^3.0.7
+  uuid: ^4.5.2
 
 dev_dependencies:
   flutter_test:

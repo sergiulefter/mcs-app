@@ -183,4 +183,54 @@ class ConsultationsController extends ChangeNotifier {
       rethrow;
     }
   }
+
+  // Submit patient response to an info request
+  Future<void> submitInfoResponse(
+    String consultationId,
+    String infoRequestId, {
+    required List<String> answers,
+    String? additionalInfo,
+  }) async {
+    try {
+      // Find the consultation
+      final consultation = _consultations.firstWhere(
+        (c) => c.id == consultationId,
+        orElse: () => throw Exception('Consultation not found'),
+      );
+
+      // Find and update the info request
+      final updatedInfoRequests = consultation.infoRequests.map((request) {
+        if (request.id == infoRequestId) {
+          return request.copyWith(
+            answers: answers,
+            additionalInfo: additionalInfo,
+            respondedAt: DateTime.now(),
+          );
+        }
+        return request;
+      }).toList();
+
+      // Update Firestore
+      await _firestore.collection('consultations').doc(consultationId).update({
+        'status': 'in_review',
+        'updatedAt': FieldValue.serverTimestamp(),
+        'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
+      });
+
+      // Update local state
+      final index = _consultations.indexWhere((c) => c.id == consultationId);
+      if (index != -1) {
+        _consultations[index] = _consultations[index].copyWith(
+          status: 'in_review',
+          updatedAt: DateTime.now(),
+          infoRequests: updatedInfoRequests,
+        );
+        notifyListeners();
+      }
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
