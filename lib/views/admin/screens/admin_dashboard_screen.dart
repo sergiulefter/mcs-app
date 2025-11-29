@@ -58,12 +58,27 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
   }
 
+  /// Refresh stats silently without showing loading indicator.
+  /// Used for background refresh after navigation to prevent layout glitch.
+  Future<void> _refreshStatisticsSilently() async {
+    try {
+      final stats = await _adminService.getStatistics();
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+        });
+      }
+    } catch (e) {
+      // Silently fail on background refresh - user can pull to refresh
+    }
+  }
+
   void _navigateToCreateDoctor(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const CreateDoctorScreen(),
       ),
-    ).then((_) => _loadStatistics()); // Refresh stats when returning
+    ).then((_) => _refreshStatisticsSilently());
   }
 
   void _navigateToDoctorManagement(BuildContext context) {
@@ -71,7 +86,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       MaterialPageRoute(
         builder: (context) => const DoctorManagementScreen(),
       ),
-    ).then((_) => _loadStatistics()); // Refresh stats when returning
+    ).then((_) => _refreshStatisticsSilently());
   }
 
   void _navigateToUserManagement(BuildContext context) {
@@ -79,7 +94,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       MaterialPageRoute(
         builder: (context) => const UserManagementScreen(),
       ),
-    ).then((_) => _loadStatistics()); // Refresh stats when returning
+    ).then((_) => _refreshStatisticsSilently());
   }
 
   void _navigateToSystemSettings(BuildContext context) {

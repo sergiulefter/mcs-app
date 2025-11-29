@@ -3,7 +3,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/user_model.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/admin/widgets/admin_user_card.dart';
+import 'package:mcs_app/views/admin/widgets/admin_user_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_search_bar.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 
@@ -26,7 +28,13 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    // Wait for route transition animation to complete before loading data
+    // Skeletons show immediately, only Firebase call is deferred
+    Future.delayed(AppConstants.mediumDuration, () {
+      if (mounted) {
+        _loadUsers();
+      }
+    });
   }
 
   @override
@@ -130,10 +138,23 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       ),
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? _buildLoadingState()
             : _error != null
                 ? _buildErrorState(context)
                 : _buildContent(context),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return ListView(
+      padding: AppTheme.screenPadding,
+      children: List.generate(
+        4,
+        (_) => const Padding(
+          padding: EdgeInsets.only(bottom: AppTheme.spacing12),
+          child: AdminUserCardSkeleton(),
+        ),
       ),
     );
   }
