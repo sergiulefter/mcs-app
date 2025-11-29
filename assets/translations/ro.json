@@ -23,10 +23,8 @@
     "sign_in": "Autentificare",
     "sign_up": "Creează Cont",
     "sign_out": "Deconectare",
-    "email": "Email",
     "password": "Parolă",
     "confirm_password": "Confirmă Parola",
-    "full_name": "Nume Complet",
     "forgot_password": "Ai uitat parola?",
     "no_account": "Nu ai cont?",
     "have_account": "Ai deja cont?",
@@ -45,7 +43,6 @@
     "date_of_birth_hint": "Selectează data nașterii",
     "sex": "Sex",
     "sex_hint": "Selectează sexul biologic",
-    "phone": "Număr de Telefon",
     "phone_hint": "Introdu numărul de telefon",
     "preferred_language": "Limba Preferată",
     "preferred_language_hint": "Selectează limba preferată",
@@ -60,23 +57,16 @@
     "romanian": "Română"
   },
   "navigation": {
-    "home": "Acasă",
     "doctors": "Medici",
-    "consultations": "Consultații",
-    "account": "Cont"
+    "consultations": "Consultații"
   },
   "home": {
-    "title": "Acasă",
     "welcome": "Bine ai revenit",
     "good_morning": "Bună dimineața",
     "good_afternoon": "Bună ziua",
     "good_evening": "Bună seara",
     "welcome_subtitle": "Cum te putem ajuta astăzi?",
     "your_stats": "Statisticile Tale",
-    "total_consultations": "Total",
-    "pending_requests": "Așteptare",
-    "completed": "Finalizate",
-    "quick_actions": "Acțiuni Rapide",
     "request_opinion": "Solicită A Doua Opinie",
     "request_opinion_desc": "Obține perspective medicale de expert",
     "browse_doctors": "Explorează Medicii",
@@ -106,14 +96,8 @@
     "results_title": "Specialiști disponibili",
     "results_count": "{count} medici",
     "view_profile": "Vezi profilul",
-    "available_now": "Disponibil acum",
-    "unavailable": "Indisponibil",
     "verified": "Profil verificat",
     "price_format": "{price} RON / consultație",
-    "availability_badge": {
-      "available": "Disponibil acum",
-      "unavailable": "Indisponibil"
-    },
     "availability_description": {
       "available": "Acceptă cereri pentru a doua opinie",
       "unavailable": "Evaluează consultațiile existente"
@@ -183,14 +167,8 @@
     "education": "Educație & Credențiale",
     "subspecialties": "Subspecialități",
     "availability_status": "Status Disponibilitate",
-    "languages": "Limbi Vorbite",
     "consultation_price": "Preț Consultație",
-    "experience": "Experiență",
-    "years": "{years} ani",
-    "years_experience": "{years} ani",
     "currency": "RON",
-    "available_now": "Disponibil acum",
-    "unavailable": "Momentan indisponibil",
     "accepting_consultations": "Acceptă cereri noi de consultație",
     "not_accepting_consultations": "Evaluează consultațiile existente",
     "on_vacation": "Indisponibil din {start} până în {end}",
@@ -199,7 +177,6 @@
     "read_more": "Citește mai mult",
     "read_less": "Citește mai puțin",
     "request_consultation": "Solicită Consultație",
-    "unavailable_button": "Momentan Indisponibil",
     "request_submitted": "Funcția de solicitare consultație vine în curând"
   },
   "consultations": {
@@ -215,9 +192,7 @@
     "empty_state_filtered_title": "Nicio Consultație Găsită",
     "empty_state_filtered_subtitle": "Nicio consultație nu se potrivește cu filtrul selectat.",
     "segments": {
-      "active": "Active",
-      "completed": "Finalizate",
-      "all": "Toate"
+      "active": "Active"
     },
     "actions": {
       "response_available": "Răspuns disponibil",
@@ -238,13 +213,7 @@
       "browse_doctors": "Explorează Medicii"
     },
     "filter_title": "Filtrează Consultațiile",
-    "filter_status": "După Status",
-    "status": {
-      "pending": "În Așteptare",
-      "in_review": "În Evaluare",
-      "completed": "Finalizată",
-      "cancelled": "Anulată"
-    }
+    "filter_status": "După Status"
   },
   "request_detail": {
     "title": "Detalii consultație",
@@ -255,10 +224,7 @@
     "updated_at": "Actualizată",
     "timeline": {
       "title": "Cronologie status",
-      "created": "Creată",
-      "in_review": "În analiză",
-      "completed": "Finalizată",
-      "cancelled": "Anulată"
+      "created": "Creată"
     },
     "doctor": {
       "title": "Medic atriubuit",
@@ -350,26 +316,21 @@
     "faq_timeline_question": "Când primesc un răspuns?",
     "faq_timeline_answer": "Primești de obicei un răspuns în 1-2 zile lucrătoare. Cazurile urgente sunt prioritizate când sunt marcate ca urgente.",
     "faq_profile_question": "Cum îmi actualizez profilul?",
-    "faq_profile_answer": "Deschide Account > Edit Profile ca să modifici datele personale și preferințele.",
-    "coming_soon": "Disponibil în curând"
+    "faq_profile_answer": "Deschide Account > Edit Profile ca să modifici datele personale și preferințele."
   },
   "account": {
     "title": "Cont",
     "overview_title": "Prezentare Generală Cont",
     "profile_info": "Informații Profil",
-    "profile_details": "Detalii Profil",
-    "quick_actions": "Acțiuni Rapide",
     "account_section": "Cont",
     "patient_account": "Cont Pacient",
     "doctor_account": "Cont Medic",
     "admin_account": "Cont Administrator",
-    "email_label": "Email",
     "user_id_label": "ID Utilizator",
     "user_id": "ID Utilizator",
     "member_since": "Membru Din",
     "date_of_birth": "Data Nașterii",
     "sex": "Sex",
-    "phone": "Număr de Telefon",
     "preferred_language": "Limba Preferată",
     "not_provided": "Necompletat",
     "account_settings": "Setări Cont",
@@ -377,7 +338,6 @@
     "change_password_desc": "Actualizează parola contului",
     "profile_picture": "Poză de Profil",
     "display_name": "Nume Afișat",
-    "save": "Salvează",
     "edit_profile": "Editează Profilul",
     "edit_profile_desc": "Actualizează informațiile personale",
     "change_language": "Schimbă Limba",
@@ -423,14 +383,38 @@
     "retry": "Reîncearcă",
     "refresh": "Actualizează",
     "all": "Toate",
+    "total": "Total",
+    "home": "Acasă",
+    "account": "Cont",
+    "experience": "Experiență",
+    "languages": "Limbi",
+    "specialty": "Specialitate",
+    "quick_actions": "Acțiuni Rapide",
+    "profile_details": "Detalii Profil",
+    "edit_profile": "Editează Profilul",
+    "email": "Email",
+    "phone": "Număr de Telefon",
+    "full_name": "Nume Complet",
+    "coming_soon": "În Curând",
+    "years": "ani",
+    "years_format": "{years} ani",
     "urgency": {
-      "normal": "Normal",
+      "routine": "Rutină",
       "urgent": "Urgent",
-      "emergency": "Urgență"
+      "critical": "Critic"
     },
     "availability": {
       "available": "Disponibil",
-      "unavailable": "Indisponibil"
+      "unavailable": "Indisponibil",
+      "available_now": "Disponibil acum",
+      "currently_unavailable": "Momentan indisponibil"
+    },
+    "status": {
+      "pending": "În Așteptare",
+      "in_review": "În Evaluare",
+      "info_requested": "Informații Solicitate",
+      "completed": "Finalizată",
+      "cancelled": "Anulată"
     }
   },
   "validation": {
@@ -462,7 +446,6 @@
     "dashboard_title": "Panou Administrator",
     "welcome": "Bine ai venit, Admin",
     "admin_user": "Administrator",
-    "quick_actions": "Acțiuni Rapide",
     "sign_out": "Deconectare",
     "sign_out_title": "Deconectare",
     "sign_out_message": "Ești sigur că vrei să te deconectezi?",
@@ -481,13 +464,10 @@
       "section_basic": "Informații de Bază",
       "section_professional": "Detalii Profesionale",
       "section_consultation": "Setări Consultație",
-      "field_full_name": "Nume Complet",
       "field_full_name_hint": "ex., Dr. Maria Ionescu",
-      "field_email": "Adresă Email",
       "field_email_hint": "doctor@exemplu.com",
       "field_password": "Parolă Inițială",
       "field_password_hint": "Minim 6 caractere",
-      "field_phone": "Număr de Telefon",
       "field_phone_hint": "+40 7XX XXX XXX",
       "field_specialty": "Specialitate Principală",
       "field_specialty_hint": "Selectează specialitatea",
@@ -532,7 +512,6 @@
     "system_settings": {
       "title": "Setări Sistem",
       "subtitle": "Configurează setările aplicației",
-      "coming_soon_title": "În Curând",
       "coming_soon_description": "Setările și configurația sistemului sunt în curs de dezvoltare.",
       "planned_features": "Funcționalități Planificate",
       "feature_app_config": "Opțiuni de configurare a aplicației",
@@ -545,23 +524,14 @@
     "stats": {
       "patients": "Pacienți",
       "doctors": "Medici",
-      "consultations": "Consultații",
-      "pending": "Așteptare"
+      "consultations": "Consultații"
     },
     "doctors": {
       "search_hint": "Caută după nume, email sau specialitate",
-      "filter_all": "Toate",
-      "filter_available": "Disponibili",
-      "filter_unavailable": "Indisponibili",
       "results_count": "{count} medici găsiți",
       "empty_title": "Niciun medic găsit",
       "empty_subtitle": "Încearcă să ajustezi căutarea sau filtrele.",
       "error_loading": "Încărcarea medicilor a eșuat. Te rugăm să încerci din nou.",
-      "available": "Disponibil",
-      "unavailable": "Indisponibil",
-      "years": "ani",
-      "edit": "Editează",
-      "delete": "Șterge",
       "delete_title": "Șterge Medicul",
       "delete_message": "Ești sigur că vrei să ștergi pe {name}? Această acțiune nu poate fi anulată.",
       "delete_success": "Medicul a fost șters cu succes",
@@ -576,7 +546,6 @@
       "profile_complete": "Profil complet",
       "profile_incomplete": "Profil incomplet",
       "joined": "Înregistrat",
-      "delete": "Șterge",
       "delete_title": "Șterge Utilizatorul",
       "delete_message": "Ești sigur că vrei să ștergi pe {name}? Această acțiune nu poate fi anulată.",
       "delete_success": "Utilizatorul a fost șters cu succes",
@@ -585,10 +554,8 @@
   },
   "doctor": {
     "navigation": {
-      "home": "Acasă",
       "requests": "Cereri",
-      "calendar": "Calendar",
-      "account": "Cont"
+      "calendar": "Calendar"
     },
     "home": {
       "welcome": "Bine ai venit, {name}",
@@ -600,12 +567,6 @@
       "now_unavailable": "Ești acum indisponibil pentru consultații",
       "availability_error": "Actualizarea disponibilității a eșuat. Te rugăm să încerci din nou.",
       "stats_title": "Statisticile Tale",
-      "stats": {
-        "total": "Total",
-        "pending": "Așteptare",
-        "in_review": "În Evaluare",
-        "completed": "Finalizate"
-      },
       "recent_requests": "Cereri Recente",
       "no_requests": "Nicio cerere în așteptare",
       "no_requests_desc": "Cererile noi de consultație vor apărea aici când pacienții le trimit.",
@@ -613,15 +574,12 @@
     },
     "requests": {
       "title": "Cereri de Consultație",
-      "coming_soon": "În Curând",
       "coming_soon_desc": "Funcția de cereri de consultație este în dezvoltare și va fi disponibilă în curând.",
       "empty_title": "Nicio cerere încă",
       "empty_subtitle": "Cererile noi de consultație vor apărea aici când pacienții le trimit.",
       "patient_unknown": "Pacient",
       "segments": {
-        "new": "Noi",
-        "in_progress": "În Curs",
-        "completed": "Finalizate"
+        "new": "Noi"
       },
       "empty": {
         "new_title": "Nicio cerere nouă",
@@ -639,25 +597,6 @@
       },
       "filter_title": "Filtrează Cererile",
       "filter_status": "După status",
-      "filters": {
-        "all": "Toate",
-        "pending": "În așteptare",
-        "in_review": "În evaluare",
-        "info_requested": "Informații solicitate",
-        "completed": "Finalizate"
-      },
-      "status": {
-        "pending": "În așteptare",
-        "in_review": "În evaluare",
-        "info_requested": "Informații solicitate",
-        "completed": "Finalizate",
-        "cancelled": "Anulate"
-      },
-      "urgency": {
-        "normal": "Rutină",
-        "urgent": "Urgent",
-        "emergency": "Critic"
-      },
       "detail": {
         "title": "Detalii cerere",
         "request_details": "Informații cerere",
@@ -678,10 +617,7 @@
         "start_review": "Începe evaluarea",
         "request_more_info": "Solicită mai multe informații",
         "write_response": "Scrie răspunsul",
-        "status_updated": "Status actualizat",
-        "urgency_normal": "Rutină",
-        "urgency_urgent": "Urgent",
-        "urgency_emergency": "Critic"
+        "status_updated": "Status actualizat"
       }
     },
     "response_form": {
@@ -720,7 +656,6 @@
     },
     "calendar": {
       "title": "Calendar",
-      "coming_soon": "În curând",
       "coming_soon_desc": "Funcția de calendar și programare este în dezvoltare și va fi disponibilă în curând.",
       "view_label": "Vizualizare",
       "view_month": "Lună",
@@ -731,20 +666,10 @@
       "vacation_badge": "Concediu"
     },
     "account": {
-      "profile_details": "Detalii Profil",
-      "quick_actions": "Acțiuni rapide",
-      "specialty": "Specialitate",
-      "experience": "Experiență",
-      "years": "{years} ani",
-      "languages": "Limbi vorbite",
       "price": "Preț consultație",
-      "available": "Disponibil",
-      "unavailable": "Indisponibil",
-      "edit_profile": "Editează profilul",
       "edit_profile_desc": "Actualizează informațiile profesionale",
       "manage_availability": "Gestionează disponibilitatea",
-      "manage_availability_desc": "Setează perioade de concediu și disponibilitate",
-      "coming_soon": "Funcție disponibilă în curând"
+      "manage_availability_desc": "Setează perioade de concediu și disponibilitate"
     },
     "profile_edit": {
       "title": "Editează Profilul",

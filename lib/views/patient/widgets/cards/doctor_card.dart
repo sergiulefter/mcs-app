@@ -195,8 +195,8 @@ class _DoctorCardState extends State<DoctorCard> {
         const SizedBox(width: AppTheme.spacing8),
         Text(
           isAvailable
-              ? 'doctors.available_now'.tr()
-              : 'doctors.unavailable'.tr(),
+              ? 'common.availability.available_now'.tr()
+              : 'common.availability.unavailable'.tr(),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: isAvailable
                     ? (semantic?.success ?? Colors.green)

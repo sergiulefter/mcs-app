@@ -107,7 +107,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     ConsultationModel consultation,
     Color statusColor,
   ) {
-    final statusText = 'consultations.status.${consultation.status}'.tr();
+    final statusText = 'common.status.${consultation.status}'.tr();
 
     return Container(
       width: double.infinity,
@@ -326,7 +326,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
         isCompleted: true,
       ),
       _TimelineStep(
-        label: 'request_detail.timeline.in_review'.tr(),
+        label: 'common.status.in_review'.tr(),
         date: consultation.status == 'in_review' ||
                 consultation.status == 'completed'
             ? consultation.updatedAt
@@ -335,7 +335,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
             consultation.status == 'in_review' || consultation.status == 'completed',
       ),
       _TimelineStep(
-        label: 'request_detail.timeline.completed'.tr(),
+        label: 'common.status.completed'.tr(),
         date: consultation.completedAt,
         isCompleted: consultation.status == 'completed',
       ),
@@ -344,7 +344,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     // Handle cancelled status
     if (consultation.status == 'cancelled') {
       steps[1] = _TimelineStep(
-        label: 'request_detail.timeline.cancelled'.tr(),
+        label: 'common.status.cancelled'.tr(),
         date: consultation.updatedAt,
         isCompleted: true,
         isCancelled: true,

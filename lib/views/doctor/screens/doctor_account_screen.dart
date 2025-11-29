@@ -50,13 +50,13 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Profile Details Section
-              SectionHeader(title: 'doctor.account.profile_details'.tr()),
+              SectionHeader(title: 'common.profile_details'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildProfileDetailsCard(context, doctor),
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Quick Actions Section
-              SectionHeader(title: 'doctor.account.quick_actions'.tr()),
+              SectionHeader(title: 'common.quick_actions'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildQuickActionsCard(context),
               const SizedBox(height: AppTheme.sectionSpacing),
@@ -130,8 +130,8 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
                 ),
                 child: Text(
                   doctor.isCurrentlyAvailable
-                      ? 'doctor.account.available'.tr()
-                      : 'doctor.account.unavailable'.tr(),
+                      ? 'common.availability.available'.tr()
+                      : 'common.availability.unavailable'.tr(),
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: doctor.isCurrentlyAvailable
                             ? Theme.of(context).colorScheme.secondary
@@ -155,19 +155,19 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
       children: [
         ProfileDetailRow(
           icon: Icons.medical_services_outlined,
-          label: 'doctor.account.specialty'.tr(),
+          label: 'common.specialty'.tr(),
           value: doctor.specialty.name,
           notProvidedText: notProvidedText,
         ),
         ProfileDetailRow(
           icon: Icons.work_history_outlined,
-          label: 'doctor.account.experience'.tr(),
-          value: 'doctor.account.years'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
+          label: 'common.experience'.tr(),
+          value: 'common.years_format'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
           notProvidedText: notProvidedText,
         ),
         ProfileDetailRow(
           icon: Icons.language_outlined,
-          label: 'doctor.account.languages'.tr(),
+          label: 'common.languages'.tr(),
           value: doctor.languages.isNotEmpty ? doctor.languages.join(', ') : notProvidedText,
           notProvidedText: notProvidedText,
         ),
@@ -189,7 +189,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
       children: [
         ActionTile(
           icon: Icons.edit_outlined,
-          title: 'doctor.account.edit_profile'.tr(),
+          title: 'common.edit_profile'.tr(),
           subtitle: 'doctor.account.edit_profile_desc'.tr(),
           onTap: () async {
             final profileController = context.read<DoctorProfileController>();

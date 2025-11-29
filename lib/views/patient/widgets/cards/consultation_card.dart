@@ -114,7 +114,7 @@ class _ConsultationCardState extends State<ConsultationCard> {
   Widget _buildStatusBadge(
       BuildContext context, ConsultationModel consultation) {
     final badgeColor = consultation.getStatusColor(context);
-    final statusText = 'consultations.status.${consultation.status}'.tr();
+    final statusText = 'common.status.${consultation.status}'.tr();
 
     return Container(
       padding: const EdgeInsets.symmetric(

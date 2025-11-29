@@ -112,7 +112,7 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.dashboard_outlined, false),
               activeIcon: _buildNavIcon(Icons.dashboard, true),
-              label: 'doctor.navigation.home'.tr(),
+              label: 'common.home'.tr(),
             ),
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.assignment_outlined, false),
@@ -127,7 +127,7 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
             BottomNavigationBarItem(
               icon: _buildNavIcon(Icons.person_outlined, false),
               activeIcon: _buildNavIcon(Icons.person, true),
-              label: 'doctor.navigation.account'.tr(),
+              label: 'common.account'.tr(),
             ),
           ],
         ),

@@ -163,7 +163,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
                 // Form Fields
                 AppTextField(
-                  label: 'auth.full_name'.tr(),
+                  label: 'common.full_name'.tr(),
                   hintText: 'auth.name_hint'.tr(),
                   controller: _nameController,
                   prefixIcon: Icons.person_outlined,
@@ -220,7 +220,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: AppTheme.spacing16),
 
                 AppTextField(
-                  label: 'profile.phone'.tr(),
+                  label: 'common.phone'.tr(),
                   hintText: 'profile.phone_hint'.tr(),
                   controller: _phoneController,
                   prefixIcon: Icons.phone_outlined,

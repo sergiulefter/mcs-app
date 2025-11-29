@@ -40,7 +40,7 @@ class SystemSettingsScreen extends StatelessWidget {
 
                 // Title
                 Text(
-                  'admin.system_settings.coming_soon_title'.tr(),
+                  'common.coming_soon'.tr(),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),

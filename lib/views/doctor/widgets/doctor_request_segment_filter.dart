@@ -57,13 +57,13 @@ class DoctorRequestSegmentFilter extends StatelessWidget {
                   _buildSegment(
                     context,
                     key: 'in_progress',
-                    label: 'doctor.requests.segments.in_progress'.tr(),
+                    label: 'common.status.in_review'.tr(),
                   ),
                   const SizedBox(width: 6),
                   _buildSegment(
                     context,
                     key: 'completed',
-                    label: 'doctor.requests.segments.completed'.tr(),
+                    label: 'common.status.completed'.tr(),
                   ),
                 ],
               ),

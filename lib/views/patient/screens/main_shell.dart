@@ -85,7 +85,7 @@ class _MainShellState extends State<MainShell> {
               BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.home_outlined, false),
                 activeIcon: _buildNavIcon(Icons.home, true),
-                label: 'navigation.home'.tr(),
+                label: 'common.home'.tr(),
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.search_outlined, false),
@@ -100,7 +100,7 @@ class _MainShellState extends State<MainShell> {
               BottomNavigationBarItem(
                 icon: _buildNavIcon(Icons.person_outlined, false),
                 activeIcon: _buildNavIcon(Icons.person, true),
-                label: 'navigation.account'.tr(),
+                label: 'common.account'.tr(),
               ),
             ],
           ),

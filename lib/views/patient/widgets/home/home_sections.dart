@@ -160,7 +160,7 @@ class HomeStatsSection extends StatelessWidget {
                   child: StatCard(
                     icon: Icons.assignment_outlined,
                     value: '$totalCount',
-                    label: 'home.total_consultations'.tr(),
+                    label: 'common.total'.tr(),
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
@@ -170,7 +170,7 @@ class HomeStatsSection extends StatelessWidget {
                   child: StatCard(
                     icon: Icons.pending_actions_outlined,
                     value: '$pendingCount',
-                    label: 'home.pending_requests'.tr(),
+                    label: 'common.status.pending'.tr(),
                     color: Theme.of(context).extension<AppSemanticColors>()!.warning,
                   ),
                 ),
@@ -180,7 +180,7 @@ class HomeStatsSection extends StatelessWidget {
                   child: StatCard(
                     icon: Icons.check_circle_outline,
                     value: '$completedCount',
-                    label: 'home.completed'.tr(),
+                    label: 'common.status.completed'.tr(),
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
@@ -207,7 +207,7 @@ class HomeQuickActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'home.quick_actions'.tr(),
+          'common.quick_actions'.tr(),
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
               ),

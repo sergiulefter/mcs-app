@@ -35,9 +35,9 @@ class UrgencyBadge extends StatelessWidget {
       case 'urgent':
         return 'common.urgency.urgent'.tr();
       case 'emergency':
-        return 'common.urgency.emergency'.tr();
+        return 'common.urgency.critical'.tr();
       default:
-        return 'common.urgency.normal'.tr();
+        return 'common.urgency.routine'.tr();
     }
   }
 

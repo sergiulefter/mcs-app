@@ -23,10 +23,8 @@
     "sign_in": "Sign In",
     "sign_up": "Create Account",
     "sign_out": "Sign Out",
-    "email": "Email",
     "password": "Password",
     "confirm_password": "Confirm Password",
-    "full_name": "Full Name",
     "forgot_password": "Forgot Password?",
     "no_account": "Don't have an account?",
     "have_account": "Already have an account?",
@@ -45,7 +43,6 @@
     "date_of_birth_hint": "Select your date of birth",
     "sex": "Sex",
     "sex_hint": "Select your biological sex",
-    "phone": "Phone Number",
     "phone_hint": "Enter your phone number",
     "preferred_language": "Preferred Language",
     "preferred_language_hint": "Select your preferred language",
@@ -60,23 +57,16 @@
     "romanian": "Romanian"
   },
   "navigation": {
-    "home": "Home",
     "doctors": "Doctors",
-    "consultations": "Consultations",
-    "account": "Account"
+    "consultations": "Consultations"
   },
   "home": {
-    "title": "Home",
     "welcome": "Welcome back",
     "good_morning": "Good morning",
     "good_afternoon": "Good afternoon",
     "good_evening": "Good evening",
     "welcome_subtitle": "How can we help you today?",
     "your_stats": "Your Stats",
-    "total_consultations": "Total",
-    "pending_requests": "Pending",
-    "completed": "Completed",
-    "quick_actions": "Quick Actions",
     "request_opinion": "Request Second Opinion",
     "request_opinion_desc": "Get expert medical insights",
     "browse_doctors": "Browse Doctors",
@@ -106,14 +96,8 @@
     "results_title": "Available Specialists",
     "results_count": "{count} doctors",
     "view_profile": "View profile",
-    "available_now": "Available now",
-    "unavailable": "Unavailable",
     "verified": "Verified profile",
     "price_format": "{price} RON / consultation",
-    "availability_badge": {
-      "available": "Available now",
-      "unavailable": "Not available"
-    },
     "availability_description": {
       "available": "Accepting second opinion requests",
       "unavailable": "Currently reviewing existing consultations"
@@ -183,14 +167,8 @@
     "education": "Education & Credentials",
     "subspecialties": "Subspecialties",
     "availability_status": "Availability Status",
-    "languages": "Languages",
     "consultation_price": "Consultation Price",
-    "experience": "Experience",
-    "years": "{years} years",
-    "years_experience": "{years} years",
     "currency": "RON",
-    "available_now": "Available now",
-    "unavailable": "Currently unavailable",
     "accepting_consultations": "Accepting new consultation requests",
     "not_accepting_consultations": "Currently reviewing existing consultations",
     "on_vacation": "Unavailable from {start} to {end}",
@@ -199,7 +177,6 @@
     "read_more": "Read more",
     "read_less": "Read less",
     "request_consultation": "Request Consultation",
-    "unavailable_button": "Currently Unavailable",
     "request_submitted": "Consultation request feature coming soon"
   },
   "consultations": {
@@ -214,16 +191,8 @@
     "empty_state_subtitle": "Your consultation requests will appear here once you submit them.",
     "empty_state_filtered_title": "No Consultations Found",
     "empty_state_filtered_subtitle": "No consultations match the selected filter.",
-    "status": {
-      "pending": "Pending",
-      "in_review": "In Review",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
-    },
     "segments": {
-      "active": "Active",
-      "completed": "Completed",
-      "all": "All"
+      "active": "Active"
     },
     "actions": {
       "response_available": "Response available",
@@ -255,10 +224,7 @@
     "updated_at": "Updated",
     "timeline": {
       "title": "Status Timeline",
-      "created": "Created",
-      "in_review": "In Review",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
+      "created": "Created"
     },
     "doctor": {
       "title": "Assigned Doctor",
@@ -350,26 +316,21 @@
     "faq_timeline_question": "When will I get a response?",
     "faq_timeline_answer": "You'll typically receive an update within 1-2 business days. Urgent cases are prioritized when marked as urgent.",
     "faq_profile_question": "How do I update my profile information?",
-    "faq_profile_answer": "Open Account > Edit Profile to update your personal details and preferences.",
-    "coming_soon": "Coming soon"
+    "faq_profile_answer": "Open Account > Edit Profile to update your personal details and preferences."
   },
   "account": {
     "title": "Account",
     "overview_title": "Account Overview",
     "profile_info": "Profile Information",
-    "profile_details": "Profile Details",
-    "quick_actions": "Quick Actions",
     "account_section": "Account",
     "patient_account": "Patient Account",
     "doctor_account": "Doctor Account",
     "admin_account": "Admin Account",
-    "email_label": "Email",
     "user_id_label": "User ID",
     "user_id": "User ID",
     "member_since": "Member Since",
     "date_of_birth": "Date of Birth",
     "sex": "Sex",
-    "phone": "Phone Number",
     "preferred_language": "Preferred Language",
     "not_provided": "Not provided",
     "account_settings": "Account Settings",
@@ -377,7 +338,6 @@
     "change_password_desc": "Update your account password",
     "profile_picture": "Profile Picture",
     "display_name": "Display Name",
-    "save": "Save",
     "edit_profile": "Edit Profile",
     "edit_profile_desc": "Update your personal information",
     "change_language": "Change Language",
@@ -423,14 +383,38 @@
     "retry": "Retry",
     "refresh": "Refresh",
     "all": "All",
+    "total": "Total",
+    "home": "Home",
+    "account": "Account",
+    "experience": "Experience",
+    "languages": "Languages",
+    "specialty": "Specialty",
+    "quick_actions": "Quick Actions",
+    "profile_details": "Profile Details",
+    "edit_profile": "Edit Profile",
+    "email": "Email",
+    "phone": "Phone Number",
+    "full_name": "Full Name",
+    "coming_soon": "Coming Soon",
+    "years": "years",
+    "years_format": "{years} years",
     "urgency": {
-      "normal": "Normal",
+      "routine": "Routine",
       "urgent": "Urgent",
-      "emergency": "Emergency"
+      "critical": "Critical"
     },
     "availability": {
       "available": "Available",
-      "unavailable": "Unavailable"
+      "unavailable": "Unavailable",
+      "available_now": "Available now",
+      "currently_unavailable": "Currently unavailable"
+    },
+    "status": {
+      "pending": "Pending",
+      "in_review": "In Review",
+      "info_requested": "Info Requested",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     }
   },
   "validation": {
@@ -462,7 +446,6 @@
     "dashboard_title": "Admin Dashboard",
     "welcome": "Welcome, Admin",
     "admin_user": "Administrator",
-    "quick_actions": "Quick Actions",
     "sign_out": "Sign Out",
     "sign_out_title": "Sign Out",
     "sign_out_message": "Are you sure you want to sign out?",
@@ -481,13 +464,10 @@
       "section_basic": "Basic Information",
       "section_professional": "Professional Details",
       "section_consultation": "Consultation Settings",
-      "field_full_name": "Full Name",
       "field_full_name_hint": "e.g., Dr. Maria Ionescu",
-      "field_email": "Email Address",
       "field_email_hint": "doctor@example.com",
       "field_password": "Initial Password",
       "field_password_hint": "Minimum 6 characters",
-      "field_phone": "Phone Number",
       "field_phone_hint": "+40 7XX XXX XXX",
       "field_specialty": "Primary Specialty",
       "field_specialty_hint": "Select specialty",
@@ -532,7 +512,6 @@
     "system_settings": {
       "title": "System Settings",
       "subtitle": "Configure application settings",
-      "coming_soon_title": "Coming Soon",
       "coming_soon_description": "System settings and configuration features are currently under development.",
       "planned_features": "Planned Features",
       "feature_app_config": "Application configuration options",
@@ -545,23 +524,14 @@
     "stats": {
       "patients": "Patients",
       "doctors": "Doctors",
-      "consultations": "Consultations",
-      "pending": "Pending"
+      "consultations": "Consultations"
     },
     "doctors": {
       "search_hint": "Search by name, email, or specialty",
-      "filter_all": "All",
-      "filter_available": "Available",
-      "filter_unavailable": "Unavailable",
       "results_count": "{count} doctors found",
       "empty_title": "No doctors found",
       "empty_subtitle": "Try adjusting your search or filters.",
       "error_loading": "Failed to load doctors. Please try again.",
-      "available": "Available",
-      "unavailable": "Unavailable",
-      "years": "years",
-      "edit": "Edit",
-      "delete": "Delete",
       "delete_title": "Delete Doctor",
       "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
       "delete_success": "Doctor deleted successfully",
@@ -576,7 +546,6 @@
       "profile_complete": "Profile complete",
       "profile_incomplete": "Profile incomplete",
       "joined": "Joined",
-      "delete": "Delete",
       "delete_title": "Delete User",
       "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
       "delete_success": "User deleted successfully",
@@ -585,10 +554,8 @@
   },
   "doctor": {
     "navigation": {
-      "home": "Home",
       "requests": "Requests",
-      "calendar": "Calendar",
-      "account": "Account"
+      "calendar": "Calendar"
     },
     "home": {
       "welcome": "Welcome, {name}",
@@ -600,12 +567,6 @@
       "now_unavailable": "You are now unavailable for consultations",
       "availability_error": "Failed to update availability. Please try again.",
       "stats_title": "Your Statistics",
-      "stats": {
-        "total": "Total",
-        "pending": "Pending",
-        "in_review": "In Review",
-        "completed": "Completed"
-      },
       "recent_requests": "Recent Requests",
       "no_requests": "No pending requests",
       "no_requests_desc": "New consultation requests will appear here when patients submit them.",
@@ -613,15 +574,12 @@
     },
     "requests": {
       "title": "Consultation Requests",
-      "coming_soon": "Coming Soon",
       "coming_soon_desc": "The consultation requests feature is being developed and will be available soon.",
       "empty_title": "No requests yet",
       "empty_subtitle": "New consultation requests will appear here once patients submit them.",
       "patient_unknown": "Patient",
       "segments": {
-        "new": "New",
-        "in_progress": "In Progress",
-        "completed": "Completed"
+        "new": "New"
       },
       "empty": {
         "new_title": "No new requests",
@@ -639,25 +597,6 @@
       },
       "filter_title": "Filter Requests",
       "filter_status": "By status",
-      "filters": {
-        "all": "All",
-        "pending": "Pending",
-        "in_review": "In Review",
-        "info_requested": "Info Requested",
-        "completed": "Completed"
-      },
-      "status": {
-        "pending": "Pending",
-        "in_review": "In Review",
-        "info_requested": "Info Requested",
-        "completed": "Completed",
-        "cancelled": "Cancelled"
-      },
-      "urgency": {
-        "normal": "Routine",
-        "urgent": "Urgent",
-        "emergency": "Critical"
-      },
       "detail": {
         "title": "Request Details",
         "request_details": "Request Information",
@@ -678,10 +617,7 @@
         "start_review": "Start Review",
         "request_more_info": "Request More Info",
         "write_response": "Write Response",
-        "status_updated": "Status updated",
-        "urgency_normal": "Routine",
-        "urgency_urgent": "Urgent",
-        "urgency_emergency": "Critical"
+        "status_updated": "Status updated"
       }
     },
     "response_form": {
@@ -720,7 +656,6 @@
     },
     "calendar": {
       "title": "Calendar",
-      "coming_soon": "Coming Soon",
       "coming_soon_desc": "The calendar and scheduling feature is being developed and will be available soon.",
       "view_label": "View",
       "view_month": "Month",
@@ -731,20 +666,10 @@
       "vacation_badge": "Vacation"
     },
     "account": {
-      "profile_details": "Profile Details",
-      "quick_actions": "Quick Actions",
-      "specialty": "Specialty",
-      "experience": "Experience",
-      "years": "{years} years",
-      "languages": "Languages",
       "price": "Consultation Price",
-      "available": "Available",
-      "unavailable": "Unavailable",
-      "edit_profile": "Edit Profile",
       "edit_profile_desc": "Update your professional information",
       "manage_availability": "Manage Availability",
-      "manage_availability_desc": "Set vacation periods and availability",
-      "coming_soon": "Feature coming soon"
+      "manage_availability_desc": "Set vacation periods and availability"
     },
     "profile_edit": {
       "title": "Edit Profile",

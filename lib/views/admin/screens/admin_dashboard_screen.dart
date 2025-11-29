@@ -168,7 +168,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Quick Actions Section
-                _buildSectionHeader(context, 'admin.quick_actions'.tr()),
+                _buildSectionHeader(context, 'common.quick_actions'.tr()),
                 const SizedBox(height: AppTheme.spacing16),
 
                 // Management Cards
@@ -278,7 +278,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               child: StatCard(
                 icon: Icons.pending_outlined,
                 value: '${_stats?['pendingConsultations'] ?? 0}',
-                label: 'admin.stats.pending'.tr(),
+                label: 'common.status.pending'.tr(),
                 color: semantic.warning,
               ),
             ),

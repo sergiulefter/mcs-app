@@ -118,7 +118,7 @@ class HelpCenterScreen extends StatelessWidget {
                   title: 'help_center.contact_chat'.tr(),
                   description: 'help_center.contact_chat_desc'.tr(),
                   color: Theme.of(context).colorScheme.secondary,
-                  onTap: () => _showSnack(context, 'help_center.coming_soon'.tr()),
+                  onTap: () => _showSnack(context, 'common.coming_soon'.tr()),
                 ),
               ),
             ],

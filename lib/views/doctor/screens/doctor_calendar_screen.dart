@@ -165,11 +165,11 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
 
   Widget _buildStatusFilters(BuildContext context) {
     final filters = <String, String>{
-      'all': 'doctor.requests.filters.all'.tr(),
-      'pending': 'doctor.requests.filters.pending'.tr(),
-      'in_review': 'doctor.requests.filters.in_review'.tr(),
-      'info_requested': 'doctor.requests.filters.info_requested'.tr(),
-      'completed': 'doctor.requests.filters.completed'.tr(),
+      'all': 'common.all'.tr(),
+      'pending': 'common.status.pending'.tr(),
+      'in_review': 'common.status.in_review'.tr(),
+      'info_requested': 'common.status.info_requested'.tr(),
+      'completed': 'common.status.completed'.tr(),
     };
 
     return SingleChildScrollView(

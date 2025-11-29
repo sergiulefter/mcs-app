@@ -57,13 +57,13 @@ class AccountScreen extends StatelessWidget {
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Profile Details Section
-              SectionHeader(title: 'account.profile_details'.tr()),
+              SectionHeader(title: 'common.profile_details'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildProfileDetailsCard(context, user),
               const SizedBox(height: AppTheme.sectionSpacing),
 
               // Quick Actions Section
-              SectionHeader(title: 'account.quick_actions'.tr()),
+              SectionHeader(title: 'common.quick_actions'.tr()),
               const SizedBox(height: AppTheme.spacing16),
               _buildQuickActionsCard(context),
               const SizedBox(height: AppTheme.sectionSpacing),
@@ -121,7 +121,7 @@ class AccountScreen extends StatelessWidget {
         ),
         ProfileDetailRow(
           icon: Icons.phone_outlined,
-          label: 'account.phone'.tr(),
+          label: 'common.phone'.tr(),
           value: user.phone ?? notProvidedText,
           notProvidedText: notProvidedText,
         ),

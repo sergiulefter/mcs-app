@@ -292,23 +292,23 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
           children: [
             ProfileDetailRow(
               icon: Icons.person_outlined,
-              label: 'auth.full_name'.tr(),
+              label: 'common.full_name'.tr(),
               value: _doctor!.fullName,
             ),
             ProfileDetailRow(
               icon: Icons.email_outlined,
-              label: 'auth.email'.tr(),
+              label: 'common.email'.tr(),
               value: _doctor!.email,
             ),
             ProfileDetailRow(
               icon: Icons.medical_services_outlined,
-              label: 'doctor.account.specialty'.tr(),
+              label: 'common.specialty'.tr(),
               value: _doctor!.specialty.name,
             ),
             ProfileDetailRow(
               icon: Icons.work_history_outlined,
-              label: 'doctor.account.experience'.tr(),
-              value: 'doctor.account.years'.tr(
+              label: 'common.experience'.tr(),
+              value: 'common.years_format'.tr(
                 namedArgs: {'years': _doctor!.experienceYears.toString()},
               ),
             ),

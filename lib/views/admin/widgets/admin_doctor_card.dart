@@ -84,8 +84,8 @@ class AdminDoctorCard extends StatelessWidget {
                   ),
                   child: Text(
                     doctor.isCurrentlyAvailable
-                        ? 'admin.doctors.available'.tr()
-                        : 'admin.doctors.unavailable'.tr(),
+                        ? 'common.availability.available'.tr()
+                        : 'common.availability.unavailable'.tr(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: doctor.isCurrentlyAvailable
                               ? colorScheme.secondary
@@ -109,7 +109,7 @@ class AdminDoctorCard extends StatelessWidget {
                 _buildInfoChip(
                   context,
                   icon: Icons.work_outline,
-                  label: '${doctor.experienceYears} ${'admin.doctors.years'.tr()}',
+                  label: '${doctor.experienceYears} ${'common.years'.tr()}',
                 ),
               ],
             ),

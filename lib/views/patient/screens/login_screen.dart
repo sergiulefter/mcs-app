@@ -187,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildEmailField() {
     return AppTextField(
-      label: 'auth.email'.tr(),
+      label: 'common.email'.tr(),
       hintText: 'auth.email_hint'.tr(),
       controller: _emailController,
       prefixIcon: Icons.email_outlined,

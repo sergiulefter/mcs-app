@@ -36,7 +36,7 @@ class DoctorRequestsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: AppTheme.spacing24),
                 Text(
-                  'doctor.requests.coming_soon'.tr(),
+                  'common.coming_soon'.tr(),
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

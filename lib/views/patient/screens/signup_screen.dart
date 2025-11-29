@@ -103,7 +103,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 // Signup Form
                 AppTextField(
-                  label: 'auth.full_name'.tr(),
+                  label: 'common.full_name'.tr(),
                   hintText: 'auth.name_hint'.tr(),
                   controller: _nameController,
                   prefixIcon: Icons.person_outlined,
@@ -115,7 +115,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: AppTheme.spacing16),
 
                 AppTextField(
-                  label: 'auth.email'.tr(),
+                  label: 'common.email'.tr(),
                   hintText: 'auth.email_hint'.tr(),
                   controller: _emailController,
                   prefixIcon: Icons.email_outlined,

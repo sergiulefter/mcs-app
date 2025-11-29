@@ -55,13 +55,13 @@ class ConsultationSegmentFilter extends StatelessWidget {
                   _buildSegment(
                     context,
                     key: 'completed',
-                    label: 'consultations.segments.completed'.tr(),
+                    label: 'common.status.completed'.tr(),
                   ),
                   const SizedBox(width: 6),
                   _buildSegment(
                     context,
                     key: 'all',
-                    label: 'consultations.segments.all'.tr(),
+                    label: 'common.all'.tr(),
                   ),
                 ],
               ),

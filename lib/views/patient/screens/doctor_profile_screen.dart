@@ -128,8 +128,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     ? Theme.of(context).colorScheme.secondary
                     : Theme.of(context).colorScheme.onSurfaceVariant,
                 label: doctor.isCurrentlyAvailable
-                    ? 'doctor_profile.available_now'.tr()
-                    : 'doctor_profile.unavailable'.tr(),
+                    ? 'common.availability.available_now'.tr()
+                    : 'common.availability.currently_unavailable'.tr(),
               ),
             ],
           ),
@@ -151,7 +151,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           Expanded(
             child: _InfoColumn(
               icon: Icons.language,
-              label: 'doctor_profile.languages'.tr(),
+              label: 'common.languages'.tr(),
               value: doctor.languagesLabel,
             ),
           ),
@@ -175,8 +175,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           Expanded(
             child: _InfoColumn(
               icon: Icons.badge_outlined,
-              label: 'doctor_profile.experience'.tr(),
-              value: 'doctor_profile.years'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
+              label: 'common.experience'.tr(),
+              value: 'common.years_format'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
             ),
           ),
         ],
@@ -396,8 +396,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   const SizedBox(width: AppTheme.spacing12),
                   Text(
                     doctor.isCurrentlyAvailable
-                        ? 'doctor_profile.available_now'.tr()
-                        : 'doctor_profile.unavailable'.tr(),
+                        ? 'common.availability.available_now'.tr()
+                        : 'common.availability.currently_unavailable'.tr(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),

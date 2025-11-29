@@ -52,15 +52,15 @@ class StatusChip extends StatelessWidget {
   String _statusLabel(String status) {
     switch (status) {
       case 'pending':
-        return 'doctor.requests.status.pending'.tr();
+        return 'common.status.pending'.tr();
       case 'in_review':
-        return 'doctor.requests.status.in_review'.tr();
+        return 'common.status.in_review'.tr();
       case 'info_requested':
-        return 'doctor.requests.status.info_requested'.tr();
+        return 'common.status.info_requested'.tr();
       case 'completed':
-        return 'doctor.requests.status.completed'.tr();
+        return 'common.status.completed'.tr();
       case 'cancelled':
-        return 'doctor.requests.status.cancelled'.tr();
+        return 'common.status.cancelled'.tr();
       default:
         return status;
     }

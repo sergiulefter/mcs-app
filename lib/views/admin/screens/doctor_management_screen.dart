@@ -208,19 +208,19 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
             child: Row(
               children: [
                 ThemedFilterChip(
-                  label: 'admin.doctors.filter_all'.tr(),
+                  label: 'common.all'.tr(),
                   selected: _selectedFilter == 'all',
                   onSelected: (_) => setState(() => _selectedFilter = 'all'),
                 ),
                 const SizedBox(width: AppTheme.spacing8),
                 ThemedFilterChip(
-                  label: 'admin.doctors.filter_available'.tr(),
+                  label: 'common.availability.available'.tr(),
                   selected: _selectedFilter == 'available',
                   onSelected: (_) => setState(() => _selectedFilter = 'available'),
                 ),
                 const SizedBox(width: AppTheme.spacing8),
                 ThemedFilterChip(
-                  label: 'admin.doctors.filter_unavailable'.tr(),
+                  label: 'common.availability.unavailable'.tr(),
                   selected: _selectedFilter == 'unavailable',
                   onSelected: (_) => setState(() => _selectedFilter = 'unavailable'),
                 ),

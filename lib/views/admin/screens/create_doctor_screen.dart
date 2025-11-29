@@ -533,7 +533,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       children: [
         // Full Name
         AppTextField(
-          label: 'admin.create_doctor.field_full_name'.tr(),
+          label: 'common.full_name'.tr(),
           hintText: 'admin.create_doctor.field_full_name_hint'.tr(),
           controller: _fullNameController,
           prefixIcon: Icons.person_outlined,
@@ -547,7 +547,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
         if (!_isEditMode) ...[
           const SizedBox(height: AppTheme.spacing16),
           AppTextField(
-            label: 'admin.create_doctor.field_email'.tr(),
+            label: 'common.email'.tr(),
             hintText: 'admin.create_doctor.field_email_hint'.tr(),
             controller: _emailController,
             prefixIcon: Icons.email_outlined,
@@ -587,7 +587,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'admin.create_doctor.field_email'.tr(),
+                        'common.email'.tr(),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: Theme.of(context).hintColor,
                             ),

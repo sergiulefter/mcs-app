@@ -437,7 +437,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         _buildUrgencyOption(
           value: 'normal',
           icon: Icons.schedule,
-          title: 'common.urgency.normal'.tr(),
+          title: 'common.urgency.routine'.tr(),
           description: 'create_request.urgency.normal_desc'.tr(),
           color: Theme.of(context).colorScheme.primary,
         ),
@@ -454,7 +454,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         _buildUrgencyOption(
           value: 'emergency',
           icon: Icons.emergency,
-          title: 'common.urgency.emergency'.tr(),
+          title: 'common.urgency.critical'.tr(),
           description: 'create_request.urgency.emergency_desc'.tr(),
           color:
               semanticColors?.error ?? Theme.of(context).colorScheme.error,
@@ -800,11 +800,11 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       case 'emergency':
         badgeColor =
             semanticColors?.error ?? Theme.of(context).colorScheme.error;
-        badgeText = 'common.urgency.emergency'.tr();
+        badgeText = 'common.urgency.critical'.tr();
         break;
       default:
         badgeColor = Theme.of(context).colorScheme.primary;
-        badgeText = 'common.urgency.normal'.tr();
+        badgeText = 'common.urgency.routine'.tr();
     }
 
     return Container(

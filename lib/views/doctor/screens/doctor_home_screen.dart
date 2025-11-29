@@ -260,7 +260,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               width: cardWidth,
               child: StatCard(
                 value: '$total',
-                label: 'doctor.home.stats.total'.tr(),
+                label: 'common.total'.tr(),
                 icon: Icons.assignment_outlined,
                 color: colorScheme.primary,
               ),
@@ -270,7 +270,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               width: cardWidth,
               child: StatCard(
                 value: '$pending',
-                label: 'doctor.home.stats.pending'.tr(),
+                label: 'common.status.pending'.tr(),
                 icon: Icons.pending_actions_outlined,
                 color: semantic.warning,
               ),
@@ -280,7 +280,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               width: cardWidth,
               child: StatCard(
                 value: '$completed',
-                label: 'doctor.home.stats.completed'.tr(),
+                label: 'common.status.completed'.tr(),
                 icon: Icons.task_alt_outlined,
                 color: colorScheme.secondary,
               ),
