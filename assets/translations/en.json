@@ -618,6 +618,27 @@
       "empty_title": "No requests yet",
       "empty_subtitle": "New consultation requests will appear here once patients submit them.",
       "patient_unknown": "Patient",
+      "segments": {
+        "new": "New",
+        "in_progress": "In Progress",
+        "completed": "Completed"
+      },
+      "empty": {
+        "new_title": "No new requests",
+        "new_subtitle": "New consultation requests from patients will appear here.",
+        "in_progress_title": "No requests in progress",
+        "in_progress_subtitle": "Requests you're actively reviewing will appear here.",
+        "completed_title": "No completed requests",
+        "completed_subtitle": "Your completed consultations will appear here."
+      },
+      "actions": {
+        "new_request": "New request",
+        "awaiting_patient": "Awaiting patient response",
+        "in_review": "In your review",
+        "response_sent": "Response sent"
+      },
+      "filter_title": "Filter Requests",
+      "filter_status": "By status",
       "filters": {
         "all": "All",
         "pending": "Pending",

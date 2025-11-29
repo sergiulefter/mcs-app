@@ -17,6 +17,7 @@ class DoctorConsultationsController extends ChangeNotifier {
 
   bool _isLoading = false;
   bool _hasPrimed = false;
+  String _selectedSegment = 'new';
   String _selectedStatus = 'all';
   String? _error;
   String? _doctorId;
@@ -24,8 +25,51 @@ class DoctorConsultationsController extends ChangeNotifier {
   List<ConsultationModel> get consultations => List.unmodifiable(_consultations);
   bool get isLoading => _isLoading;
   bool get hasPrimed => _hasPrimed;
+  String get selectedSegment => _selectedSegment;
   String get selectedStatus => _selectedStatus;
   String? get error => _error;
+
+  /// Get consultations filtered by segment (New, In Progress, Completed)
+  List<ConsultationModel> get segmentFilteredConsultations {
+    List<ConsultationModel> segmentFiltered;
+
+    switch (_selectedSegment) {
+      case 'new':
+        segmentFiltered =
+            consultations.where((c) => c.status == 'pending').toList();
+        break;
+      case 'in_progress':
+        segmentFiltered = consultations
+            .where((c) => c.status == 'in_review' || c.status == 'info_requested')
+            .toList();
+        break;
+      case 'completed':
+        segmentFiltered = consultations
+            .where((c) => c.status == 'completed' || c.status == 'cancelled')
+            .toList();
+        break;
+      default:
+        segmentFiltered = consultations;
+    }
+
+    // Apply additional status filter if not 'all'
+    if (_selectedStatus != 'all') {
+      segmentFiltered =
+          segmentFiltered.where((c) => c.status == _selectedStatus).toList();
+    }
+
+    return segmentFiltered;
+  }
+
+  /// Counts for segment badges
+  int get newCount =>
+      consultations.where((c) => c.status == 'pending').length;
+  int get inProgressCount => consultations
+      .where((c) => c.status == 'in_review' || c.status == 'info_requested')
+      .length;
+  int get completedCount => consultations
+      .where((c) => c.status == 'completed' || c.status == 'cancelled')
+      .length;
 
   List<ConsultationModel> get filteredConsultations {
     if (_selectedStatus == 'all') return consultations;
@@ -76,6 +120,11 @@ class DoctorConsultationsController extends ChangeNotifier {
   Future<void> refresh() async {
     if (_doctorId == null) return;
     await primeForDoctor(_doctorId!, force: true);
+  }
+
+  void setSegmentFilter(String segment) {
+    _selectedSegment = segment;
+    notifyListeners();
   }
 
   void setStatusFilter(String status) {
@@ -206,6 +255,7 @@ class DoctorConsultationsController extends ChangeNotifier {
   void clear() {
     _consultations.clear();
     _patientsCache.clear();
+    _selectedSegment = 'new';
     _selectedStatus = 'all';
     _isLoading = false;
     _hasPrimed = false;

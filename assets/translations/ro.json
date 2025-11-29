@@ -618,6 +618,27 @@
       "empty_title": "Nicio cerere încă",
       "empty_subtitle": "Cererile noi de consultație vor apărea aici când pacienții le trimit.",
       "patient_unknown": "Pacient",
+      "segments": {
+        "new": "Noi",
+        "in_progress": "În Curs",
+        "completed": "Finalizate"
+      },
+      "empty": {
+        "new_title": "Nicio cerere nouă",
+        "new_subtitle": "Cererile noi de consultație de la pacienți vor apărea aici.",
+        "in_progress_title": "Nicio cerere în curs",
+        "in_progress_subtitle": "Cererile pe care le evaluezi activ vor apărea aici.",
+        "completed_title": "Nicio cerere finalizată",
+        "completed_subtitle": "Consultațiile finalizate vor apărea aici."
+      },
+      "actions": {
+        "new_request": "Cerere nouă",
+        "awaiting_patient": "Se așteaptă răspuns de la pacient",
+        "in_review": "În evaluarea ta",
+        "response_sent": "Răspuns trimis"
+      },
+      "filter_title": "Filtrează Cererile",
+      "filter_status": "După status",
       "filters": {
         "all": "Toate",
         "pending": "În așteptare",
