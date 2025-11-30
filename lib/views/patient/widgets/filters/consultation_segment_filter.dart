@@ -82,6 +82,7 @@ class ConsultationSegmentFilter extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
+                side: BorderSide(color: Theme.of(context).dividerColor),
               ),
             ),
           ],

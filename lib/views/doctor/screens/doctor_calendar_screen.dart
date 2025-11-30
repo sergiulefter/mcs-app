@@ -208,7 +208,7 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
         CalendarFormat.month: 'Month',
         CalendarFormat.week: 'Week',
       },
-      rowHeight: 72,
+      rowHeight: 64,
       startingDayOfWeek: StartingDayOfWeek.monday,
       selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
       eventLoader: (day) => eventsByDay[_dayKey(day)] ?? const [],

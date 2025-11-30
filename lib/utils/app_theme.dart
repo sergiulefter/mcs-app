@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mcs_app/utils/badge_colors.dart';
 
 /// App-wide design system following CONSISTENCY, MODERNITY, MATURITY principles
 class AppTheme {
@@ -151,6 +152,7 @@ class AppTheme {
           warning: warningOrange,
           info: infoBlue,
         ),
+        AppBadgeColors.light,
       ],
       dividerColor: dividerColor,
 
@@ -295,6 +297,7 @@ class AppTheme {
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
+        errorMaxLines: 2,
       ),
 
       // Bottom Navigation Bar Theme
@@ -505,6 +508,7 @@ class AppTheme {
           warning: warningOrangeDark,
           info: infoBlueDark,
         ),
+        AppBadgeColors.dark,
       ],
       dividerColor: dividerDark,
 
@@ -653,6 +657,7 @@ class AppTheme {
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
+        errorMaxLines: 2,
       ),
 
       // Bottom Navigation Bar Theme

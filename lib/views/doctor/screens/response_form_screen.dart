@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -21,8 +22,6 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
   final _recommendationsController = TextEditingController();
   bool _followUpNeeded = false;
   bool _isSubmitting = false;
-  static const int _responseMin = 200;
-  static const int _responseMax = 2000;
 
   @override
   void dispose() {
@@ -73,11 +72,15 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
                     if (text.isEmpty) {
                       return 'doctor.response_form.validation.required'.tr();
                     }
-                    if (text.length < _responseMin) {
-                      return 'doctor.response_form.validation.min_length'.tr();
+                    if (text.length < AppConstants.responseMinLength) {
+                      return 'doctor.response_form.validation.min_length'.tr(
+                        namedArgs: {'min': AppConstants.responseMinLength.toString()},
+                      );
                     }
-                    if (text.length > _responseMax) {
-                      return 'doctor.response_form.validation.max_length'.tr();
+                    if (text.length > AppConstants.responseMaxLength) {
+                      return 'doctor.response_form.validation.max_length'.tr(
+                        namedArgs: {'max': AppConstants.responseMaxLength.toString()},
+                      );
                     }
                     return null;
                   },
@@ -86,7 +89,7 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    '${_responseController.text.trim().length}/$_responseMax',
+                    '${_responseController.text.trim().length}/${AppConstants.responseMaxLength}',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).hintColor,
                         ),

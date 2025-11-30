@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
@@ -174,8 +175,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     if (value == null || value.trim().isEmpty) {
                       return 'validation.please_enter_full_name'.tr();
                     }
-                    if (value.trim().length < 2) {
-                      return 'validation.name_too_short'.tr();
+                    if (value.trim().length < AppConstants.nameMinLength) {
+                      return 'validation.name_too_short'.tr(
+                        namedArgs: {'min': AppConstants.nameMinLength.toString()},
+                      );
                     }
                     return null;
                   },
@@ -232,7 +235,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     if (value != null && value.trim().isNotEmpty) {
                       // Basic phone validation - at least 10 digits
                       final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
-                      if (digitsOnly.length < 10) {
+                      if (digitsOnly.length < AppConstants.phoneMinDigits) {
                         return 'validation.invalid_phone'.tr();
                       }
                     }

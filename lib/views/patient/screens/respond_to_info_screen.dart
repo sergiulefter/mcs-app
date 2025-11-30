@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -27,9 +28,6 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
   final _additionalInfoController = TextEditingController();
   final List<TextEditingController> _answerControllers = [];
   bool _isSubmitting = false;
-
-  static const int _answerMin = 10;
-  static const int _answerMax = 500;
 
   @override
   void initState() {
@@ -201,8 +199,10 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
               if (text.isEmpty) {
                 return 'info_response.validation.answer_required'.tr();
               }
-              if (text.length < _answerMin) {
-                return 'info_response.validation.answer_too_short'.tr();
+              if (text.length < AppConstants.infoAnswerMinLength) {
+                return 'info_response.validation.answer_too_short'.tr(
+                  namedArgs: {'min': AppConstants.infoAnswerMinLength.toString()},
+                );
               }
               return null;
             },
@@ -211,7 +211,7 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: Text(
-              '${_answerControllers[index].text.trim().length}/$_answerMax',
+              '${_answerControllers[index].text.trim().length}/${AppConstants.infoAnswerMaxLength}',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: Theme.of(context).hintColor,
                   ),

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -20,10 +21,6 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
   final List<TextEditingController> _questionControllers = [TextEditingController()];
   final List<FocusNode> _questionFocusNodes = [FocusNode()];
   bool _isSubmitting = false;
-  static const int _messageMin = 100;
-  static const int _messageMax = 500;
-  static const int _questionMin = 10;
-  static const int _questionMax = 200;
 
   @override
   void dispose() {
@@ -62,11 +59,15 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                     if (text.isEmpty) {
                       return 'doctor.request_more_info.validation.required'.tr();
                     }
-                    if (text.length < _messageMin) {
-                      return 'doctor.request_more_info.validation.min_length'.tr();
+                    if (text.length < AppConstants.infoMessageMinLength) {
+                      return 'doctor.request_more_info.validation.min_length'.tr(
+                        namedArgs: {'min': AppConstants.infoMessageMinLength.toString()},
+                      );
                     }
-                    if (text.length > _messageMax) {
-                      return 'doctor.request_more_info.validation.max_length'.tr();
+                    if (text.length > AppConstants.infoMessageMaxLength) {
+                      return 'doctor.request_more_info.validation.max_length'.tr(
+                        namedArgs: {'max': AppConstants.infoMessageMaxLength.toString()},
+                      );
                     }
                     return null;
                   },
@@ -75,7 +76,7 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    '${_messageController.text.trim().length}/$_messageMax',
+                    '${_messageController.text.trim().length}/${AppConstants.infoMessageMaxLength}',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).hintColor,
                         ),
@@ -114,11 +115,15 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                               if (text.isEmpty) {
                                 return 'doctor.request_more_info.validation.question_required'.tr();
                               }
-                              if (text.length < _questionMin) {
-                                return 'doctor.request_more_info.validation.question_too_short'.tr();
+                              if (text.length < AppConstants.infoQuestionMinLength) {
+                                return 'doctor.request_more_info.validation.question_too_short'.tr(
+                                  namedArgs: {'min': AppConstants.infoQuestionMinLength.toString()},
+                                );
                               }
-                              if (text.length > _questionMax) {
-                                return 'doctor.request_more_info.validation.question_too_long'.tr();
+                              if (text.length > AppConstants.infoQuestionMaxLength) {
+                                return 'doctor.request_more_info.validation.question_too_long'.tr(
+                                  namedArgs: {'max': AppConstants.infoQuestionMaxLength.toString()},
+                                );
                               }
                               return null;
                             },

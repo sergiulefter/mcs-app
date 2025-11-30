@@ -6,6 +6,7 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -459,6 +460,7 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     DateTime? startDate;
     DateTime? endDate;
     final reasonController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
     String? startDateError;
     String? endDateError;
 
@@ -467,67 +469,74 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           title: Text('doctor.availability.add_vacation'.tr()),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          content: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 AppDatePickerField(
                   label: 'doctor.availability.start_date'.tr(),
                   hintText: 'dd/MM/yyyy',
                   selectedDate: startDate,
                   onDateSelected: (date) {
-                    setDialogState(() {
-                      startDate = date;
-                      startDateError = null;
-                      // Reset end date if it's before start date
-                      if (endDate != null && endDate!.isBefore(date)) {
-                        endDate = null;
-                      }
+                      setDialogState(() {
+                        startDate = date;
+                        startDateError = null;
+                        // Reset end date if it's before start date
+                        if (endDate != null && endDate!.isBefore(date)) {
+                          endDate = null;
+                        }
                     });
                   },
                   firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                  lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
                   errorText: startDateError,
                 ),
                 const SizedBox(height: AppTheme.spacing16),
                 AppDatePickerField(
                   label: 'doctor.availability.end_date'.tr(),
-                  hintText: 'dd/MM/yyyy',
-                  selectedDate: endDate,
-                  onDateSelected: (date) {
+                    hintText: 'dd/MM/yyyy',
+                    selectedDate: endDate,
+                    onDateSelected: (date) {
                     setDialogState(() {
                       endDate = date;
                       endDateError = null;
                     });
                   },
                   firstDate: startDate ?? DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 2)),
+                  lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
                   errorText: endDateError,
                 ),
-                const SizedBox(height: AppTheme.spacing16),
-                AppTextField(
-                  label: 'doctor.availability.reason'.tr(),
-                  hintText: 'doctor.availability.reason_hint'.tr(),
-                  controller: reasonController,
-                  prefixIcon: Icons.notes_outlined,
-                  isOptional: false,
-                  textCapitalization: TextCapitalization.sentences,
-                  validator: (value) {
-                    final text = value?.trim() ?? '';
-                    if (text.isEmpty) {
-                      return 'doctor.availability.validation.reason_required'.tr();
-                    }
-                    if (text.length < 3) {
-                      return 'doctor.availability.validation.reason_too_short'.tr();
-                    }
-                    if (text.length > 120) {
-                      return 'doctor.availability.validation.reason_too_long'.tr();
-                    }
-                    return null;
-                  },
-                ),
-              ],
+                  const SizedBox(height: AppTheme.spacing16),
+                  AppTextField(
+                    label: 'doctor.availability.reason'.tr(),
+                    hintText: 'doctor.availability.reason_hint'.tr(),
+                    controller: reasonController,
+                    prefixIcon: Icons.notes_outlined,
+                    isOptional: false,
+                    textCapitalization: TextCapitalization.sentences,
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'doctor.availability.validation.reason_required'.tr();
+                      }
+                      if (text.length < AppConstants.availabilityReasonMinLength) {
+                        return 'doctor.availability.validation.reason_too_short'.tr(
+                          namedArgs: {'min': AppConstants.availabilityReasonMinLength.toString()},
+                        );
+                      }
+                      if (text.length > AppConstants.availabilityReasonMaxLength) {
+                        return 'doctor.availability.validation.reason_too_long'.tr(
+                          namedArgs: {'max': AppConstants.availabilityReasonMaxLength.toString()},
+                        );
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -537,38 +546,39 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Validate
-                bool isValid = true;
+                // Validate dates manually (not part of Form)
+                bool datesValid = true;
 
                 if (startDate == null) {
                   setDialogState(() {
                     startDateError = 'doctor.availability.validation.start_date_required'.tr();
                   });
-                  isValid = false;
+                  datesValid = false;
                 }
 
                 if (endDate == null) {
                   setDialogState(() {
                     endDateError = 'doctor.availability.validation.end_date_required'.tr();
                   });
-                  isValid = false;
+                  datesValid = false;
                 }
 
                 if (startDate != null && endDate != null && endDate!.isBefore(startDate!)) {
                   setDialogState(() {
                     endDateError = 'doctor.availability.validation.end_before_start'.tr();
                   });
-                  isValid = false;
+                  datesValid = false;
                 }
 
-                if (!isValid) return;
+                // Validate form (reason field)
+                final formValid = formKey.currentState!.validate();
+
+                if (!datesValid || !formValid) return;
 
                 final vacation = DateRange(
                   startDate: startDate!,
                   endDate: endDate!,
-                  reason: reasonController.text.trim().isNotEmpty
-                      ? reasonController.text.trim()
-                      : null,
+                  reason: reasonController.text.trim(),
                 );
 
                 Navigator.of(dialogContext).pop();

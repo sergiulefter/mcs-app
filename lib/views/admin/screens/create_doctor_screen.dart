@@ -5,6 +5,7 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
@@ -610,7 +611,9 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           const SizedBox(height: AppTheme.spacing16),
           AppTextField(
             label: 'admin.create_doctor.field_password'.tr(),
-            hintText: 'admin.create_doctor.field_password_hint'.tr(),
+            hintText: 'admin.create_doctor.field_password_hint'.tr(
+              namedArgs: {'min': AppConstants.passwordMinLength.toString()},
+            ),
             controller: _passwordController,
             prefixIcon: Icons.lock_outlined,
             suffixIcon: _obscurePassword

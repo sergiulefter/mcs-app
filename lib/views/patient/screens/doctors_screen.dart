@@ -496,12 +496,13 @@ class _SortDropdown extends StatefulWidget {
 
 class _SortDropdownState extends State<_SortDropdown> {
   bool _isOpen = false;
-  bool _isPressed = false;
   final MenuController _menuController = MenuController();
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final borderColor = Theme.of(context).dividerColor;
+    final backgroundColor = colorScheme.surfaceContainerLow;
 
     final sortOptions = [
       {'key': 'availability', 'label': 'doctors.sort.availability'.tr()},
@@ -553,10 +554,7 @@ class _SortDropdownState extends State<_SortDropdown> {
           ),
         );
       }).toList(),
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) => setState(() => _isPressed = false),
-        onTapCancel: () => setState(() => _isPressed = false),
+      child: InkWell(
         onTap: () {
           if (_menuController.isOpen) {
             _menuController.close();
@@ -564,18 +562,27 @@ class _SortDropdownState extends State<_SortDropdown> {
             _menuController.open();
           }
         },
-        child: AnimatedScale(
-          scale: _isPressed ? 0.97 : 1.0,
-          duration: const Duration(milliseconds: 100),
-          curve: Curves.easeOutCubic,
-          child: Container(
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        overlayColor: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.pressed)) {
+              return colorScheme.onSurface.withValues(alpha: 0.06);
+            }
+            if (states.contains(WidgetState.hovered) ||
+                states.contains(WidgetState.focused)) {
+              return colorScheme.onSurface.withValues(alpha: 0.03);
+            }
+            return null;
+          },
+        ),
+        child: Ink(
           padding: const EdgeInsets.symmetric(
             horizontal: AppTheme.spacing16,
             vertical: AppTheme.spacing12,
           ),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerLow,
-            border: Border.all(color: Theme.of(context).dividerColor),
+            color: backgroundColor,
+            border: Border.all(color: borderColor),
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           ),
           child: Row(
@@ -605,7 +612,6 @@ class _SortDropdownState extends State<_SortDropdown> {
             ],
           ),
         ),
-        ),
       ),
     );
   }
@@ -625,66 +631,69 @@ class _FilterButton extends StatefulWidget {
 }
 
 class _FilterButtonState extends State<_FilterButton> {
-  bool _isPressed = false;
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final borderColor = widget.activeCount > 0
+        ? colorScheme.primary
+        : Theme.of(context).dividerColor;
+    final backgroundColor = widget.activeCount > 0
+        ? colorScheme.primary.withValues(alpha: 0.08)
+        : colorScheme.surfaceContainerLow;
 
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => setState(() => _isPressed = false),
-      onTapCancel: () => setState(() => _isPressed = false),
+    return InkWell(
       onTap: widget.onTap,
-      child: AnimatedScale(
-        scale: _isPressed ? 0.97 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOutCubic,
-        child: Container(
-          padding: const EdgeInsets.all(AppTheme.spacing12),
-          decoration: BoxDecoration(
-            border: Border.all(
+      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      overlayColor: WidgetStateProperty.resolveWith(
+        (states) {
+          if (states.contains(WidgetState.pressed)) {
+            return colorScheme.onSurface.withValues(alpha: 0.06);
+          }
+          if (states.contains(WidgetState.hovered) ||
+              states.contains(WidgetState.focused)) {
+            return colorScheme.onSurface.withValues(alpha: 0.03);
+          }
+          return null;
+        },
+      ),
+      child: Ink(
+        decoration: BoxDecoration(
+          border: Border.all(color: borderColor),
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          color: backgroundColor,
+        ),
+        padding: const EdgeInsets.all(AppTheme.spacing12),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.tune,
+              size: 20,
               color: widget.activeCount > 0
                   ? colorScheme.primary
-                  : Theme.of(context).dividerColor,
+                  : colorScheme.onSurfaceVariant,
             ),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            color: widget.activeCount > 0
-                ? colorScheme.primary.withValues(alpha: 0.08)
-                : colorScheme.surfaceContainerLow,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.tune,
-                size: 20,
-                color: widget.activeCount > 0
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-              ),
-              if (widget.activeCount > 0) ...[
-                const SizedBox(width: AppTheme.spacing4),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    widget.activeCount.toString(),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
+            if (widget.activeCount > 0) ...[
+              const SizedBox(width: AppTheme.spacing4),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 2,
                 ),
-              ],
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  widget.activeCount.toString(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+              ),
             ],
-          ),
+          ],
         ),
       ),
     );

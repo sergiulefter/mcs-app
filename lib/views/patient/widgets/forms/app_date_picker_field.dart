@@ -133,9 +133,14 @@ class AppDatePickerField extends StatelessWidget {
     final now = DateTime.now();
     final effectiveFirstDate = firstDate ?? DateTime(1900);
     final effectiveLastDate = lastDate ?? now;
-    final effectiveInitialDate = initialDate ??
-        selectedDate ??
-        effectiveLastDate;
+    DateTime initialFallback = now;
+    if (initialFallback.isBefore(effectiveFirstDate)) {
+      initialFallback = effectiveFirstDate;
+    } else if (initialFallback.isAfter(effectiveLastDate)) {
+      initialFallback = effectiveLastDate;
+    }
+    final effectiveInitialDate =
+        initialDate ?? selectedDate ?? initialFallback;
 
     final picked = await showDatePicker(
       context: context,

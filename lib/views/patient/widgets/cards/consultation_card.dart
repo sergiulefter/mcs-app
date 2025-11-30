@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/doctor/widgets/urgency_badge.dart';
+import 'package:mcs_app/views/shared/widgets/status_badge.dart';
+import 'package:mcs_app/views/shared/widgets/urgency_badge.dart';
 
 class ConsultationCard extends StatefulWidget {
   final ConsultationModel consultation;
@@ -90,38 +91,12 @@ class _ConsultationCardState extends State<ConsultationCard> {
     return Row(
       children: [
         // Status badge
-        _buildStatusBadge(context, consultation),
+        StatusBadge(status: consultation.status),
 
-        // Urgency badge (only for priority)
-        if (consultation.urgency == 'priority') ...[
-          const SizedBox(width: AppTheme.spacing8),
-          UrgencyBadge(urgency: consultation.urgency),
-        ],
+        // Urgency badge (only shows for priority)
+        const SizedBox(width: AppTheme.spacing8),
+        UrgencyBadge(urgency: consultation.urgency),
       ],
-    );
-  }
-
-  Widget _buildStatusBadge(
-      BuildContext context, ConsultationModel consultation) {
-    final badgeColor = consultation.getStatusColor(context);
-    final statusText = 'common.status.${consultation.status}'.tr();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
-      ),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-      ),
-      child: Text(
-        statusText,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: badgeColor,
-              fontWeight: FontWeight.w700,
-            ),
-      ),
     );
   }
 

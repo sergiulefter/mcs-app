@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
+import '../utils/constants.dart';
 
 class AuthController extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -281,23 +283,23 @@ class AuthController extends ChangeNotifier {
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':
-        return 'The password provided is too weak.';
+        return 'errors.auth.weak_password'.tr(
+          namedArgs: {'min': AppConstants.passwordMinLength.toString()},
+        );
       case 'email-already-in-use':
-        return 'An account already exists for this email.';
+        return 'errors.auth.email_in_use'.tr();
       case 'user-not-found':
-        return 'No user found for this email.';
       case 'wrong-password':
-        return 'Wrong password provided.';
+      case 'invalid-credential':
+        return 'errors.auth.invalid_credentials'.tr();
       case 'invalid-email':
-        return 'The email address is not valid.';
+        return 'errors.auth.invalid_email'.tr();
       case 'user-disabled':
-        return 'This user account has been disabled.';
+        return 'errors.auth.account_disabled'.tr();
       case 'too-many-requests':
-        return 'Too many requests. Please try again later.';
-      case 'operation-not-allowed':
-        return 'This operation is not allowed.';
+        return 'errors.auth.too_many_attempts'.tr();
       default:
-        return 'An error occurred: ${e.message}';
+        return 'errors.auth.generic'.tr();
     }
   }
 }

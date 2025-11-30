@@ -247,7 +247,14 @@
     "info_request": {
       "title": "Information Requested",
       "pending_response": "The doctor needs more information from you",
-      "respond_button": "Respond to Doctor"
+      "respond_button": "Respond to Doctor",
+      "history_title": "Questions & Answers",
+      "doctor_asked": "Doctor asked",
+      "your_response": "Your response",
+      "question_label": "Question {number}",
+      "your_answer": "Your Answer",
+      "additional_info": "Additional Information",
+      "responded_on": "Responded on {date}"
     },
     "cancel_request": "Cancel Request",
     "cancel_dialog_title": "Cancel Consultation Request?",
@@ -273,7 +280,7 @@
     "error": "Failed to send response. Please try again.",
     "validation": {
       "answer_required": "Please provide an answer",
-      "answer_too_short": "Answer must be at least 10 characters"
+      "answer_too_short": "Answer must be at least {min} characters"
     }
   },
   "create_request": {
@@ -310,8 +317,8 @@
       "priority_fee": "+{fee} RON"
     },
     "validation": {
-      "title_too_short": "Title must be at least 10 characters",
-      "description_too_short": "Description must be at least 50 characters",
+      "title_too_short": "Title must be at least {min} characters",
+      "description_too_short": "Description must be at least {min} characters",
       "accept_terms": "You must accept the terms and conditions"
     }
   },
@@ -443,20 +450,40 @@
   },
   "validation": {
     "required_field": "This field is required",
+    "email_required": "Email is required",
     "invalid_email": "Please enter a valid email address",
-    "password_too_short": "Password must be at least 6 characters",
+    "password_required": "Password is required",
+    "password_too_short": "Password must be at least {min} characters",
+    "confirm_password_required": "Please confirm your password",
     "passwords_not_match": "Passwords do not match",
-    "name_too_short": "Name must be at least 2 characters",
+    "name_required": "Name is required",
+    "name_too_short": "Name must be at least {min} characters",
     "invalid_phone": "Please enter a valid phone number",
     "select_date_of_birth": "Please select your date of birth",
     "select_sex": "Please select your biological sex",
-    "please_enter_full_name": "Please enter your full name"
+    "please_enter_full_name": "Please enter your full name",
+    "experience_required": "Years of experience is required",
+    "experience_range": "Experience must be between {min} and {max} years",
+    "invalid_number": "Please enter a valid number",
+    "price_required": "Consultation price is required",
+    "invalid_price": "Please enter a valid price",
+    "price_positive": "Price must be greater than 0",
+    "price_max": "Price cannot exceed {max} RON"
   },
   "errors": {
     "signup_failed": "Signup failed",
     "login_failed": "Login failed",
     "profile_save_failed": "Failed to save profile",
-    "unknown_error": "An unknown error occurred"
+    "unknown_error": "An unknown error occurred",
+    "auth": {
+      "weak_password": "Password is too weak. Use at least {min} characters.",
+      "email_in_use": "This email is already registered",
+      "invalid_credentials": "Incorrect email or password",
+      "invalid_email": "Please enter a valid email address",
+      "account_disabled": "This account has been disabled",
+      "too_many_attempts": "Too many attempts. Please try again later.",
+      "generic": "Sign in failed. Please try again."
+    }
   },
   "languages": {
     "RO": "Romanian",
@@ -491,7 +518,7 @@
       "field_full_name_hint": "e.g., Dr. Maria Ionescu",
       "field_email_hint": "doctor@example.com",
       "field_password": "Initial Password",
-      "field_password_hint": "Minimum 6 characters",
+      "field_password_hint": "Minimum {min} characters",
       "field_phone_hint": "+40 7XX XXX XXX",
       "field_specialty": "Primary Specialty",
       "field_specialty_hint": "Select specialty",
@@ -641,7 +668,20 @@
         "start_review": "Start Review",
         "request_more_info": "Request More Info",
         "write_response": "Write Response",
-        "status_updated": "Status updated"
+        "status_updated": "Status updated",
+        "info_request_card": {
+          "your_questions": "Your Questions",
+          "asked_on": "Asked on {date}",
+          "answered": "Answered",
+          "pending": "Pending",
+          "message_label": "Message to patient",
+          "question_label": "Question {number}",
+          "answer_label": "Patient's Answer",
+          "no_answer": "No answer provided",
+          "additional_info_label": "Additional Information from Patient",
+          "responded_on": "Patient responded on {date}",
+          "waiting_response": "Waiting for patient response"
+        }
       }
     },
     "response_form": {
@@ -657,8 +697,8 @@
       "error": "Unable to submit response. Please try again.",
       "validation": {
         "required": "Response is required",
-        "min_length": "Response must be at least 200 characters",
-        "max_length": "Response must be under 2000 characters"
+        "min_length": "Response must be at least {min} characters",
+        "max_length": "Response must be under {max} characters"
       }
     },
     "request_more_info": {
@@ -674,11 +714,11 @@
       "error": "Unable to send request. Please try again.",
       "validation": {
         "required": "Message is required",
-        "min_length": "Message must be at least 100 characters",
-        "max_length": "Message must be under 500 characters",
+        "min_length": "Message must be at least {min} characters",
+        "max_length": "Message must be under {max} characters",
         "question_required": "Question is required",
-        "question_too_short": "Question must be at least 10 characters",
-        "question_too_long": "Question must be under 200 characters"
+        "question_too_short": "Question must be at least {min} characters",
+        "question_too_long": "Question must be under {max} characters"
       }
     },
     "calendar": {
@@ -729,8 +769,8 @@
       "profile_update_error": "Failed to update profile",
       "validation": {
         "bio_required": "Professional bio is required",
-        "bio_too_short": "Bio must be at least 50 characters",
-        "bio_too_long": "Bio must be less than 1000 characters",
+        "bio_too_short": "Bio must be at least {min} characters",
+        "bio_too_long": "Bio must be less than {max} characters",
         "languages_required": "Please select at least one language",
         "education_required": "At least one education entry is required",
         "institution_required": "Institution is required",
@@ -740,7 +780,7 @@
         "subspecialties_required": "Please select at least one subspecialty",
         "price_required": "Consultation price is required",
         "experience_required": "Experience years are required",
-        "experience_invalid": "Please enter experience between 1 and 60 years"
+        "experience_invalid": "Please enter experience between {min} and {max} years"
       }
     },
     "availability": {
@@ -770,7 +810,10 @@
       "validation": {
         "start_date_required": "Start date is required",
         "end_date_required": "End date is required",
-        "end_before_start": "End date must be after start date"
+        "end_before_start": "End date must be after start date",
+        "reason_required": "Reason is required",
+        "reason_too_short": "Reason must be at least {min} characters",
+        "reason_too_long": "Reason must be under {max} characters"
       }
     }
   }

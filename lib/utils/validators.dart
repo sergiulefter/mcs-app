@@ -1,13 +1,16 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:mcs_app/utils/constants.dart';
+
 class Validators {
   // Email validation
   static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email is required';
+      return 'validation.email_required'.tr();
     }
 
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
-      return 'Please enter a valid email';
+      return 'validation.invalid_email'.tr();
     }
 
     return null;
@@ -16,11 +19,13 @@ class Validators {
   // Password validation
   static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password is required';
+      return 'validation.password_required'.tr();
     }
 
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    if (value.length < AppConstants.passwordMinLength) {
+      return 'validation.password_too_short'.tr(
+        namedArgs: {'min': AppConstants.passwordMinLength.toString()},
+      );
     }
 
     return null;
@@ -29,11 +34,11 @@ class Validators {
   // Confirm password validation
   static String? validateConfirmPassword(String? value, String password) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password';
+      return 'validation.confirm_password_required'.tr();
     }
 
     if (value != password) {
-      return 'Passwords do not match';
+      return 'validation.passwords_not_match'.tr();
     }
 
     return null;
@@ -42,11 +47,13 @@ class Validators {
   // Name validation
   static String? validateName(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Name is required';
+      return 'validation.name_required'.tr();
     }
 
-    if (value.length < 2) {
-      return 'Name must be at least 2 characters';
+    if (value.length < AppConstants.nameMinLength) {
+      return 'validation.name_too_short'.tr(
+        namedArgs: {'min': AppConstants.nameMinLength.toString()},
+      );
     }
 
     return null;
@@ -55,7 +62,7 @@ class Validators {
   // Generic required field validation
   static String? validateRequired(String? value, String fieldName) {
     if (value == null || value.isEmpty) {
-      return '$fieldName is required';
+      return 'validation.required_field'.tr();
     }
     return null;
   }
@@ -63,16 +70,21 @@ class Validators {
   // Experience years validation (0-60 range)
   static String? validateExperienceYears(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Years of experience is required';
+      return 'validation.experience_required'.tr();
     }
 
     final years = int.tryParse(value);
     if (years == null) {
-      return 'Please enter a valid number';
+      return 'validation.invalid_number'.tr();
     }
 
-    if (years < 0 || years > 60) {
-      return 'Experience must be between 0 and 60 years';
+    if (years < AppConstants.experienceMinYears || years > AppConstants.experienceMaxYears) {
+      return 'validation.experience_range'.tr(
+        namedArgs: {
+          'min': AppConstants.experienceMinYears.toString(),
+          'max': AppConstants.experienceMaxYears.toString(),
+        },
+      );
     }
 
     return null;
@@ -81,20 +93,22 @@ class Validators {
   // Consultation price validation (positive number)
   static String? validateConsultationPrice(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Consultation price is required';
+      return 'validation.price_required'.tr();
     }
 
     final price = double.tryParse(value);
     if (price == null) {
-      return 'Please enter a valid price';
+      return 'validation.invalid_price'.tr();
     }
 
     if (price <= 0) {
-      return 'Price must be greater than 0';
+      return 'validation.price_positive'.tr();
     }
 
-    if (price > 10000) {
-      return 'Price cannot exceed 10,000 RON';
+    if (price > AppConstants.priceMax) {
+      return 'validation.price_max'.tr(
+        namedArgs: {'max': AppConstants.priceMax.toStringAsFixed(0)},
+      );
     }
 
     return null;
@@ -107,8 +121,8 @@ class Validators {
     }
 
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
-    if (digitsOnly.length < 10) {
-      return 'Phone number must have at least 10 digits';
+    if (digitsOnly.length < AppConstants.phoneMinDigits) {
+      return 'validation.invalid_phone'.tr();
     }
 
     return null;
@@ -122,11 +136,16 @@ class Validators {
 
     final years = int.tryParse(value);
     if (years == null) {
-      return 'Please enter a valid number';
+      return 'validation.invalid_number'.tr();
     }
 
-    if (years < 0 || years > 60) {
-      return 'Experience must be between 0 and 60 years';
+    if (years < AppConstants.experienceMinYears || years > AppConstants.experienceMaxYears) {
+      return 'validation.experience_range'.tr(
+        namedArgs: {
+          'min': AppConstants.experienceMinYears.toString(),
+          'max': AppConstants.experienceMaxYears.toString(),
+        },
+      );
     }
 
     return null;
@@ -140,15 +159,17 @@ class Validators {
 
     final price = double.tryParse(value);
     if (price == null) {
-      return 'Please enter a valid price';
+      return 'validation.invalid_price'.tr();
     }
 
     if (price <= 0) {
-      return 'Price must be greater than 0';
+      return 'validation.price_positive'.tr();
     }
 
-    if (price > 10000) {
-      return 'Price cannot exceed 10,000 RON';
+    if (price > AppConstants.priceMax) {
+      return 'validation.price_max'.tr(
+        namedArgs: {'max': AppConstants.priceMax.toStringAsFixed(0)},
+      );
     }
 
     return null;

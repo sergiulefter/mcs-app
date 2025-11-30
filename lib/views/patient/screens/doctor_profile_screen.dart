@@ -364,56 +364,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   }
 
   Widget _buildAvailabilitySection(BuildContext context, DoctorModel doctor) {
-    if (!doctor.isCurrentlyAvailable) {
-      // Avoid duplicating the unavailable messaging; the footer handles it.
-      return const SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'doctor_profile.availability_status'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-        SurfaceCard(
-          padding: AppTheme.cardPadding,
-          borderColor: Theme.of(context).dividerColor,
-          showShadow: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: doctor.isCurrentlyAvailable
-                          ? Theme.of(context).colorScheme.secondary
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.spacing12),
-                  Text(
-                    doctor.isCurrentlyAvailable
-                        ? 'common.availability.available_now'.tr()
-                        : 'common.availability.currently_unavailable'.tr(),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppTheme.spacing8),
-              Text(
-                'doctor_profile.accepting_consultations'.tr(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+    // Availability is already shown in the header badge and the footer handles
+    // unavailable state with vacation details, so this section is redundant.
+    return const SizedBox.shrink();
   }
 
   Widget _buildRequestButton(BuildContext context, DoctorModel doctor) {

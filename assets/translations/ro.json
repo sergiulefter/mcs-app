@@ -247,7 +247,14 @@
     "info_request": {
       "title": "Informații Solicitate",
       "pending_response": "Doctorul are nevoie de mai multe informații de la tine",
-      "respond_button": "Răspunde Doctorului"
+      "respond_button": "Răspunde Doctorului",
+      "history_title": "Întrebări și Răspunsuri",
+      "doctor_asked": "Doctorul a întrebat",
+      "your_response": "Răspunsul tău",
+      "question_label": "Întrebarea {number}",
+      "your_answer": "Răspunsul Tău",
+      "additional_info": "Informații Suplimentare",
+      "responded_on": "Răspuns pe {date}"
     },
     "cancel_request": "Anulează cererea",
     "cancel_dialog_title": "Anulezi cererea de consultație?",
@@ -273,7 +280,7 @@
     "error": "Nu s-a putut trimite răspunsul. Te rugăm să încerci din nou.",
     "validation": {
       "answer_required": "Te rugăm să furnizezi un răspuns",
-      "answer_too_short": "Răspunsul trebuie să aibă cel puțin 10 caractere"
+      "answer_too_short": "Răspunsul trebuie să aibă cel puțin {min} caractere"
     }
   },
   "create_request": {
@@ -310,8 +317,8 @@
       "priority_fee": "+{fee} RON"
     },
     "validation": {
-      "title_too_short": "Titlul trebuie să aibă cel puțin 10 caractere",
-      "description_too_short": "Descrierea trebuie să aibă cel puțin 50 de caractere",
+      "title_too_short": "Titlul trebuie să aibă cel puțin {min} caractere",
+      "description_too_short": "Descrierea trebuie să aibă cel puțin {min} de caractere",
       "accept_terms": "Trebuie să accepți termenii și condițiile"
     }
   },
@@ -443,20 +450,40 @@
   },
   "validation": {
     "required_field": "Acest câmp este obligatoriu",
+    "email_required": "Email-ul este obligatoriu",
     "invalid_email": "Te rugăm să introduci o adresă de email validă",
-    "password_too_short": "Parola trebuie să aibă cel puțin 6 caractere",
+    "password_required": "Parola este obligatorie",
+    "password_too_short": "Parola trebuie să aibă cel puțin {min} caractere",
+    "confirm_password_required": "Te rugăm să confirmi parola",
     "passwords_not_match": "Parolele nu se potrivesc",
-    "name_too_short": "Numele trebuie să aibă cel puțin 2 caractere",
+    "name_required": "Numele este obligatoriu",
+    "name_too_short": "Numele trebuie să aibă cel puțin {min} caractere",
     "invalid_phone": "Te rugăm să introduci un număr de telefon valid",
     "select_date_of_birth": "Te rugăm să selectezi data nașterii",
     "select_sex": "Te rugăm să selectezi sexul biologic",
-    "please_enter_full_name": "Te rugăm să introduci numele complet"
+    "please_enter_full_name": "Te rugăm să introduci numele complet",
+    "experience_required": "Anii de experiență sunt obligatorii",
+    "experience_range": "Experiența trebuie să fie între {min} și {max} de ani",
+    "invalid_number": "Te rugăm să introduci un număr valid",
+    "price_required": "Prețul consultației este obligatoriu",
+    "invalid_price": "Te rugăm să introduci un preț valid",
+    "price_positive": "Prețul trebuie să fie mai mare decât 0",
+    "price_max": "Prețul nu poate depăși {max} RON"
   },
   "errors": {
     "signup_failed": "Înregistrarea a eșuat",
     "login_failed": "Autentificarea a eșuat",
     "profile_save_failed": "Salvarea profilului a eșuat",
-    "unknown_error": "A apărut o eroare necunoscută"
+    "unknown_error": "A apărut o eroare necunoscută",
+    "auth": {
+      "weak_password": "Parola este prea slabă. Folosește cel puțin {min} caractere.",
+      "email_in_use": "Acest email este deja înregistrat",
+      "invalid_credentials": "Email sau parolă incorectă",
+      "invalid_email": "Te rugăm să introduci o adresă de email validă",
+      "account_disabled": "Acest cont a fost dezactivat",
+      "too_many_attempts": "Prea multe încercări. Încearcă din nou mai târziu.",
+      "generic": "Autentificarea a eșuat. Te rugăm să încerci din nou."
+    }
   },
   "languages": {
     "RO": "Română",
@@ -491,7 +518,7 @@
       "field_full_name_hint": "ex., Dr. Maria Ionescu",
       "field_email_hint": "doctor@exemplu.com",
       "field_password": "Parolă Inițială",
-      "field_password_hint": "Minim 6 caractere",
+      "field_password_hint": "Minim {min} caractere",
       "field_phone_hint": "+40 7XX XXX XXX",
       "field_specialty": "Specialitate Principală",
       "field_specialty_hint": "Selectează specialitatea",
@@ -641,7 +668,20 @@
         "start_review": "Începe evaluarea",
         "request_more_info": "Solicită mai multe informații",
         "write_response": "Scrie răspunsul",
-        "status_updated": "Status actualizat"
+        "status_updated": "Status actualizat",
+        "info_request_card": {
+          "your_questions": "Întrebările Tale",
+          "asked_on": "Întrebat pe {date}",
+          "answered": "Răspuns",
+          "pending": "În așteptare",
+          "message_label": "Mesaj către pacient",
+          "question_label": "Întrebarea {number}",
+          "answer_label": "Răspunsul Pacientului",
+          "no_answer": "Niciun răspuns furnizat",
+          "additional_info_label": "Informații Suplimentare de la Pacient",
+          "responded_on": "Pacientul a răspuns pe {date}",
+          "waiting_response": "Se așteaptă răspunsul pacientului"
+        }
       }
     },
     "response_form": {
@@ -657,8 +697,8 @@
       "error": "Trimiterea răspunsului a eșuat. Te rugăm să încerci din nou.",
       "validation": {
         "required": "Răspunsul este obligatoriu",
-        "min_length": "Răspunsul trebuie să aibă cel puțin 200 de caractere",
-        "max_length": "Răspunsul trebuie să aibă sub 2000 de caractere"
+        "min_length": "Răspunsul trebuie să aibă cel puțin {min} de caractere",
+        "max_length": "Răspunsul trebuie să aibă sub {max} de caractere"
       }
     },
     "request_more_info": {
@@ -674,11 +714,11 @@
       "error": "Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.",
       "validation": {
         "required": "Mesajul este obligatoriu",
-        "min_length": "Mesajul trebuie să aibă cel puțin 100 de caractere",
-        "max_length": "Mesajul trebuie să aibă sub 500 de caractere",
+        "min_length": "Mesajul trebuie să aibă cel puțin {min} de caractere",
+        "max_length": "Mesajul trebuie să aibă sub {max} de caractere",
         "question_required": "Întrebarea este obligatorie",
-        "question_too_short": "Întrebarea trebuie să aibă cel puțin 10 caractere",
-        "question_too_long": "Întrebarea trebuie să aibă sub 200 de caractere"
+        "question_too_short": "Întrebarea trebuie să aibă cel puțin {min} caractere",
+        "question_too_long": "Întrebarea trebuie să aibă sub {max} caractere"
       }
     },
     "calendar": {
@@ -729,8 +769,8 @@
       "profile_update_error": "Eroare la actualizarea profilului",
       "validation": {
         "bio_required": "Biografia profesională este obligatorie",
-        "bio_too_short": "Biografia trebuie să aibă cel puțin 50 de caractere",
-        "bio_too_long": "Biografia trebuie să aibă mai puțin de 1000 de caractere",
+        "bio_too_short": "Biografia trebuie să aibă cel puțin {min} de caractere",
+        "bio_too_long": "Biografia trebuie să aibă mai puțin de {max} de caractere",
         "languages_required": "Te rugăm să selectezi cel puțin o limbă",
         "education_required": "Este necesară cel puțin o înregistrare de educație",
         "institution_required": "Instituția este obligatorie",
@@ -740,7 +780,7 @@
         "subspecialties_required": "Te rugăm să selectezi cel puțin o subspecialitate",
         "price_required": "Prețul consultației este obligatoriu",
         "experience_required": "Anii de experiență sunt obligatorii",
-        "experience_invalid": "Te rugăm să introduci o experiență între 1 și 60 de ani"
+        "experience_invalid": "Te rugăm să introduci o experiență între {min} și {max} de ani"
       }
     },
     "availability": {
@@ -770,7 +810,10 @@
       "validation": {
         "start_date_required": "Data de început este obligatorie",
         "end_date_required": "Data de sfârșit este obligatorie",
-        "end_before_start": "Data de sfârșit trebuie să fie după data de început"
+        "end_before_start": "Data de sfârșit trebuie să fie după data de început",
+        "reason_required": "Motivul este obligatoriu",
+        "reason_too_short": "Motivul trebuie să aibă cel puțin {min} caractere",
+        "reason_too_long": "Motivul trebuie să aibă sub {max} caractere"
       }
     }
   }

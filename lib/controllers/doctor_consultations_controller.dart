@@ -18,7 +18,7 @@ class DoctorConsultationsController extends ChangeNotifier {
 
   bool _isLoading = false;
   bool _hasPrimed = false;
-  String _selectedSegment = 'new';
+  String _selectedSegment = 'in_progress';
   String _selectedStatus = 'all';
   String? _error;
   String? _doctorId;
@@ -257,7 +257,7 @@ class DoctorConsultationsController extends ChangeNotifier {
   void clear() {
     _consultations.clear();
     _patientsCache.clear();
-    _selectedSegment = 'new';
+    _selectedSegment = 'in_progress';
     _selectedStatus = 'all';
     _isLoading = false;
     _hasPrimed = false;

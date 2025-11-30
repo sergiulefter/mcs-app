@@ -6,6 +6,7 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
@@ -335,11 +336,15 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
             if (value == null || value.trim().isEmpty) {
               return 'doctor.profile_edit.validation.bio_required'.tr();
             }
-            if (value.trim().length < 50) {
-              return 'doctor.profile_edit.validation.bio_too_short'.tr();
+            if (value.trim().length < AppConstants.bioMinLength) {
+              return 'doctor.profile_edit.validation.bio_too_short'.tr(
+                namedArgs: {'min': AppConstants.bioMinLength.toString()},
+              );
             }
-            if (value.trim().length > 1000) {
-              return 'doctor.profile_edit.validation.bio_too_long'.tr();
+            if (value.trim().length > AppConstants.bioMaxLength) {
+              return 'doctor.profile_edit.validation.bio_too_long'.tr(
+                namedArgs: {'max': AppConstants.bioMaxLength.toString()},
+              );
             }
             return null;
           },
@@ -373,7 +378,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
             if (price == null || price <= 0) {
               return 'validation.invalid_price'.tr();
             }
-            if (price > 10000) {
+            if (price > AppConstants.priceMax) {
               return 'validation.price_too_high'.tr();
             }
             return null;
@@ -398,8 +403,13 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
               return 'doctor.profile_edit.validation.experience_required'.tr();
             }
             final years = int.tryParse(text);
-            if (years == null || years <= 0 || years > 60) {
-              return 'doctor.profile_edit.validation.experience_invalid'.tr();
+            if (years == null || years < AppConstants.experienceMinYears || years > AppConstants.experienceMaxYears) {
+              return 'doctor.profile_edit.validation.experience_invalid'.tr(
+                namedArgs: {
+                  'min': AppConstants.experienceMinYears.toString(),
+                  'max': AppConstants.experienceMaxYears.toString(),
+                },
+              );
             }
             return null;
           },

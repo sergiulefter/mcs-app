@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/doctor/widgets/urgency_badge.dart';
+import 'package:mcs_app/views/shared/widgets/status_badge.dart';
+import 'package:mcs_app/views/shared/widgets/urgency_badge.dart';
 import 'package:provider/provider.dart';
 
 /// Reusable consultation preview card for doctor flows.
@@ -98,38 +99,12 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     return Row(
       children: [
         // Status badge
-        _buildStatusBadge(context, consultation),
+        StatusBadge(status: consultation.status),
 
-        // Urgency badge (only for priority)
-        if (consultation.urgency == 'priority') ...[
-          const SizedBox(width: AppTheme.spacing8),
-          UrgencyBadge(urgency: consultation.urgency),
-        ],
+        // Urgency badge (only shows for priority)
+        const SizedBox(width: AppTheme.spacing8),
+        UrgencyBadge(urgency: consultation.urgency),
       ],
-    );
-  }
-
-  Widget _buildStatusBadge(
-      BuildContext context, ConsultationModel consultation) {
-    final badgeColor = consultation.getStatusColor(context);
-    final statusText = 'common.status.${consultation.status}'.tr();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing8,
-        vertical: 6,
-      ),
-      decoration: BoxDecoration(
-        color: badgeColor.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-      ),
-      child: Text(
-        statusText,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: badgeColor,
-              fontWeight: FontWeight.w700,
-            ),
-      ),
     );
   }
 

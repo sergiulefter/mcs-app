@@ -8,8 +8,8 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/views/patient/screens/main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
-import 'consultations_screen.dart';
 
 class CreateRequestScreen extends StatefulWidget {
   final DoctorModel doctor;
@@ -86,15 +86,19 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       _descriptionError = null;
     });
 
-    if (_title.trim().length < 10) {
+    if (_title.trim().length < AppConstants.titleMinLength) {
       setState(() {
-        _titleError = 'create_request.validation.title_too_short'.tr();
+        _titleError = 'create_request.validation.title_too_short'.tr(
+          namedArgs: {'min': AppConstants.titleMinLength.toString()},
+        );
       });
       isValid = false;
     }
-    if (_description.trim().length < 50) {
+    if (_description.trim().length < AppConstants.descriptionMinLength) {
       setState(() {
-        _descriptionError = 'create_request.validation.description_too_short'.tr();
+        _descriptionError = 'create_request.validation.description_too_short'.tr(
+          namedArgs: {'min': AppConstants.descriptionMinLength.toString()},
+        );
       });
       isValid = false;
     }
@@ -176,11 +180,12 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         // Show success and navigate
         _showSuccess('create_request.success_message'.tr());
 
-        // Navigate to consultations screen
-        Navigator.of(context).pushReplacement(
+        // Navigate to consultations tab with bottom navigation visible
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const ConsultationsScreen(),
+            builder: (context) => const MainShell(initialIndex: 2),
           ),
+          (route) => false,
         );
       }
     } catch (e) {
@@ -362,7 +367,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             ),
             const SizedBox(height: AppTheme.spacing8),
             TextField(
-              maxLength: 100,
+              maxLength: AppConstants.titleMaxLength,
               onChanged: (value) {
                 setState(() {
                   _title = value;
@@ -386,7 +391,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             ),
             const SizedBox(height: AppTheme.spacing8),
             TextField(
-              maxLength: 1000,
+              maxLength: AppConstants.descriptionMaxLength,
               maxLines: 6,
               onChanged: (value) {
                 setState(() {
@@ -672,8 +677,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                 ),
                 const SizedBox(height: AppTheme.spacing8),
                 Text(
-                  _description.length > 200
-                      ? '${_description.substring(0, 200)}...'
+                  _description.length > AppConstants.descriptionCounterThreshold
+                      ? '${_description.substring(0, AppConstants.descriptionCounterThreshold)}...'
                       : _description,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
