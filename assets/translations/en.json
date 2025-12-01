@@ -19,6 +19,22 @@
     "slide3_title": "Receive Expert Insights",
     "slide3_description": "Get detailed professional opinions to help you make informed decisions about your health"
   },
+  "consultation_guide": {
+    "title": "How Consultations Work",
+    "slide1_title": "Browse Doctors",
+    "slide1_desc": "Explore our network of verified medical specialists. Filter by specialty, experience, and availability to find the right doctor for your needs.",
+    "slide2_title": "View Doctor Profile",
+    "slide2_desc": "Review each doctor's credentials, education, experience, and consultation pricing before making your choice.",
+    "slide3_title": "Submit Your Request",
+    "slide3_desc": "Describe your symptoms and medical concerns in detail. Upload relevant medical documents like test results and imaging for a thorough review.",
+    "slide4_title": "Doctor Reviews",
+    "slide4_desc": "Your assigned doctor will carefully analyze your case, reviewing all submitted information and documents.",
+    "slide5_title": "Answer Questions",
+    "slide5_desc": "Sometimes doctors need additional information. You'll be notified if they have follow-up questions for a more accurate assessment.",
+    "slide6_title": "Receive Response",
+    "slide6_desc": "Get your detailed medical opinion with diagnosis insights and recommendations to help you make informed health decisions.",
+    "got_it": "Got It"
+  },
   "auth": {
     "sign_in": "Sign In",
     "sign_up": "Create Account",

@@ -7,6 +7,7 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/buttons/primary_cta_button.dart';
 import 'package:mcs_app/views/patient/widgets/home/home_sections.dart';
+import 'package:mcs_app/views/patient/widgets/sheets/consultation_guide_sheet.dart';
 import 'complete_profile_screen.dart';
 import 'help_center_screen.dart';
 import 'notifications_screen.dart';
@@ -103,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // Active Consultations Section with real data
               ActiveConsultationsSection(
                 activeConsultations: activeConsultations,
+                totalConsultations: totalCount,
                 onViewAll: activeConsultations.isNotEmpty
                     ? () => _navigateToTab(context, 2)
                     : null,
@@ -115,6 +117,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   );
                 },
+                onEmptyActionTap: totalCount == 0
+                    ? () => ConsultationGuideSheet.show(context)
+                    : null,
               ),
               const SizedBox(height: AppTheme.sectionSpacing),
 

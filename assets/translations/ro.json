@@ -19,6 +19,22 @@
     "slide3_title": "Primește Perspective de Expert",
     "slide3_description": "Obține opinii profesionale detaliate care te ajută să iei decizii informate despre sănătatea ta"
   },
+  "consultation_guide": {
+    "title": "Cum Funcționează Consultațiile",
+    "slide1_title": "Caută Doctori",
+    "slide1_desc": "Explorează rețeaua noastră de specialiști medicali verificați. Filtrează după specialitate, experiență și disponibilitate pentru a găsi doctorul potrivit.",
+    "slide2_title": "Vezi Profilul Doctorului",
+    "slide2_desc": "Analizează credențialele, educația, experiența și prețul consultației fiecărui doctor înainte de a face alegerea.",
+    "slide3_title": "Trimite Cererea",
+    "slide3_desc": "Descrie în detaliu simptomele și problemele medicale. Încarcă documente medicale relevante precum rezultate de teste și imagistică pentru o evaluare completă.",
+    "slide4_title": "Doctorul Analizează",
+    "slide4_desc": "Doctorul desemnat va analiza cu atenție cazul tău, revizuind toate informațiile și documentele trimise.",
+    "slide5_title": "Răspunde la Întrebări",
+    "slide5_desc": "Uneori doctorii au nevoie de informații suplimentare. Vei fi notificat dacă au întrebări suplimentare pentru o evaluare mai precisă.",
+    "slide6_title": "Primește Răspunsul",
+    "slide6_desc": "Primește opinia medicală detaliată cu perspective de diagnostic și recomandări pentru a lua decizii informate privind sănătatea ta.",
+    "got_it": "Am Înțeles"
+  },
   "auth": {
     "sign_in": "Autentificare",
     "sign_up": "Creează Cont",

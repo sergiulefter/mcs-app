@@ -384,6 +384,7 @@ class _SupportPill extends StatelessWidget {
 }
 class ActiveConsultationsSection extends StatelessWidget {
   final List<ConsultationModel> activeConsultations;
+  final int totalConsultations;
   final VoidCallback? onViewAll;
   final ValueChanged<ConsultationModel> onConsultationTap;
   final VoidCallback? onEmptyActionTap;
@@ -392,6 +393,7 @@ class ActiveConsultationsSection extends StatelessWidget {
     super.key,
     required this.activeConsultations,
     required this.onConsultationTap,
+    this.totalConsultations = 0,
     this.onViewAll,
     this.onEmptyActionTap,
   });
@@ -429,8 +431,9 @@ class ActiveConsultationsSection extends StatelessWidget {
             icon: Icons.assignment_outlined,
             title: 'home.no_active_consultations'.tr(),
             description: 'home.no_active_consultations_desc'.tr(),
-            actionText: 'home.learn_how'.tr(),
-            onActionTap: onEmptyActionTap,
+            // Only show "Learn How" button for new users with 0 total consultations
+            actionText: totalConsultations == 0 ? 'home.learn_how'.tr() : null,
+            onActionTap: totalConsultations == 0 ? onEmptyActionTap : null,
           )
         else
           Column(
