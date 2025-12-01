@@ -73,7 +73,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
 
   Widget _buildDoctorHeader(BuildContext context, DoctorModel doctor) {
     final doctorName = doctor.fullName;
-    final specialty = doctor.specialty.name;
+    final specialty = 'specialties.${doctor.specialty.name}'.tr();
     final initials = _getInitials(doctorName);
 
     return Row(
@@ -156,7 +156,7 @@ class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
         ProfileDetailRow(
           icon: Icons.medical_services_outlined,
           label: 'common.specialty'.tr(),
-          value: doctor.specialty.name,
+          value: 'specialties.${doctor.specialty.name}'.tr(),
           notProvidedText: notProvidedText,
         ),
         ProfileDetailRow(

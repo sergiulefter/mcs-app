@@ -255,13 +255,13 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
           fontWeight: FontWeight.w700,
         ),
         holidayDecoration: BoxDecoration(
-          color: colorScheme.tertiary.withValues(alpha: 0.16),
+          color: colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         ),
         holidayTextStyle:
             (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-          color: colorScheme.tertiary,
-          fontWeight: FontWeight.w700,
+          color: colorScheme.onSurface.withValues(alpha: 0.5),
+          fontWeight: FontWeight.w500,
         ),
         weekendTextStyle: textTheme.bodyMedium!,
         defaultTextStyle: textTheme.bodyMedium!,
@@ -344,6 +344,14 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
             isVacation: isVacation,
           );
         },
+        holidayBuilder: (context, day, focusedDay) {
+          return _buildDayCell(
+            context,
+            day,
+            eventsByDay[_dayKey(day)] ?? const [],
+            isVacation: true,
+          );
+        },
       ),
     );
   }
@@ -358,19 +366,29 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     bool isDisabled = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+
+    // Background - use subtle opacity for vacation days
     final background = isSelected
         ? colorScheme.primary
         : isToday
             ? colorScheme.primary.withValues(alpha: 0.12)
             : isVacation
-                ? colorScheme.tertiary.withValues(alpha: 0.12)
+                ? colorScheme.onSurface.withValues(alpha: 0.05)
                 : colorScheme.surface;
 
+    // Text color - slightly muted for vacation days
     final textColor = isSelected
         ? colorScheme.onPrimary
         : isDisabled
             ? Theme.of(context).hintColor
-            : Theme.of(context).colorScheme.onSurface;
+            : isVacation
+                ? colorScheme.onSurface.withValues(alpha: 0.5)
+                : colorScheme.onSurface;
+
+    // Border - only for today indicator, none for other cells
+    final border = isToday && !isSelected
+        ? Border.all(color: colorScheme.primary, width: 1)
+        : null;
 
     return Padding(
       padding: const EdgeInsets.all(AppTheme.spacing4),
@@ -379,42 +397,51 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
           decoration: BoxDecoration(
             color: background,
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            border: Border.all(
-              color: isSelected
-                  ? colorScheme.primary
-                  : Theme.of(context).dividerColor,
-              width: 1.5,
-            ),
+            border: border,
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${day.day}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: textColor,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w600,
-                      ),
-                ),
-                if (isVacation || (events.isNotEmpty && !isVacation))
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: isVacation
-                            ? colorScheme.tertiary
-                            : colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
+          child: Stack(
+            children: [
+              // Vacation icon indicator in top-right corner (subtle)
+              if (isVacation)
+                Positioned(
+                  top: 2,
+                  right: 2,
+                  child: Icon(
+                    Icons.beach_access,
+                    size: 10,
+                    color: colorScheme.onSurface.withValues(alpha: 0.3),
                   ),
-              ],
-            ),
+                ),
+              // Day number and event indicator
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${day.day}',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: textColor,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w600,
+                          ),
+                    ),
+                    if (events.isNotEmpty && !isVacation)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

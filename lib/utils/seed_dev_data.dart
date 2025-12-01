@@ -256,13 +256,13 @@ const _lastNames = [
 ];
 
 final Map<MedicalSpecialty, List<String>> _subspecialtyPool = {
-  MedicalSpecialty.cardiology: ['Interventional', 'Heart Failure', 'Arrhythmia'],
-  MedicalSpecialty.oncology: ['Solid Tumors', 'Hematology', 'Immunotherapy'],
-  MedicalSpecialty.neurology: ['Epilepsy', 'Movement Disorders', 'Neuroimmunology'],
-  MedicalSpecialty.orthopedics: ['Sports Medicine', 'Arthroscopy', 'Joint Replacement'],
-  MedicalSpecialty.dermatology: ['Medical Derm', 'Skin Cancer', 'Psoriasis'],
-  MedicalSpecialty.endocrinology: ['Diabetes', 'Thyroid', 'Metabolic'],
-  MedicalSpecialty.gastroenterology: ['IBD', 'Hepatology', 'ERCP'],
+  MedicalSpecialty.cardiology: ['interventional', 'heartFailure', 'arrhythmia'],
+  MedicalSpecialty.oncology: ['solidTumors', 'hematologicOncology', 'immunotherapy'],
+  MedicalSpecialty.neurology: ['epilepsy', 'movementDisorders', 'neuroimmunology'],
+  MedicalSpecialty.orthopedics: ['sportsMedicine', 'jointReplacement', 'spinalSurgery'],
+  MedicalSpecialty.dermatology: ['medicalDermatology', 'skinCancer', 'mohs'],
+  MedicalSpecialty.endocrinology: ['diabetesManagement', 'thyroidDisorders', 'metabolicDisorders'],
+  MedicalSpecialty.gastroenterology: ['inflammatoryBowelDisease', 'hepatology', 'endoscopy'],
 };
 
 final Map<MedicalSpecialty, String> _bioPool = {

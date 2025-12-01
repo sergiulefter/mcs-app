@@ -140,7 +140,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
 
   Widget _buildWelcomeHeader(BuildContext context, DoctorModel doctor) {
     final doctorName = doctor.fullName;
-    final specialty = doctor.specialty.name;
+    final specialty = 'specialties.${doctor.specialty.name}'.tr();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -34,7 +34,7 @@ class DoctorSeeder {
         fullName: 'Dr. Andreea Popescu',
         photoUrl: null,
         specialty: MedicalSpecialty.cardiology,
-        subspecialties: ['Interventional Cardiology', 'Heart Failure'],
+        subspecialties: ['interventional', 'heartFailure'],
         experienceYears: 18,
         bio:
             'Cardiologist with extensive experience in interventional procedures and heart failure management. Specialized in complex coronary interventions and structural heart disease.',
@@ -63,7 +63,7 @@ class DoctorSeeder {
         fullName: 'Dr. Victor Marinescu',
         photoUrl: null,
         specialty: MedicalSpecialty.oncology,
-        subspecialties: ['Medical Oncology', 'Hematology'],
+        subspecialties: ['solidTumors', 'hematologicOncology'],
         experienceYears: 16,
         bio:
             'Medical oncologist specializing in solid tumors and hematological malignancies. Extensive experience with chemotherapy, targeted therapy, and immunotherapy protocols.',
@@ -98,7 +98,7 @@ class DoctorSeeder {
         fullName: 'Dr. Alexandra Dima',
         photoUrl: null,
         specialty: MedicalSpecialty.neurology,
-        subspecialties: ['Movement Disorders', 'Epilepsy'],
+        subspecialties: ['movementDisorders', 'epilepsy'],
         experienceYears: 12,
         bio:
             'Neurologist with expertise in movement disorders, epilepsy management, and neurodegenerative diseases. Active researcher in Parkinson\'s disease treatment.',
@@ -127,7 +127,7 @@ class DoctorSeeder {
         fullName: 'Dr. Mihai Cernat',
         photoUrl: null,
         specialty: MedicalSpecialty.orthopedics,
-        subspecialties: ['Sports Medicine', 'Joint Replacement'],
+        subspecialties: ['sportsMedicine', 'jointReplacement'],
         experienceYears: 14,
         bio:
             'Orthopedic surgeon specializing in sports injuries, arthroscopic surgery, and joint replacement procedures. Team physician for professional sports teams.',
@@ -156,7 +156,7 @@ class DoctorSeeder {
         fullName: 'Dr. Iulia Andreescu',
         photoUrl: null,
         specialty: MedicalSpecialty.endocrinology,
-        subspecialties: ['Diabetes Management', 'Thyroid Disorders'],
+        subspecialties: ['diabetesManagement', 'thyroidDisorders'],
         experienceYears: 11,
         bio:
             'Endocrinologist focusing on diabetes management, thyroid disorders, and metabolic diseases. Expert in insulin pump therapy and continuous glucose monitoring.',
@@ -185,7 +185,7 @@ class DoctorSeeder {
         fullName: 'Dr. Radu Ionescu',
         photoUrl: null,
         specialty: MedicalSpecialty.gastroenterology,
-        subspecialties: ['Inflammatory Bowel Disease', 'Hepatology'],
+        subspecialties: ['inflammatoryBowelDisease', 'hepatology'],
         experienceYears: 15,
         bio:
             'Gastroenterologist with expertise in inflammatory bowel disease, liver disorders, and advanced endoscopic procedures. Certified in ERCP and EUS.',
@@ -214,7 +214,7 @@ class DoctorSeeder {
         fullName: 'Dr. Maria Popa',
         photoUrl: null,
         specialty: MedicalSpecialty.dermatology,
-        subspecialties: ['Medical Dermatology', 'Dermatologic Surgery'],
+        subspecialties: ['medicalDermatology', 'mohs'],
         experienceYears: 13,
         bio:
             'Dermatologist specializing in medical dermatology, skin cancer detection, and dermatologic surgery. Expert in psoriasis and eczema management.',

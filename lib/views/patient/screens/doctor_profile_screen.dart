@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/doctor_model.dart';
+import 'package:mcs_app/models/specialty_registry.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -352,7 +353,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             runSpacing: AppTheme.spacing8,
             children: doctor.subspecialties.map((subspecialty) {
               return _Badge(
-                label: subspecialty,
+                label: SpecialtyRegistry.translateSubspecialty(subspecialty),
                 icon: Icons.medical_services_outlined,
                 iconColor: Theme.of(context).colorScheme.primary,
               );

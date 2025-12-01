@@ -27,68 +27,25 @@ enum MedicalSpecialty {
   emergency,
 }
 
-/// Extension to get display names for specialties
+/// Extension for MedicalSpecialty translation and serialization.
+///
+/// Uses Dart's built-in enum `name` property for the translation key.
+/// Example: MedicalSpecialty.cardiology.name returns "cardiology"
 extension MedicalSpecialtyExtension on MedicalSpecialty {
-  String get name {
-    switch (this) {
-      case MedicalSpecialty.cardiology:
-        return 'Cardiology';
-      case MedicalSpecialty.oncology:
-        return 'Oncology';
-      case MedicalSpecialty.neurology:
-        return 'Neurology';
-      case MedicalSpecialty.orthopedics:
-        return 'Orthopedics';
-      case MedicalSpecialty.endocrinology:
-        return 'Endocrinology';
-      case MedicalSpecialty.dermatology:
-        return 'Dermatology';
-      case MedicalSpecialty.gastroenterology:
-        return 'Gastroenterology';
-      case MedicalSpecialty.pulmonology:
-        return 'Pulmonology';
-      case MedicalSpecialty.nephrology:
-        return 'Nephrology';
-      case MedicalSpecialty.rheumatology:
-        return 'Rheumatology';
-      case MedicalSpecialty.hematology:
-        return 'Hematology';
-      case MedicalSpecialty.infectious:
-        return 'Infectious Diseases';
-      case MedicalSpecialty.pediatrics:
-        return 'Pediatrics';
-      case MedicalSpecialty.psychiatry:
-        return 'Psychiatry';
-      case MedicalSpecialty.radiology:
-        return 'Radiology';
-      case MedicalSpecialty.surgery:
-        return 'General Surgery';
-      case MedicalSpecialty.urology:
-        return 'Urology';
-      case MedicalSpecialty.gynecology:
-        return 'Gynecology';
-      case MedicalSpecialty.ophthalmology:
-        return 'Ophthalmology';
-      case MedicalSpecialty.otolaryngology:
-        return 'Otolaryngology (ENT)';
-      case MedicalSpecialty.anesthesiology:
-        return 'Anesthesiology';
-      case MedicalSpecialty.pathology:
-        return 'Pathology';
-      case MedicalSpecialty.familyMedicine:
-        return 'Family Medicine';
-      case MedicalSpecialty.internalMedicine:
-        return 'Internal Medicine';
-      case MedicalSpecialty.emergency:
-        return 'Emergency Medicine';
-    }
-  }
+  /// Returns the translation key (same as enum name).
+  /// Example: "cardiology", "familyMedicine"
+  String get key => name;
 
+  /// Serialize to JSON (uses the enum name).
   String toJson() => name;
 
+  /// Parse a specialty from a string value.
+  /// Handles both lowercase enum names ("cardiology") and
+  /// legacy capitalized format ("Cardiology").
   static MedicalSpecialty fromString(String value) {
+    final normalized = value.toLowerCase();
     return MedicalSpecialty.values.firstWhere(
-      (e) => e.name == value,
+      (e) => e.name.toLowerCase() == normalized,
       orElse: () => MedicalSpecialty.familyMedicine,
     );
   }

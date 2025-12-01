@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/models/doctor_model.dart';
+import 'package:mcs_app/models/specialty_registry.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
@@ -47,16 +48,6 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
 
   // Available options
   final List<String> _languageOptions = ['RO', 'EN', 'FR', 'DE', 'HU', 'RU'];
-  final List<String> _subspecialtyOptions = [
-    'Interventional',
-    'Pediatric',
-    'Geriatric',
-    'Oncologic',
-    'Sports Medicine',
-    'Pain Management',
-    'Critical Care',
-    'Transplant',
-  ];
 
   @override
   void initState() {
@@ -242,7 +233,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
                 const SizedBox(height: AppTheme.spacing16),
                 MultiSelectChipField(
                   label: '',
-                  options: _subspecialtyOptions,
+                  options: SpecialtyRegistry.getSubspecialties(_doctor!.specialty),
                   selectedOptions: _selectedSubspecialties,
                   onSelectionChanged: (selected) {
                     setState(() {
@@ -250,6 +241,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
                       _subspecialtiesError = null;
                     });
                   },
+                  translationPrefix: 'subspecialties',
                   isRequired: true,
                   isOptional: false,
                   errorText: _subspecialtiesError,
@@ -312,7 +304,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
             ProfileDetailRow(
               icon: Icons.medical_services_outlined,
               label: 'common.specialty'.tr(),
-              value: _doctor!.specialty.name,
+              value: 'specialties.${_doctor!.specialty.name}'.tr(),
             ),
             ProfileDetailRow(
               icon: Icons.work_history_outlined,

@@ -119,7 +119,7 @@ class DoctorModel {
       email: map['email'] ?? '',
       fullName: map['fullName'] ?? '',
       photoUrl: map['photoUrl'],
-      specialty: MedicalSpecialtyExtension.fromString(map['specialty'] ?? 'Family Medicine'),
+      specialty: MedicalSpecialtyExtension.fromString(map['specialty'] ?? 'familyMedicine'),
       subspecialties: List<String>.from(map['subspecialties'] ?? []),
       experienceYears: map['experienceYears'] ?? 0,
       bio: map['bio'] ?? '',

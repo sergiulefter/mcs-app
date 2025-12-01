@@ -315,7 +315,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         ),
                   ),
                   Text(
-                    widget.doctor.specialty.name,
+                    'specialties.${widget.doctor.specialty.name}'.tr(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
