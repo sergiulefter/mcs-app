@@ -650,6 +650,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           hintText: 'admin.create_doctor.field_specialty_hint'.tr(),
           value: _selectedSpecialty?.name,
           items: specialtyItems,
+          translationPrefix: 'specialties',
           prefixIcon: Icons.medical_services_outlined,
           onChanged: (value) {
             setState(() {
