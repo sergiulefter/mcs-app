@@ -7,7 +7,6 @@ import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'main_shell.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -107,11 +106,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
 
     if (success && mounted) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const MainShell(initialIndex: 3),
-        ),
-      );
+      Navigator.of(context).pop();
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -124,11 +119,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   void _handleSkip() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const MainShell(initialIndex: 3),
-      ),
-    );
+    Navigator.of(context).pop();
   }
 
   @override

@@ -47,9 +47,9 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
       appBar: AppBar(
         title: Text('consultations.title'.tr()),
       ),
-      body: consultationsController.isLoading
+      body: consultationsController.isLoading && !consultationsController.hasPrimedForUser
           ? _buildLoadingState()
-          : consultationsController.error != null
+          : consultationsController.error != null && !consultationsController.hasPrimedForUser
               ? _buildErrorState()
               : _buildConsultationsContent(consultationsController),
     );

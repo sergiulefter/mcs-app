@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
+import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/models/specialty_registry.dart';
 import 'package:mcs_app/utils/app_theme.dart';
@@ -55,6 +57,29 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                 _buildAvailabilitySection(context, doctor),
               ],
             ),
+            // Gradient scrim - fades content behind the floating area
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                child: Container(
+                  height: 90,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0),
+                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.7),
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Button and text - floating
             Positioned(
               left: AppTheme.spacing16,
               right: AppTheme.spacing16,
@@ -379,6 +404,10 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         .toList()
       ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
+    // Check if user has completed profile
+    final user = context.watch<AuthController>().currentUser;
+    final isProfileComplete = user?.profileCompleted ?? false;
+
     String? startDate;
     String? endDate;
     String? unavailableReason;
@@ -394,6 +423,59 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     }
 
     if (doctor.isCurrentlyAvailable) {
+      // Profile incomplete - show disabled state
+      if (!isProfileComplete) {
+        // Create solid opaque disabled colors by blending with surface
+        final disabledBg = Color.alphaBlend(
+          colorScheme.onSurface.withValues(alpha: 0.12),
+          colorScheme.surface,
+        );
+        final disabledFg = Color.alphaBlend(
+          colorScheme.onSurface.withValues(alpha: 0.38),
+          colorScheme.surface,
+        );
+        return Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.shadow.withValues(alpha: isDark ? 0.3 : 0.15),
+                    blurRadius: 12,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: null,
+                icon: const Icon(Icons.medical_services_outlined),
+                label: Text('doctor_profile.request_consultation'.tr()),
+                style: ElevatedButton.styleFrom(
+                  disabledBackgroundColor: disabledBg,
+                  disabledForegroundColor: disabledFg,
+                  minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacing8),
+            Text(
+              'doctor_profile.complete_profile_required'.tr(),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        );
+      }
+
+      // Profile complete - show enabled button with colored shadow
       return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),

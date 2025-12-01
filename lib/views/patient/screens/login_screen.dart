@@ -10,6 +10,7 @@ import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'signup_screen.dart';
 import 'main_shell.dart';
+import 'complete_profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -75,9 +76,23 @@ class _LoginScreenState extends State<LoginScreen> {
             MaterialPageRoute(builder: (context) => const DoctorMainShell()),
           );
         } else {
-          Navigator.of(context).pushReplacement(
+          // Patient navigation
+          final navigator = Navigator.of(context);
+          final shouldShowCompleteProfile = user?.profileCompleted == false;
+
+          navigator.pushReplacement(
             MaterialPageRoute(builder: (context) => const MainShell()),
           );
+
+          // If profile not completed, push CompleteProfileScreen on top
+          if (shouldShowCompleteProfile) {
+            // Give user time to see the home screen before prompting to complete profile
+            Future.delayed(const Duration(milliseconds: 800), () {
+              navigator.push(
+                MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+              );
+            });
+          }
         }
 
         if (mounted) {

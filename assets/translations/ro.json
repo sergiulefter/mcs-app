@@ -338,7 +338,7 @@
     "read_more": "Citește mai mult",
     "read_less": "Citește mai puțin",
     "request_consultation": "Solicită Consultație",
-    "request_submitted": "Funcția de solicitare consultație vine în curând"
+    "complete_profile_required": "Te rugăm să îți completezi profilul înainte de a solicita o consultație"
   },
   "consultations": {
     "title": "Consultațiile Mele",

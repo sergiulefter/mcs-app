@@ -5,6 +5,7 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
 import 'package:mcs_app/views/patient/screens/main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/cards/stat_card.dart';
@@ -107,8 +108,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   void _navigateToPatientApp(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const MainShell(),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainShell(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            ),
+            child: child,
+          );
+        },
+        transitionDuration: AppConstants.longDuration,
       ),
     );
   }

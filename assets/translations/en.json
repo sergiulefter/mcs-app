@@ -338,7 +338,7 @@
     "read_more": "Read more",
     "read_less": "Read less",
     "request_consultation": "Request Consultation",
-    "request_submitted": "Consultation request feature coming soon"
+    "complete_profile_required": "Please complete your profile before requesting a consultation"
   },
   "consultations": {
     "title": "My Consultations",

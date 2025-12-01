@@ -12,6 +12,7 @@ import 'language_selection_screen.dart';
 import 'login_screen.dart';
 import 'main_shell.dart';
 import 'onboarding_screen.dart';
+import 'complete_profile_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final Future<FirebaseApp> firebaseInitialization;
@@ -76,7 +77,21 @@ class _SplashScreenState extends State<SplashScreen> {
           // Patient users go to main shell
           await _primeUserData(authController);
           if (!mounted) return;
+
+          final navigator = Navigator.of(context);
+          final shouldShowCompleteProfile = user?.profileCompleted == false;
+
           _navigateToMainShell();
+
+          // If profile not completed, push CompleteProfileScreen on top
+          if (shouldShowCompleteProfile) {
+            // Give user time to see the home screen before prompting to complete profile
+            Future.delayed(const Duration(milliseconds: 800), () {
+              navigator.push(
+                MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+              );
+            });
+          }
         }
       } else {
         _navigateToAuthFlow(languageSelected, onboardingCompleted);

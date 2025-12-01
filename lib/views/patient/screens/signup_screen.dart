@@ -6,6 +6,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'complete_profile_screen.dart';
+import 'main_shell.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -57,9 +58,19 @@ class _SignupScreenState extends State<SignupScreen> {
       );
 
       if (success && mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+        // Navigate to MainShell first, then push CompleteProfileScreen on top
+        final navigator = Navigator.of(context);
+
+        navigator.pushReplacement(
+          MaterialPageRoute(builder: (context) => const MainShell()),
         );
+
+        // Give user time to see the home screen before prompting to complete profile
+        Future.delayed(const Duration(milliseconds: 800), () {
+          navigator.push(
+            MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+          );
+        });
       } else if (mounted) {
         // Map Firebase error to appropriate field
         final errorCode = authController.errorCode;

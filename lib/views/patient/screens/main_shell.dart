@@ -19,26 +19,36 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  late int _currentIndex;
+  int? _currentIndex;
+  Set<int>? _visitedTabs;
 
-  // List of screens - using IndexedStack to preserve state
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    DoctorsScreen(),
-    ConsultationsScreen(),
-    AccountScreen(),
-  ];
+  int get currentIndex => _currentIndex ??= widget.initialIndex.clamp(0, 3);
+  Set<int> get visitedTabs => _visitedTabs ??= {currentIndex};
+
+  // Build screen only when first visited, then cached by IndexedStack
+  Widget _buildScreen(int index) {
+    if (!visitedTabs.contains(index)) {
+      return const SizedBox.shrink();
+    }
+    switch (index) {
+      case 0:
+        return const HomeScreen();
+      case 1:
+        return const DoctorsScreen();
+      case 2:
+        return const ConsultationsScreen();
+      case 3:
+        return const AccountScreen();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
+      visitedTabs.add(index);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex.clamp(0, _screens.length - 1);
   }
 
   @override
@@ -47,16 +57,17 @@ class _MainShellState extends State<MainShell> {
     final locale = context.locale;
 
     return NavigationController(
-      currentIndex: _currentIndex,
+      currentIndex: currentIndex,
       onTabChange: (index) {
         setState(() {
           _currentIndex = index;
+          visitedTabs.add(index);
         });
       },
       child: Scaffold(
         body: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
+          index: currentIndex,
+          children: List.generate(4, _buildScreen),
         ),
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
@@ -79,7 +90,7 @@ class _MainShellState extends State<MainShell> {
               fontWeight: FontWeight.w500,
             ),
             key: ValueKey(locale.languageCode),
-            currentIndex: _currentIndex,
+            currentIndex: currentIndex,
             onTap: _onTabTapped,
             items: [
               BottomNavigationBarItem(
