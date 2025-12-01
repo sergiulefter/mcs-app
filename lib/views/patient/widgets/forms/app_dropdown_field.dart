@@ -79,7 +79,6 @@ class AppDropdownField extends StatefulWidget {
 }
 
 class _AppDropdownFieldState extends State<AppDropdownField> {
-  bool _isPressed = false;
   bool _isOpen = false;
   final MenuController _menuController = MenuController();
 
@@ -170,10 +169,7 @@ class _AppDropdownFieldState extends State<AppDropdownField> {
                   ),
                 );
               }).toList(),
-              child: GestureDetector(
-                onTapDown: (_) => setState(() => _isPressed = true),
-                onTapUp: (_) => setState(() => _isPressed = false),
-                onTapCancel: () => setState(() => _isPressed = false),
+              child: InkWell(
                 onTap: () {
                   if (_menuController.isOpen) {
                     _menuController.close();
@@ -181,59 +177,67 @@ class _AppDropdownFieldState extends State<AppDropdownField> {
                     _menuController.open();
                   }
                 },
-                child: AnimatedScale(
-                  scale: _isPressed ? 0.97 : 1.0,
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOutCubic,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacing16,
-                      vertical: AppTheme.spacing12,
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                overlayColor: WidgetStateProperty.resolveWith(
+                  (states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return colorScheme.onSurface.withValues(alpha: 0.06);
+                    }
+                    if (states.contains(WidgetState.hovered) ||
+                        states.contains(WidgetState.focused)) {
+                      return colorScheme.onSurface.withValues(alpha: 0.03);
+                    }
+                    return null;
+                  },
+                ),
+                child: Ink(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacing16,
+                    vertical: AppTheme.spacing12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerLow,
+                    border: Border.all(
+                      color: state.hasError
+                          ? colorScheme.error
+                          : Theme.of(context).dividerColor,
                     ),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerLow,
-                      border: Border.all(
-                        color: state.hasError
-                            ? colorScheme.error
-                            : Theme.of(context).dividerColor,
-                      ),
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                    ),
-                    child: Row(
-                      children: [
-                        if (widget.prefixIcon != null) ...[
-                          Icon(
-                            widget.prefixIcon,
-                            size: 20,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: AppTheme.spacing8),
-                        ],
-                        Expanded(
-                          child: Text(
-                            widget.value != null
-                                ? _getItemDisplayText(widget.value!)
-                                : widget.hintText,
-                            style:
-                                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: widget.value == null
-                                          ? colorScheme.onSurfaceVariant
-                                          : null,
-                                    ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  ),
+                  child: Row(
+                    children: [
+                      if (widget.prefixIcon != null) ...[
+                        Icon(
+                          widget.prefixIcon,
+                          size: 20,
+                          color: colorScheme.onSurfaceVariant,
                         ),
-                        AnimatedRotation(
-                          turns: _isOpen ? 0.5 : 0,
-                          duration: const Duration(milliseconds: 250),
-                          curve: Curves.easeOutCubic,
-                          child: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                        ),
+                        const SizedBox(width: AppTheme.spacing8),
                       ],
-                    ),
+                      Expanded(
+                        child: Text(
+                          widget.value != null
+                              ? _getItemDisplayText(widget.value!)
+                              : widget.hintText,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: widget.value == null
+                                        ? colorScheme.onSurfaceVariant
+                                        : null,
+                                  ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      AnimatedRotation(
+                        turns: _isOpen ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        child: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
