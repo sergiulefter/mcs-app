@@ -54,7 +54,16 @@
     "male": "Masculin",
     "female": "Feminin",
     "english": "Engleză",
-    "romanian": "Română"
+    "romanian": "Română",
+    "edit": {
+      "title": "Editare Profil",
+      "account_info": "Informații Cont",
+      "account_info_hint": "Aceste informații nu pot fi modificate",
+      "personal_info": "Informații Personale",
+      "save_changes": "Salvează Modificările",
+      "success": "Profilul a fost actualizat cu succes",
+      "error": "Nu s-a putut actualiza profilul. Încercați din nou."
+    }
   },
   "navigation": {
     "doctors": "Medici",

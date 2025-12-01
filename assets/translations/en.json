@@ -54,7 +54,16 @@
     "male": "Male",
     "female": "Female",
     "english": "English",
-    "romanian": "Romanian"
+    "romanian": "Romanian",
+    "edit": {
+      "title": "Edit Profile",
+      "account_info": "Account Information",
+      "account_info_hint": "This information cannot be changed",
+      "personal_info": "Personal Information",
+      "save_changes": "Save Changes",
+      "success": "Profile updated successfully",
+      "error": "Failed to update profile. Please try again."
+    }
   },
   "navigation": {
     "doctors": "Doctors",

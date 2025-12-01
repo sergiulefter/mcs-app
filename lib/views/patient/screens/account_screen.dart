@@ -17,7 +17,7 @@ import 'package:mcs_app/views/patient/widgets/cards/user_header_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'login_screen.dart';
-import 'complete_profile_screen.dart';
+import 'patient_profile_edit_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -150,7 +150,7 @@ class AccountScreen extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const CompleteProfileScreen(),
+                builder: (context) => const PatientProfileEditScreen(),
               ),
             );
           },
