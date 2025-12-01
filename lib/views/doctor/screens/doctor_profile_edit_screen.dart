@@ -12,6 +12,7 @@ import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/admin/widgets/multi_select_chip_field.dart';
+import 'package:mcs_app/views/doctor/widgets/skeletons/doctor_profile_edit_skeleton.dart';
 
 /// Doctor profile edit screen - Edit bio, price, languages, education
 class DoctorProfileEditScreen extends StatefulWidget {
@@ -60,7 +61,12 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
   @override
   void initState() {
     super.initState();
-    _loadDoctorData();
+    // Delay data loading to allow route transition animation to complete
+    Future.delayed(AppConstants.mediumDuration, () {
+      if (mounted) {
+        _loadDoctorData();
+      }
+    });
   }
 
   @override
@@ -199,7 +205,9 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
         appBar: AppBar(
           title: Text('doctor.profile_edit.title'.tr()),
         ),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const SafeArea(
+          child: DoctorProfileEditSkeleton(),
+        ),
       );
     }
 
