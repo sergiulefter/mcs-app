@@ -387,7 +387,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                 Text(
                   isAnswered
                       ? 'doctor.requests.detail.info_request_card.answered'.tr()
-                      : 'doctor.requests.detail.info_request_card.pending'.tr(),
+                      : 'common.status.pending'.tr(),
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: statusColor,
                         fontWeight: FontWeight.w600,

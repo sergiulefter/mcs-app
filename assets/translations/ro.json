@@ -619,7 +619,7 @@
       "currently_unavailable": "Momentan indisponibil"
     },
     "status": {
-      "pending": "În Așteptare",
+      "pending": "Așteptare",
       "in_review": "În Evaluare",
       "info_requested": "Informații Solicitate",
       "completed": "Finalizată",
@@ -851,7 +851,6 @@
           "your_questions": "Întrebările Tale",
           "asked_on": "Întrebat pe {date}",
           "answered": "Răspuns",
-          "pending": "În așteptare",
           "message_label": "Mesaj către pacient",
           "question_label": "Întrebarea {number}",
           "answer_label": "Răspunsul Pacientului",

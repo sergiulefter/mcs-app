@@ -851,7 +851,6 @@
           "your_questions": "Your Questions",
           "asked_on": "Asked on {date}",
           "answered": "Answered",
-          "pending": "Pending",
           "message_label": "Message to patient",
           "question_label": "Question {number}",
           "answer_label": "Patient's Answer",
