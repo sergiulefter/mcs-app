@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 
 /// A modal bottom sheet that explains the consultation process
 /// with a carousel-style walkthrough.
@@ -90,7 +91,10 @@ class _ConsultationGuideSheetState extends State<ConsultationGuideSheet> {
       child: Column(
         children: [
           // Handle bar
-          _buildHandleBar(context),
+          const Padding(
+            padding: EdgeInsets.only(top: AppTheme.spacing12),
+            child: ModalHandleBar(),
+          ),
 
           // Header with close button
           _buildHeader(context),
@@ -114,20 +118,6 @@ class _ConsultationGuideSheetState extends State<ConsultationGuideSheet> {
           // Bottom section with dots and button
           _buildBottomSection(context),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHandleBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppTheme.spacing12),
-      child: Container(
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Theme.of(context).dividerColor,
-          borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-        ),
       ),
     );
   }

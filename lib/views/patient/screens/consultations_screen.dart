@@ -10,6 +10,7 @@ import 'package:mcs_app/views/patient/widgets/cards/consultation_card_skeleton.d
 import 'package:mcs_app/views/patient/widgets/filters/consultation_segment_filter.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
+import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 import 'request_detail_screen.dart';
 
 class ConsultationsScreen extends StatefulWidget {
@@ -275,16 +276,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+            const ModalHandleBar(),
             const SizedBox(height: AppTheme.spacing20),
 
             // Title

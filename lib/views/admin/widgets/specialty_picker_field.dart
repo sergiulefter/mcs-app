@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 
 /// A specialty picker field that opens a searchable bottom sheet.
 ///
@@ -204,16 +205,9 @@ class _SpecialtyPickerSheetState extends State<_SpecialtyPickerSheet> {
       child: Column(
         children: [
           // Handle bar
-          Padding(
-            padding: const EdgeInsets.only(top: AppTheme.spacing12),
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).dividerColor,
-                borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-              ),
-            ),
+          const Padding(
+            padding: EdgeInsets.only(top: AppTheme.spacing12),
+            child: ModalHandleBar(),
           ),
           // Header
           Padding(

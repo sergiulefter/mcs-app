@@ -9,6 +9,7 @@ import 'package:mcs_app/views/doctor/widgets/doctor_request_card_skeleton.dart';
 import 'package:mcs_app/views/doctor/widgets/doctor_request_segment_filter.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
+import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 import 'package:provider/provider.dart';
 
 /// Doctor-facing list of consultation requests with status filters.
@@ -255,16 +256,7 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+            const ModalHandleBar(),
             const SizedBox(height: AppTheme.spacing20),
 
             // Title

@@ -10,6 +10,7 @@ import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_search_bar.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
+import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 import 'doctor_profile_screen.dart';
 
 class DoctorsScreen extends StatefulWidget {
@@ -263,6 +264,9 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                     child: ListView(
                       controller: scrollController,
                       children: [
+                        // Handle bar
+                        const ModalHandleBar(),
+                        const SizedBox(height: AppTheme.spacing20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
