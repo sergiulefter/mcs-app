@@ -411,6 +411,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
             return [
               // Step circle and label
               Expanded(
+                flex: 2,
                 child: Column(
                   children: [
                     Container(
