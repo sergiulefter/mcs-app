@@ -28,6 +28,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   final PageController _pageController = PageController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _scrollHelper = FormScrollHelper();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   int _currentStep = 0;
   bool _isSubmitting = false;
@@ -49,6 +51,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   @override
   void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
     _scrollHelper.dispose();
     _pageController.dispose();
     super.dispose();
@@ -392,6 +396,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   ),
                   const SizedBox(height: AppTheme.spacing8),
                   TextField(
+                    controller: _titleController,
                     maxLength: AppConstants.titleMaxLength,
                     onChanged: (value) {
                       setState(() {
@@ -424,6 +429,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                   ),
                   const SizedBox(height: AppTheme.spacing8),
                   TextField(
+                    controller: _descriptionController,
                     maxLength: AppConstants.descriptionMaxLength,
                     maxLines: 6,
                     onChanged: (value) {
