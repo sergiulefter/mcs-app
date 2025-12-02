@@ -698,7 +698,7 @@ class _InfoColumn extends StatelessWidget {
     final twoLineValueHeight = valueLineHeight * 2 + 4; // 2 lines + padding
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing8),
+      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing4),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

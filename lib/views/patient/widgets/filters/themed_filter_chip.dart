@@ -43,6 +43,8 @@ class ThemedFilterChip extends StatelessWidget {
       selectedColor: colorScheme.primary,
       backgroundColor: colorScheme.surfaceContainerHighest,
       checkmarkColor: selectedLabelColor,
+      labelPadding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing2),
+      visualDensity: VisualDensity.compact,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
         side: BorderSide(
