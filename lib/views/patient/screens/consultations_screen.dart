@@ -264,7 +264,6 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
       {'key': 'all', 'label': 'common.all'.tr()},
       {'key': 'pending', 'label': 'common.status.pending'.tr()},
       {'key': 'in_review', 'label': 'common.status.in_review'.tr()},
-      {'key': 'completed', 'label': 'common.status.completed'.tr()},
       {'key': 'cancelled', 'label': 'common.status.cancelled'.tr()},
     ];
 
