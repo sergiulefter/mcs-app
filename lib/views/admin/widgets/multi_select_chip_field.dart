@@ -54,27 +54,29 @@ class MultiSelectChipField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label row
-        Row(
-          children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            if (isOptional) ...[
-              const SizedBox(width: AppTheme.spacing4),
+        // Label row (only if label is not empty)
+        if (label.isNotEmpty) ...[
+          Row(
+            children: [
               Text(
-                optionalText ?? 'Optional',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).hintColor,
+                label,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
               ),
+              if (isOptional) ...[
+                const SizedBox(width: AppTheme.spacing4),
+                Text(
+                  optionalText ?? 'Optional',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).hintColor,
+                      ),
+                ),
+              ],
             ],
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacing8),
+          ),
+          const SizedBox(height: AppTheme.spacing8),
+        ],
 
         // Chips wrap
         Wrap(

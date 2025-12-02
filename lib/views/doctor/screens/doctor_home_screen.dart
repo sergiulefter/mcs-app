@@ -168,54 +168,32 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     final isAvailable = doctor.isCurrentlyAvailable;
     final isProfileComplete = doctor.isProfileComplete;
     final colorScheme = Theme.of(context).colorScheme;
+    final statusColor = isAvailable ? colorScheme.secondary : colorScheme.error;
 
     return SurfaceCard(
-      backgroundColor: isAvailable
-          ? colorScheme.secondary.withValues(alpha: 0.1)
-          : colorScheme.errorContainer.withValues(alpha: 0.3),
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      backgroundColor: statusColor.withValues(alpha: 0.08),
+      borderColor: statusColor.withValues(alpha: 0.2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isAvailable
-                      ? colorScheme.secondary.withValues(alpha: 0.2)
-                      : colorScheme.error.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                ),
-                child: Icon(
-                  isAvailable ? Icons.check_circle_outline : Icons.cancel_outlined,
-                  color: isAvailable ? colorScheme.secondary : colorScheme.error,
-                  size: AppTheme.iconLarge,
-                ),
+              Icon(
+                isAvailable ? Icons.check_circle_outline : Icons.cancel_outlined,
+                size: 24,
+                color: statusColor,
               ),
-              const SizedBox(width: AppTheme.spacing16),
+              const SizedBox(width: AppTheme.spacing12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'doctor.home.availability'.tr(),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: AppTheme.spacing4),
-                    Text(
-                      isAvailable
-                          ? 'doctor.home.available'.tr()
-                          : 'doctor.home.unavailable'.tr(),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: isAvailable
-                                ? colorScheme.secondary
-                                : colorScheme.error,
-                          ),
-                    ),
-                  ],
+                child: Text(
+                  isAvailable
+                      ? 'doctor.home.available'.tr()
+                      : 'doctor.home.unavailable'.tr(),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: statusColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
               ),
             ],
@@ -223,7 +201,10 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
           // Show hint when toggle is disabled due to incomplete profile
           if (!isProfileComplete && !doctor.isAvailable)
             Padding(
-              padding: const EdgeInsets.only(top: AppTheme.spacing8),
+              padding: const EdgeInsets.only(
+                top: AppTheme.spacing4,
+                left: 36, // 24px icon + 12px spacing
+              ),
               child: Text(
                 'doctor.home.availability_disabled_hint'.tr(),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
