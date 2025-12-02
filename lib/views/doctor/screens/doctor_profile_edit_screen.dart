@@ -8,6 +8,7 @@ import 'package:mcs_app/models/specialty_registry.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
@@ -27,6 +28,15 @@ class DoctorProfileEditScreen extends StatefulWidget {
 class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final DoctorService _doctorService = DoctorService();
+  final _scrollHelper = FormScrollHelper();
+
+  // GlobalKeys for scroll-to-error functionality
+  final _bioKey = GlobalKey();
+  final _priceKey = GlobalKey();
+  final _experienceKey = GlobalKey();
+  final _languagesKey = GlobalKey();
+  final _subspecialtiesKey = GlobalKey();
+  final _educationKey = GlobalKey();
 
   // Form controllers
   final _bioController = TextEditingController();
@@ -62,6 +72,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _bioController.dispose();
     _priceController.dispose();
     _experienceController.dispose();
@@ -102,31 +113,28 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
 
   Future<void> _saveProfile() async {
     // Clear previous errors
+    _scrollHelper.clearErrors();
     setState(() {
       _languagesError = null;
       _educationError = null;
       _subspecialtiesError = null;
     });
 
-    // Validate form fields
+    // Track if any validation fails
+    bool hasError = false;
+
+    // Validate form fields (bio, price, experience)
     if (!_formKey.currentState!.validate()) {
-      return;
+      hasError = true;
     }
 
     // Custom validation for languages
     if (_selectedLanguages.isEmpty) {
       setState(() {
-      _languagesError = 'doctor.profile_edit.validation.languages_required'.tr();
-    });
-    return;
-  }
-
-    if (_selectedSubspecialties.isEmpty) {
-      setState(() {
-        _subspecialtiesError =
-            'doctor.profile_edit.validation.subspecialties_required'.tr();
+        _languagesError = 'doctor.profile_edit.validation.languages_required'.tr();
       });
-      return;
+      _scrollHelper.setError('languages');
+      hasError = true;
     }
 
     // Custom validation for education
@@ -134,6 +142,23 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
       setState(() {
         _educationError = 'doctor.profile_edit.validation.education_required'.tr();
       });
+      _scrollHelper.setError('education');
+      hasError = true;
+    }
+
+    // Custom validation for subspecialties
+    if (_selectedSubspecialties.isEmpty) {
+      setState(() {
+        _subspecialtiesError =
+            'doctor.profile_edit.validation.subspecialties_required'.tr();
+      });
+      _scrollHelper.setError('subspecialties');
+      hasError = true;
+    }
+
+    // If any validation failed, scroll to first error and return
+    if (hasError) {
+      _scrollHelper.scrollToFirstError(context);
       return;
     }
 
@@ -202,6 +227,14 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
       );
     }
 
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('bio', _bioKey);
+    _scrollHelper.register('price', _priceKey);
+    _scrollHelper.register('experience', _experienceKey);
+    _scrollHelper.register('languages', _languagesKey);
+    _scrollHelper.register('education', _educationKey);
+    _scrollHelper.register('subspecialties', _subspecialtiesKey);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('doctor.profile_edit.title'.tr()),
@@ -225,27 +258,33 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
                 const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Education Section
-                _buildEducationSection(context),
+                KeyedSubtree(
+                  key: _educationKey,
+                  child: _buildEducationSection(context),
+                ),
                 const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Subspecialties Section
                 SectionHeader(title: 'doctor.profile_edit.subspecialties'.tr()),
                 const SizedBox(height: AppTheme.spacing16),
-                MultiSelectChipField(
-                  label: '',
-                  options: SpecialtyRegistry.getSubspecialties(_doctor!.specialty),
-                  selectedOptions: _selectedSubspecialties,
-                  onSelectionChanged: (selected) {
-                    setState(() {
-                      _selectedSubspecialties = selected;
-                      _subspecialtiesError = null;
-                    });
-                  },
-                  translationPrefix: 'subspecialties',
-                  isRequired: true,
-                  isOptional: false,
-                  errorText: _subspecialtiesError,
-                  optionalText: 'doctor.profile_edit.subspecialties_hint'.tr(),
+                KeyedSubtree(
+                  key: _subspecialtiesKey,
+                  child: MultiSelectChipField(
+                    label: '',
+                    options: SpecialtyRegistry.getSubspecialties(_doctor!.specialty),
+                    selectedOptions: _selectedSubspecialties,
+                    onSelectionChanged: (selected) {
+                      setState(() {
+                        _selectedSubspecialties = selected;
+                        _subspecialtiesError = null;
+                      });
+                    },
+                    translationPrefix: 'subspecialties',
+                    isRequired: true,
+                    isOptional: false,
+                    errorText: _subspecialtiesError,
+                    optionalText: 'doctor.profile_edit.subspecialties_hint'.tr(),
+                  ),
                 ),
                 const SizedBox(height: AppTheme.sectionSpacing),
 
@@ -324,112 +363,140 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Bio field
-        AppTextField(
-          label: 'doctor.profile_edit.bio'.tr(),
-          hintText: 'doctor.profile_edit.bio_hint'.tr(),
-          controller: _bioController,
-          prefixIcon: Icons.description_outlined,
-          maxLines: 5,
-          minLines: 3,
-          textCapitalization: TextCapitalization.sentences,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'doctor.profile_edit.validation.bio_required'.tr();
-            }
-            if (value.trim().length < AppConstants.bioMinLength) {
-              return 'doctor.profile_edit.validation.bio_too_short'.tr(
-                namedArgs: {'min': AppConstants.bioMinLength.toString()},
-              );
-            }
-            if (value.trim().length > AppConstants.bioMaxLength) {
-              return 'doctor.profile_edit.validation.bio_too_long'.tr(
-                namedArgs: {'max': AppConstants.bioMaxLength.toString()},
-              );
-            }
-            return null;
-          },
+        KeyedSubtree(
+          key: _bioKey,
+          child: AppTextField(
+            label: 'doctor.profile_edit.bio'.tr(),
+            hintText: 'doctor.profile_edit.bio_hint'.tr(),
+            controller: _bioController,
+            prefixIcon: Icons.description_outlined,
+            maxLines: 5,
+            minLines: 3,
+            textCapitalization: TextCapitalization.sentences,
+            onChanged: (_) => setState(() {}),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'doctor.profile_edit.validation.bio_required'.tr();
+              }
+              if (value.trim().length < AppConstants.bioMinLength) {
+                return 'doctor.profile_edit.validation.bio_too_short'.tr(
+                  namedArgs: {'min': AppConstants.bioMinLength.toString()},
+                );
+              }
+              if (value.trim().length > AppConstants.bioMaxLength) {
+                return 'doctor.profile_edit.validation.bio_too_long'.tr(
+                  namedArgs: {'max': AppConstants.bioMaxLength.toString()},
+                );
+              }
+              return null;
+            },
+          ),
         ),
         const SizedBox(height: AppTheme.spacing4),
-        Text(
-          'doctor.profile_edit.bio_helper'.tr(),
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).hintColor,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                'doctor.profile_edit.bio_helper'.tr(),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).hintColor,
+                    ),
               ),
+            ),
+            const SizedBox(width: AppTheme.spacing8),
+            Text(
+              '${_bioController.text.trim().length}/${AppConstants.bioMaxLength}',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(context).hintColor,
+                  ),
+              textAlign: TextAlign.right,
+            ),
+          ],
         ),
         const SizedBox(height: AppTheme.spacing16),
 
         // Consultation price field
-        AppTextField(
-          label: 'doctor.profile_edit.consultation_price'.tr(),
-          hintText: '350',
-          controller: _priceController,
-          prefixIcon: Icons.payments_outlined,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
-          ],
-          isOptional: false,
-          validator: (value) {
-            final text = value?.trim() ?? '';
-            if (text.isEmpty) {
-              return 'doctor.profile_edit.validation.price_required'.tr();
-            }
-            final price = double.tryParse(text);
-            if (price == null || price <= 0) {
-              return 'validation.invalid_price'.tr();
-            }
-            if (price > AppConstants.priceMax) {
-              return 'validation.price_too_high'.tr();
-            }
-            return null;
-          },
+        KeyedSubtree(
+          key: _priceKey,
+          child: AppTextField(
+            label: 'doctor.profile_edit.consultation_price'.tr(),
+            hintText: '350',
+            controller: _priceController,
+            prefixIcon: Icons.payments_outlined,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]')),
+            ],
+            isOptional: false,
+            validator: (value) {
+              final text = value?.trim() ?? '';
+              if (text.isEmpty) {
+                return 'doctor.profile_edit.validation.price_required'.tr();
+              }
+              final price = double.tryParse(text);
+              if (price == null || price <= 0) {
+                return 'validation.invalid_price'.tr();
+              }
+              if (price > AppConstants.priceMax) {
+                return 'validation.price_too_high'.tr();
+              }
+              return null;
+            },
+          ),
         ),
         const SizedBox(height: AppTheme.spacing16),
 
         // Experience years field
-        AppTextField(
-          label: 'doctor.profile_edit.experience_years'.tr(),
-          hintText: '10',
-          controller: _experienceController,
-          prefixIcon: Icons.work_history_outlined,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-          ],
-          isOptional: false,
-          validator: (value) {
-            final text = value?.trim() ?? '';
-            if (text.isEmpty) {
-              return 'doctor.profile_edit.validation.experience_required'.tr();
-            }
-            final years = int.tryParse(text);
-            if (years == null || years < AppConstants.experienceMinYears || years > AppConstants.experienceMaxYears) {
-              return 'doctor.profile_edit.validation.experience_invalid'.tr(
-                namedArgs: {
-                  'min': AppConstants.experienceMinYears.toString(),
-                  'max': AppConstants.experienceMaxYears.toString(),
-                },
-              );
-            }
-            return null;
-          },
+        KeyedSubtree(
+          key: _experienceKey,
+          child: AppTextField(
+            label: 'doctor.profile_edit.experience_years'.tr(),
+            hintText: '10',
+            controller: _experienceController,
+            prefixIcon: Icons.work_history_outlined,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+            isOptional: false,
+            validator: (value) {
+              final text = value?.trim() ?? '';
+              if (text.isEmpty) {
+                return 'doctor.profile_edit.validation.experience_required'.tr();
+              }
+              final years = int.tryParse(text);
+              if (years == null || years < AppConstants.experienceMinYears || years > AppConstants.experienceMaxYears) {
+                return 'doctor.profile_edit.validation.experience_invalid'.tr(
+                  namedArgs: {
+                    'min': AppConstants.experienceMinYears.toString(),
+                    'max': AppConstants.experienceMaxYears.toString(),
+                  },
+                );
+              }
+              return null;
+            },
+          ),
         ),
         const SizedBox(height: AppTheme.spacing16),
 
         // Languages selection
-        MultiSelectChipField(
-          label: 'doctor.profile_edit.languages_spoken'.tr(),
-          options: _languageOptions,
-          selectedOptions: _selectedLanguages,
-          onSelectionChanged: (selected) {
-            setState(() {
-              _selectedLanguages = selected;
-              _languagesError = null;
-            });
-          },
-          translationPrefix: 'languages',
-          isRequired: true,
-          errorText: _languagesError,
+        KeyedSubtree(
+          key: _languagesKey,
+          child: MultiSelectChipField(
+            label: 'doctor.profile_edit.languages_spoken'.tr(),
+            options: _languageOptions,
+            selectedOptions: _selectedLanguages,
+            onSelectionChanged: (selected) {
+              setState(() {
+                _selectedLanguages = selected;
+                _languagesError = null;
+              });
+            },
+            translationPrefix: 'languages',
+            isRequired: true,
+            errorText: _languagesError,
+          ),
         ),
       ],
     );

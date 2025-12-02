@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
@@ -17,8 +18,15 @@ class CompleteProfileScreen extends StatefulWidget {
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _scrollHelper = FormScrollHelper();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+
+  // GlobalKeys for scroll-to-error functionality
+  final _nameKey = GlobalKey();
+  final _dateOfBirthKey = GlobalKey();
+  final _sexKey = GlobalKey();
+  final _phoneKey = GlobalKey();
 
   DateTime? _selectedDateOfBirth;
   String? _selectedGender;
@@ -54,6 +62,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _nameController.dispose();
     _phoneController.dispose();
     super.dispose();
@@ -61,6 +70,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<void> _handleCompleteProfile() async {
     // Clear previous errors
+    _scrollHelper.clearErrors();
     setState(() {
       _dateOfBirthError = null;
     });
@@ -76,6 +86,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       setState(() {
         _dateOfBirthError = 'validation.select_date_of_birth'.tr();
       });
+      _scrollHelper.setError('dateOfBirth');
       hasError = true;
     }
 
@@ -87,6 +98,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
 
     if (hasError) {
+      _scrollHelper.scrollToFirstError(context);
       return;
     }
 
@@ -126,6 +138,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
 
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('name', _nameKey);
+    _scrollHelper.register('dateOfBirth', _dateOfBirthKey);
+    _scrollHelper.register('sex', _sexKey);
+    _scrollHelper.register('phone', _phoneKey);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -154,84 +172,96 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Form Fields
-                AppTextField(
-                  label: 'common.full_name'.tr(),
-                  hintText: 'auth.name_hint'.tr(),
-                  controller: _nameController,
-                  prefixIcon: Icons.person_outlined,
-                  keyboardType: TextInputType.name,
-                  textInputAction: TextInputAction.next,
-                  textCapitalization: TextCapitalization.words,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'validation.please_enter_full_name'.tr();
-                    }
-                    if (value.trim().length < AppConstants.nameMinLength) {
-                      return 'validation.name_too_short'.tr(
-                        namedArgs: {'min': AppConstants.nameMinLength.toString()},
-                      );
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppTheme.spacing16),
-
-                AppDatePickerField(
-                  label: 'profile.date_of_birth'.tr(),
-                  hintText: 'profile.date_of_birth_hint'.tr(),
-                  selectedDate: _selectedDateOfBirth,
-                  onDateSelected: (date) {
-                    setState(() {
-                      _selectedDateOfBirth = date;
-                      if (_dateOfBirthError != null) _dateOfBirthError = null;
-                    });
-                  },
-                  firstDate: DateTime(now.year - 120),
-                  lastDate: DateTime(now.year - 18),
-                  errorText: _dateOfBirthError,
-                ),
-                const SizedBox(height: AppTheme.spacing16),
-
-                AppDropdownField(
-                  label: 'profile.sex'.tr(),
-                  hintText: 'profile.sex_hint'.tr(),
-                  value: _selectedGender,
-                  items: _sexKeys,
-                  translationPrefix: 'profile',
-                  prefixIcon: Icons.wc_outlined,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGender = value;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'validation.select_sex'.tr();
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppTheme.spacing16),
-
-                AppTextField(
-                  label: 'common.phone'.tr(),
-                  hintText: 'profile.phone_hint'.tr(),
-                  controller: _phoneController,
-                  prefixIcon: Icons.phone_outlined,
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.done,
-                  isOptional: true,
-                  optionalText: 'profile.optional'.tr(),
-                  validator: (value) {
-                    if (value != null && value.trim().isNotEmpty) {
-                      // Basic phone validation - at least 10 digits
-                      final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
-                      if (digitsOnly.length < AppConstants.phoneMinDigits) {
-                        return 'validation.invalid_phone'.tr();
+                KeyedSubtree(
+                  key: _nameKey,
+                  child: AppTextField(
+                    label: 'common.full_name'.tr(),
+                    hintText: 'auth.name_hint'.tr(),
+                    controller: _nameController,
+                    prefixIcon: Icons.person_outlined,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                    textCapitalization: TextCapitalization.words,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'validation.please_enter_full_name'.tr();
                       }
-                    }
-                    return null;
-                  },
+                      if (value.trim().length < AppConstants.nameMinLength) {
+                        return 'validation.name_too_short'.tr(
+                          namedArgs: {'min': AppConstants.nameMinLength.toString()},
+                        );
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacing16),
+
+                KeyedSubtree(
+                  key: _dateOfBirthKey,
+                  child: AppDatePickerField(
+                    label: 'profile.date_of_birth'.tr(),
+                    hintText: 'profile.date_of_birth_hint'.tr(),
+                    selectedDate: _selectedDateOfBirth,
+                    onDateSelected: (date) {
+                      setState(() {
+                        _selectedDateOfBirth = date;
+                        if (_dateOfBirthError != null) _dateOfBirthError = null;
+                      });
+                    },
+                    firstDate: DateTime(now.year - 120),
+                    lastDate: DateTime(now.year - 18),
+                    errorText: _dateOfBirthError,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacing16),
+
+                KeyedSubtree(
+                  key: _sexKey,
+                  child: AppDropdownField(
+                    label: 'profile.sex'.tr(),
+                    hintText: 'profile.sex_hint'.tr(),
+                    value: _selectedGender,
+                    items: _sexKeys,
+                    translationPrefix: 'profile',
+                    prefixIcon: Icons.wc_outlined,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedGender = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'validation.select_sex'.tr();
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacing16),
+
+                KeyedSubtree(
+                  key: _phoneKey,
+                  child: AppTextField(
+                    label: 'common.phone'.tr(),
+                    hintText: 'profile.phone_hint'.tr(),
+                    controller: _phoneController,
+                    prefixIcon: Icons.phone_outlined,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    isOptional: true,
+                    optionalText: 'profile.optional'.tr(),
+                    validator: (value) {
+                      if (value != null && value.trim().isNotEmpty) {
+                        // Basic phone validation - at least 10 digits
+                        final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+                        if (digitsOnly.length < AppConstants.phoneMinDigits) {
+                          return 'validation.invalid_phone'.tr();
+                        }
+                      }
+                      return null;
+                    },
+                  ),
                 ),
                 const SizedBox(height: AppTheme.sectionSpacing),
 

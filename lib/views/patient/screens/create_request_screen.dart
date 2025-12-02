@@ -8,6 +8,7 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/views/patient/screens/main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 
@@ -26,6 +27,7 @@ class CreateRequestScreen extends StatefulWidget {
 class _CreateRequestScreenState extends State<CreateRequestScreen> {
   final PageController _pageController = PageController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final _scrollHelper = FormScrollHelper();
 
   int _currentStep = 0;
   bool _isSubmitting = false;
@@ -41,8 +43,13 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   String? _descriptionError;
   String? _termsError;
 
+  // GlobalKeys for scroll-to-error functionality
+  final _titleKey = GlobalKey();
+  final _descriptionKey = GlobalKey();
+
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -81,6 +88,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   bool _validateStep1() {
     bool isValid = true;
 
+    // Clear previous errors
+    _scrollHelper.clearErrors();
     setState(() {
       _titleError = null;
       _descriptionError = null;
@@ -92,6 +101,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           namedArgs: {'min': AppConstants.titleMinLength.toString()},
         );
       });
+      _scrollHelper.setError('title');
       isValid = false;
     }
     if (_description.trim().length < AppConstants.descriptionMinLength) {
@@ -100,8 +110,14 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           namedArgs: {'min': AppConstants.descriptionMinLength.toString()},
         );
       });
+      _scrollHelper.setError('description');
       isValid = false;
     }
+
+    if (!isValid) {
+      _scrollHelper.scrollToFirstError(context);
+    }
+
     return isValid;
   }
 
@@ -338,6 +354,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   // Step 1: Request Details
   Widget _buildStep1() {
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('title', _titleKey);
+    _scrollHelper.register('description', _descriptionKey);
+
     return SingleChildScrollView(
       padding: AppTheme.screenPadding,
       child: Form(
@@ -361,51 +381,67 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
             const SizedBox(height: AppTheme.sectionSpacing),
 
             // Title field
-            Text(
-              'create_request.step1.title_label'.tr(),
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: AppTheme.spacing8),
-            TextField(
-              maxLength: AppConstants.titleMaxLength,
-              onChanged: (value) {
-                setState(() {
-                  _title = value;
-                  if (_titleError != null) _titleError = null;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'create_request.step1.title_hint'.tr(),
-                errorText: _titleError,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                ),
+            KeyedSubtree(
+              key: _titleKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'create_request.step1.title_label'.tr(),
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: AppTheme.spacing8),
+                  TextField(
+                    maxLength: AppConstants.titleMaxLength,
+                    onChanged: (value) {
+                      setState(() {
+                        _title = value;
+                        if (_titleError != null) _titleError = null;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'create_request.step1.title_hint'.tr(),
+                      errorText: _titleError,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: AppTheme.spacing24),
 
             // Description field
-            Text(
-              'create_request.step1.description_label'.tr(),
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            const SizedBox(height: AppTheme.spacing8),
-            TextField(
-              maxLength: AppConstants.descriptionMaxLength,
-              maxLines: 6,
-              onChanged: (value) {
-                setState(() {
-                  _description = value;
-                  if (_descriptionError != null) _descriptionError = null;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'create_request.step1.description_hint'.tr(),
-                errorText: _descriptionError,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                ),
-                alignLabelWithHint: true,
+            KeyedSubtree(
+              key: _descriptionKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'create_request.step1.description_label'.tr(),
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: AppTheme.spacing8),
+                  TextField(
+                    maxLength: AppConstants.descriptionMaxLength,
+                    maxLines: 6,
+                    onChanged: (value) {
+                      setState(() {
+                        _description = value;
+                        if (_descriptionError != null) _descriptionError = null;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'create_request.step1.description_hint'.tr(),
+                      errorText: _descriptionError,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      ),
+                      alignLabelWithHint: true,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: AppTheme.spacing24),

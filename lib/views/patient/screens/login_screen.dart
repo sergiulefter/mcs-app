@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
@@ -21,10 +22,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _scrollHelper = FormScrollHelper();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isPrefetching = false;
+
+  // GlobalKeys for scroll-to-error functionality
+  final _emailKey = GlobalKey();
+  final _passwordKey = GlobalKey();
 
   // Inline error messages from Firebase auth
   String? _emailError;
@@ -32,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -39,91 +46,103 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     // Clear previous auth errors before validation
+    _scrollHelper.clearErrors();
     setState(() {
       _emailError = null;
       _passwordError = null;
     });
 
-    if (_formKey.currentState!.validate()) {
-      final authController = context.read<AuthController>();
-      final consultationsController = context.read<ConsultationsController>();
+    if (!_formKey.currentState!.validate()) {
+      _scrollHelper.scrollToFirstError(context);
+      return;
+    }
 
-      final success = await authController.signIn(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+    final authController = context.read<AuthController>();
+    final consultationsController = context.read<ConsultationsController>();
 
-      if (success && mounted) {
-        setState(() => _isPrefetching = true);
+    final success = await authController.signIn(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
 
-        final user = authController.currentUser;
-        final userId = user?.uid;
+    if (success && mounted) {
+      setState(() => _isPrefetching = true);
 
-        // Only prefetch consultations for patients (not doctors/admins)
-        if (userId != null && user?.isDoctor != true && user?.userType != 'admin') {
-          await consultationsController.primeForUser(userId, force: true);
-        }
+      final user = authController.currentUser;
+      final userId = user?.uid;
 
-        if (!mounted) return;
-
-        // Role-based navigation
-        if (user?.userType == 'admin') {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-          );
-        } else if (user?.isDoctor == true) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => const DoctorMainShell()),
-          );
-        } else {
-          // Patient navigation
-          final navigator = Navigator.of(context);
-          final shouldShowCompleteProfile = user?.profileCompleted == false;
-
-          navigator.pushReplacement(
-            MaterialPageRoute(builder: (context) => const MainShell()),
-          );
-
-          // If profile not completed, push CompleteProfileScreen on top
-          if (shouldShowCompleteProfile) {
-            // Give user time to see the home screen before prompting to complete profile
-            Future.delayed(const Duration(milliseconds: 800), () {
-              navigator.push(
-                MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
-              );
-            });
-          }
-        }
-
-        if (mounted) {
-          setState(() => _isPrefetching = false);
-        }
-      } else if (mounted) {
-        setState(() => _isPrefetching = false);
-
-        // Map Firebase error to appropriate field
-        final errorCode = authController.errorCode;
-        final errorMessage = authController.errorMessage ?? 'auth.login_failed'.tr();
-
-        setState(() {
-          if (errorCode == 'wrong-password' || errorCode == 'invalid-credential') {
-            _passwordError = errorMessage;
-          } else if (errorCode == 'user-not-found' || errorCode == 'invalid-email') {
-            _emailError = errorMessage;
-          } else {
-            // For other errors, show under email field as general error
-            _emailError = errorMessage;
-          }
-        });
-
-        // Trigger form revalidation to show the inline error
-        _formKey.currentState!.validate();
+      // Only prefetch consultations for patients (not doctors/admins)
+      if (userId != null && user?.isDoctor != true && user?.userType != 'admin') {
+        await consultationsController.primeForUser(userId, force: true);
       }
+
+      if (!mounted) return;
+
+      // Role-based navigation
+      if (user?.userType == 'admin') {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+        );
+      } else if (user?.isDoctor == true) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const DoctorMainShell()),
+        );
+      } else {
+        // Patient navigation
+        final navigator = Navigator.of(context);
+        final shouldShowCompleteProfile = user?.profileCompleted == false;
+
+        navigator.pushReplacement(
+          MaterialPageRoute(builder: (context) => const MainShell()),
+        );
+
+        // If profile not completed, push CompleteProfileScreen on top
+        if (shouldShowCompleteProfile) {
+          // Give user time to see the home screen before prompting to complete profile
+          Future.delayed(const Duration(milliseconds: 800), () {
+            navigator.push(
+              MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+            );
+          });
+        }
+      }
+
+      if (mounted) {
+        setState(() => _isPrefetching = false);
+      }
+    } else if (mounted) {
+      setState(() => _isPrefetching = false);
+
+      // Map Firebase error to appropriate field
+      final errorCode = authController.errorCode;
+      final errorMessage = authController.errorMessage ?? 'auth.login_failed'.tr();
+
+      setState(() {
+        if (errorCode == 'wrong-password' || errorCode == 'invalid-credential') {
+          _passwordError = errorMessage;
+          _scrollHelper.setError('password');
+        } else if (errorCode == 'user-not-found' || errorCode == 'invalid-email') {
+          _emailError = errorMessage;
+          _scrollHelper.setError('email');
+        } else {
+          // For other errors, show under email field as general error
+          _emailError = errorMessage;
+          _scrollHelper.setError('email');
+        }
+      });
+
+      // Trigger form revalidation to show the inline error
+      _formKey.currentState!.validate();
+      _scrollHelper.scrollToFirstError(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('email', _emailKey);
+    _scrollHelper.register('password', _passwordKey);
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -139,9 +158,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppTheme.spacing48),
 
                   // Login Form
-                  _buildEmailField(),
+                  KeyedSubtree(
+                    key: _emailKey,
+                    child: _buildEmailField(),
+                  ),
                   const SizedBox(height: AppTheme.spacing16),
-                  _buildPasswordField(),
+                  KeyedSubtree(
+                    key: _passwordKey,
+                    child: _buildPasswordField(),
+                  ),
                   const SizedBox(height: AppTheme.spacing8),
 
                   // Forgot Password

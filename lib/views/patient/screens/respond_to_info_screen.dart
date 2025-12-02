@@ -5,6 +5,7 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -25,21 +26,25 @@ class RespondToInfoScreen extends StatefulWidget {
 
 class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _scrollHelper = FormScrollHelper();
   final _additionalInfoController = TextEditingController();
   final List<TextEditingController> _answerControllers = [];
+  final List<GlobalKey> _answerKeys = [];
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize answer controllers for each question
+    // Initialize answer controllers and keys for each question
     for (var i = 0; i < widget.infoRequest.questions.length; i++) {
       _answerControllers.add(TextEditingController());
+      _answerKeys.add(GlobalKey());
     }
   }
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _additionalInfoController.dispose();
     for (final controller in _answerControllers) {
       controller.dispose();
@@ -49,6 +54,11 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register fields in order for scroll-to-error
+    for (var i = 0; i < _answerKeys.length; i++) {
+      _scrollHelper.register('answer_$i', _answerKeys[i]);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('info_response.title'.tr()),
@@ -153,7 +163,10 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
                   ? AppTheme.spacing20
                   : 0,
             ),
-            child: _buildQuestionCard(context, index),
+            child: KeyedSubtree(
+              key: _answerKeys[index],
+              child: _buildQuestionCard(context, index),
+            ),
           );
         }),
       ],
@@ -298,7 +311,10 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      _scrollHelper.scrollToFirstError(context);
+      return;
+    }
 
     setState(() => _isSubmitting = true);
 

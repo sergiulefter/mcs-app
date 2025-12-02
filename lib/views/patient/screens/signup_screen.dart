@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'complete_profile_screen.dart';
@@ -17,6 +18,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _scrollHelper = FormScrollHelper();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -24,12 +26,19 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  // GlobalKeys for scroll-to-error functionality
+  final _nameKey = GlobalKey();
+  final _emailKey = GlobalKey();
+  final _passwordKey = GlobalKey();
+  final _confirmPasswordKey = GlobalKey();
+
   // Inline error messages from Firebase auth
   String? _emailError;
   String? _passwordError;
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -39,62 +48,76 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _handleSignup() async {
     // Clear previous auth errors before validation
+    _scrollHelper.clearErrors();
     setState(() {
       _emailError = null;
       _passwordError = null;
     });
 
-    if (_formKey.currentState!.validate()) {
-      final authController = context.read<AuthController>();
+    if (!_formKey.currentState!.validate()) {
+      _scrollHelper.scrollToFirstError(context);
+      return;
+    }
 
-      // Get the current language from EasyLocalization (set in LanguageSelectionScreen)
-      final currentLanguage = context.locale.languageCode;
+    final authController = context.read<AuthController>();
 
-      final success = await authController.signUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        displayName: _nameController.text.trim(),
-        preferredLanguage: currentLanguage,
+    // Get the current language from EasyLocalization (set in LanguageSelectionScreen)
+    final currentLanguage = context.locale.languageCode;
+
+    final success = await authController.signUp(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      displayName: _nameController.text.trim(),
+      preferredLanguage: currentLanguage,
+    );
+
+    if (success && mounted) {
+      // Navigate to MainShell first, then push CompleteProfileScreen on top
+      final navigator = Navigator.of(context);
+
+      navigator.pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainShell()),
       );
 
-      if (success && mounted) {
-        // Navigate to MainShell first, then push CompleteProfileScreen on top
-        final navigator = Navigator.of(context);
-
-        navigator.pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainShell()),
+      // Give user time to see the home screen before prompting to complete profile
+      Future.delayed(const Duration(milliseconds: 800), () {
+        navigator.push(
+          MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
         );
+      });
+    } else if (mounted) {
+      // Map Firebase error to appropriate field
+      final errorCode = authController.errorCode;
+      final errorMessage = authController.errorMessage ?? 'errors.signup_failed'.tr();
 
-        // Give user time to see the home screen before prompting to complete profile
-        Future.delayed(const Duration(milliseconds: 800), () {
-          navigator.push(
-            MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
-          );
-        });
-      } else if (mounted) {
-        // Map Firebase error to appropriate field
-        final errorCode = authController.errorCode;
-        final errorMessage = authController.errorMessage ?? 'errors.signup_failed'.tr();
+      setState(() {
+        if (errorCode == 'email-already-in-use' || errorCode == 'invalid-email') {
+          _emailError = errorMessage;
+          _scrollHelper.setError('email');
+        } else if (errorCode == 'weak-password') {
+          _passwordError = errorMessage;
+          _scrollHelper.setError('password');
+        } else {
+          // For other errors, show under email field as general error
+          _emailError = errorMessage;
+          _scrollHelper.setError('email');
+        }
+      });
 
-        setState(() {
-          if (errorCode == 'email-already-in-use' || errorCode == 'invalid-email') {
-            _emailError = errorMessage;
-          } else if (errorCode == 'weak-password') {
-            _passwordError = errorMessage;
-          } else {
-            // For other errors, show under email field as general error
-            _emailError = errorMessage;
-          }
-        });
-
-        // Trigger form revalidation to show the inline error
-        _formKey.currentState!.validate();
-      }
+      // Trigger form revalidation to show the inline error
+      _formKey.currentState!.validate();
+      _scrollHelper.scrollToFirstError(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('name', _nameKey);
+    _scrollHelper.register('email', _emailKey);
+    _scrollHelper.register('password', _passwordKey);
+    _scrollHelper.register('confirmPassword', _confirmPasswordKey);
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -113,41 +136,53 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Signup Form
-                AppTextField(
-                  label: 'common.full_name'.tr(),
-                  hintText: 'auth.name_hint'.tr(),
-                  controller: _nameController,
-                  prefixIcon: Icons.person_outlined,
-                  keyboardType: TextInputType.name,
-                  textInputAction: TextInputAction.next,
-                  textCapitalization: TextCapitalization.words,
-                  validator: Validators.validateName,
+                KeyedSubtree(
+                  key: _nameKey,
+                  child: AppTextField(
+                    label: 'common.full_name'.tr(),
+                    hintText: 'auth.name_hint'.tr(),
+                    controller: _nameController,
+                    prefixIcon: Icons.person_outlined,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                    textCapitalization: TextCapitalization.words,
+                    validator: Validators.validateName,
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing16),
 
-                AppTextField(
-                  label: 'common.email'.tr(),
-                  hintText: 'auth.email_hint'.tr(),
-                  controller: _emailController,
-                  prefixIcon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  validator: (value) {
-                    if (_emailError != null) return _emailError;
-                    return Validators.validateEmail(value);
-                  },
-                  onChanged: (_) {
-                    if (_emailError != null) {
-                      setState(() => _emailError = null);
-                    }
-                  },
+                KeyedSubtree(
+                  key: _emailKey,
+                  child: AppTextField(
+                    label: 'common.email'.tr(),
+                    hintText: 'auth.email_hint'.tr(),
+                    controller: _emailController,
+                    prefixIcon: Icons.email_outlined,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if (_emailError != null) return _emailError;
+                      return Validators.validateEmail(value);
+                    },
+                    onChanged: (_) {
+                      if (_emailError != null) {
+                        setState(() => _emailError = null);
+                      }
+                    },
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing16),
 
-                _buildPasswordField(),
+                KeyedSubtree(
+                  key: _passwordKey,
+                  child: _buildPasswordField(),
+                ),
                 const SizedBox(height: AppTheme.spacing16),
 
-                _buildConfirmPasswordField(),
+                KeyedSubtree(
+                  key: _confirmPasswordKey,
+                  child: _buildConfirmPasswordField(),
+                ),
                 const SizedBox(height: AppTheme.sectionSpacing),
 
                 // Sign Up Button

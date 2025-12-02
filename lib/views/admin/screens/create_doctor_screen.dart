@@ -6,6 +6,7 @@ import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/admin/widgets/multi_select_chip_field.dart';
@@ -27,6 +28,16 @@ class CreateDoctorScreen extends StatefulWidget {
 class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _adminService = AdminService();
+  final _scrollHelper = FormScrollHelper();
+
+  // GlobalKeys for scroll-to-error functionality
+  final _fullNameKey = GlobalKey();
+  final _emailKey = GlobalKey();
+  final _passwordKey = GlobalKey();
+  final _specialtyKey = GlobalKey();
+  final _experienceKey = GlobalKey();
+  final _priceKey = GlobalKey();
+  final _languagesKey = GlobalKey();
 
   /// Whether we are editing an existing doctor (true) or creating a new one (false)
   bool get _isEditMode => widget.doctorToEdit != null;
@@ -86,6 +97,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -99,19 +111,6 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
     setState(() {
       _obscurePassword = !_obscurePassword;
     });
-  }
-
-  bool _validateLanguages() {
-    if (_selectedLanguages.isEmpty) {
-      setState(() {
-        _languagesError = 'admin.create_doctor.validation.languages_required'.tr();
-      });
-      return false;
-    }
-    setState(() {
-      _languagesError = null;
-    });
-    return true;
   }
 
   /// Show dialog to confirm admin password before creating doctor
@@ -185,15 +184,20 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
   Future<void> _handleSubmit() async {
     // Clear previous errors
+    _scrollHelper.clearErrors();
     setState(() {
       _emailError = null;
       _passwordError = null;
       _specialtyError = null;
+      _languagesError = null;
     });
 
-    // Validate form fields
+    // Track if any validation fails
+    bool hasError = false;
+
+    // Validate form fields (fullName, email, password, experience, price)
     if (!_formKey.currentState!.validate()) {
-      return;
+      hasError = true;
     }
 
     // Validate specialty selection
@@ -201,11 +205,22 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       setState(() {
         _specialtyError = 'admin.create_doctor.validation.specialty_required'.tr();
       });
-      return;
+      _scrollHelper.setError('specialty');
+      hasError = true;
     }
 
     // Validate languages
-    if (!_validateLanguages()) {
+    if (_selectedLanguages.isEmpty) {
+      setState(() {
+        _languagesError = 'admin.create_doctor.validation.languages_required'.tr();
+      });
+      _scrollHelper.setError('languages');
+      hasError = true;
+    }
+
+    // If any validation failed, scroll to first error and return
+    if (hasError) {
+      _scrollHelper.scrollToFirstError(context);
       return;
     }
 
@@ -287,17 +302,23 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           setState(() {
             _emailError = 'admin.create_doctor.error_email_exists'.tr();
           });
+          _scrollHelper.setError('email');
           _formKey.currentState!.validate();
+          _scrollHelper.scrollToFirstError(context);
         } else if (errorString.contains('invalid-email')) {
           setState(() {
             _emailError = 'admin.create_doctor.error_invalid_email'.tr();
           });
+          _scrollHelper.setError('email');
           _formKey.currentState!.validate();
+          _scrollHelper.scrollToFirstError(context);
         } else if (errorString.contains('weak-password')) {
           setState(() {
             _passwordError = 'admin.create_doctor.error_weak_password'.tr();
           });
+          _scrollHelper.setError('password');
           _formKey.currentState!.validate();
+          _scrollHelper.scrollToFirstError(context);
         } else if (errorString.contains('wrong-password') ||
             errorString.contains('invalid-credential')) {
           // Admin password error - show in SnackBar since it's in a dialog
@@ -401,6 +422,15 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('fullName', _fullNameKey);
+    _scrollHelper.register('email', _emailKey);
+    _scrollHelper.register('password', _passwordKey);
+    _scrollHelper.register('specialty', _specialtyKey);
+    _scrollHelper.register('experience', _experienceKey);
+    _scrollHelper.register('price', _priceKey);
+    _scrollHelper.register('languages', _languagesKey);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditMode
@@ -533,36 +563,42 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
     return Column(
       children: [
         // Full Name
-        AppTextField(
-          label: 'common.full_name'.tr(),
-          hintText: 'admin.create_doctor.field_full_name_hint'.tr(),
-          controller: _fullNameController,
-          prefixIcon: Icons.person_outlined,
-          keyboardType: TextInputType.name,
-          textInputAction: TextInputAction.next,
-          textCapitalization: TextCapitalization.words,
-          validator: Validators.validateName,
+        KeyedSubtree(
+          key: _fullNameKey,
+          child: AppTextField(
+            label: 'common.full_name'.tr(),
+            hintText: 'admin.create_doctor.field_full_name_hint'.tr(),
+            controller: _fullNameController,
+            prefixIcon: Icons.person_outlined,
+            keyboardType: TextInputType.name,
+            textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.words,
+            validator: Validators.validateName,
+          ),
         ),
 
         // Email - only show in create mode (email can't be changed)
         if (!_isEditMode) ...[
           const SizedBox(height: AppTheme.spacing16),
-          AppTextField(
-            label: 'common.email'.tr(),
-            hintText: 'admin.create_doctor.field_email_hint'.tr(),
-            controller: _emailController,
-            prefixIcon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            validator: (value) {
-              if (_emailError != null) return _emailError;
-              return Validators.validateEmail(value);
-            },
-            onChanged: (_) {
-              if (_emailError != null) {
-                setState(() => _emailError = null);
-              }
-            },
+          KeyedSubtree(
+            key: _emailKey,
+            child: AppTextField(
+              label: 'common.email'.tr(),
+              hintText: 'admin.create_doctor.field_email_hint'.tr(),
+              controller: _emailController,
+              prefixIcon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              validator: (value) {
+                if (_emailError != null) return _emailError;
+                return Validators.validateEmail(value);
+              },
+              onChanged: (_) {
+                if (_emailError != null) {
+                  setState(() => _emailError = null);
+                }
+              },
+            ),
           ),
         ],
 
@@ -609,29 +645,32 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
         // Password - only show in create mode
         if (!_isEditMode) ...[
           const SizedBox(height: AppTheme.spacing16),
-          AppTextField(
-            label: 'admin.create_doctor.field_password'.tr(),
-            hintText: 'admin.create_doctor.field_password_hint'.tr(
-              namedArgs: {'min': AppConstants.passwordMinLength.toString()},
+          KeyedSubtree(
+            key: _passwordKey,
+            child: AppTextField(
+              label: 'admin.create_doctor.field_password'.tr(),
+              hintText: 'admin.create_doctor.field_password_hint'.tr(
+                namedArgs: {'min': AppConstants.passwordMinLength.toString()},
+              ),
+              controller: _passwordController,
+              prefixIcon: Icons.lock_outlined,
+              suffixIcon: _obscurePassword
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              onSuffixIconTap: _togglePasswordVisibility,
+              obscureText: _obscurePassword,
+              keyboardType: TextInputType.visiblePassword,
+              textInputAction: TextInputAction.next,
+              validator: (value) {
+                if (_passwordError != null) return _passwordError;
+                return Validators.validatePassword(value);
+              },
+              onChanged: (_) {
+                if (_passwordError != null) {
+                  setState(() => _passwordError = null);
+                }
+              },
             ),
-            controller: _passwordController,
-            prefixIcon: Icons.lock_outlined,
-            suffixIcon: _obscurePassword
-                ? Icons.visibility_outlined
-                : Icons.visibility_off_outlined,
-            onSuffixIconTap: _togglePasswordVisibility,
-            obscureText: _obscurePassword,
-            keyboardType: TextInputType.visiblePassword,
-            textInputAction: TextInputAction.next,
-            validator: (value) {
-              if (_passwordError != null) return _passwordError;
-              return Validators.validatePassword(value);
-            },
-            onChanged: (_) {
-              if (_passwordError != null) {
-                setState(() => _passwordError = null);
-              }
-            },
           ),
         ],
       ],
@@ -642,38 +681,44 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
     return Column(
       children: [
         // Specialty Picker (searchable bottom sheet)
-        SpecialtyPickerField(
-          label: 'admin.create_doctor.field_specialty'.tr(),
-          hintText: 'admin.create_doctor.field_specialty_hint'.tr(),
-          value: _selectedSpecialty,
-          prefixIcon: Icons.medical_services_outlined,
-          onChanged: (value) {
-            setState(() {
-              _selectedSpecialty = value;
-              if (_specialtyError != null) _specialtyError = null;
-            });
-          },
-          validator: (value) {
-            if (_specialtyError != null) return _specialtyError;
-            if (value == null) {
-              return 'admin.create_doctor.validation.specialty_required'.tr();
-            }
-            return null;
-          },
+        KeyedSubtree(
+          key: _specialtyKey,
+          child: SpecialtyPickerField(
+            label: 'admin.create_doctor.field_specialty'.tr(),
+            hintText: 'admin.create_doctor.field_specialty_hint'.tr(),
+            value: _selectedSpecialty,
+            prefixIcon: Icons.medical_services_outlined,
+            onChanged: (value) {
+              setState(() {
+                _selectedSpecialty = value;
+                if (_specialtyError != null) _specialtyError = null;
+              });
+            },
+            validator: (value) {
+              if (_specialtyError != null) return _specialtyError;
+              if (value == null) {
+                return 'admin.create_doctor.validation.specialty_required'.tr();
+              }
+              return null;
+            },
+          ),
         ),
         const SizedBox(height: AppTheme.spacing16),
 
         // Years of Experience (optional)
-        AppTextField(
-          label: 'admin.create_doctor.field_experience'.tr(),
-          hintText: 'admin.create_doctor.field_experience_hint'.tr(),
-          controller: _experienceYearsController,
-          prefixIcon: Icons.work_history_outlined,
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.next,
-          isOptional: true,
-          optionalText: 'profile.optional'.tr(),
-          validator: Validators.validateExperienceYearsOptional,
+        KeyedSubtree(
+          key: _experienceKey,
+          child: AppTextField(
+            label: 'admin.create_doctor.field_experience'.tr(),
+            hintText: 'admin.create_doctor.field_experience_hint'.tr(),
+            controller: _experienceYearsController,
+            prefixIcon: Icons.work_history_outlined,
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.next,
+            isOptional: true,
+            optionalText: 'profile.optional'.tr(),
+            validator: Validators.validateExperienceYearsOptional,
+          ),
         ),
       ],
     );
@@ -684,33 +729,39 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Consultation Price (optional)
-        AppTextField(
-          label: 'admin.create_doctor.field_price'.tr(),
-          hintText: 'admin.create_doctor.field_price_hint'.tr(),
-          controller: _priceController,
-          prefixIcon: Icons.payments_outlined,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          textInputAction: TextInputAction.done,
-          isOptional: true,
-          optionalText: 'profile.optional'.tr(),
-          validator: Validators.validateConsultationPriceOptional,
+        KeyedSubtree(
+          key: _priceKey,
+          child: AppTextField(
+            label: 'admin.create_doctor.field_price'.tr(),
+            hintText: 'admin.create_doctor.field_price_hint'.tr(),
+            controller: _priceController,
+            prefixIcon: Icons.payments_outlined,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.done,
+            isOptional: true,
+            optionalText: 'profile.optional'.tr(),
+            validator: Validators.validateConsultationPriceOptional,
+          ),
         ),
         const SizedBox(height: AppTheme.spacing16),
 
         // Languages
-        MultiSelectChipField(
-          label: 'admin.create_doctor.field_languages'.tr(),
-          options: _availableLanguages,
-          selectedOptions: _selectedLanguages,
-          onSelectionChanged: (selected) {
-            setState(() {
-              _selectedLanguages = selected;
-              _languagesError = null;
-            });
-          },
-          translationPrefix: 'languages',
-          isRequired: true,
-          errorText: _languagesError,
+        KeyedSubtree(
+          key: _languagesKey,
+          child: MultiSelectChipField(
+            label: 'admin.create_doctor.field_languages'.tr(),
+            options: _availableLanguages,
+            selectedOptions: _selectedLanguages,
+            onSelectionChanged: (selected) {
+              setState(() {
+                _selectedLanguages = selected;
+                _languagesError = null;
+              });
+            },
+            translationPrefix: 'languages',
+            isRequired: true,
+            errorText: _languagesError,
+          ),
         ),
         const SizedBox(height: AppTheme.spacing16),
 

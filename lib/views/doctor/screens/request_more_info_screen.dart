@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -17,13 +18,19 @@ class RequestMoreInfoScreen extends StatefulWidget {
 
 class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _scrollHelper = FormScrollHelper();
   final _messageController = TextEditingController();
   final List<TextEditingController> _questionControllers = [TextEditingController()];
   final List<FocusNode> _questionFocusNodes = [FocusNode()];
+  final List<GlobalKey> _questionKeys = [GlobalKey()];
   bool _isSubmitting = false;
+
+  // GlobalKeys for scroll-to-error functionality
+  final _messageKey = GlobalKey();
 
   @override
   void dispose() {
+    _scrollHelper.dispose();
     _messageController.dispose();
     for (final controller in _questionControllers) {
       controller.dispose();
@@ -36,6 +43,12 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Register fields in order for scroll-to-error
+    _scrollHelper.register('message', _messageKey);
+    for (var i = 0; i < _questionKeys.length; i++) {
+      _scrollHelper.register('question_$i', _questionKeys[i]);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('doctor.request_more_info.title'.tr()),
@@ -48,29 +61,32 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppTextField(
-                  label: 'doctor.request_more_info.message_label'.tr(),
-                  controller: _messageController,
-                  maxLines: 4,
-                  hintText: 'doctor.request_more_info.message_hint'.tr(),
-                  onChanged: (_) => setState(() {}),
-                  validator: (value) {
-                    final text = value?.trim() ?? '';
-                    if (text.isEmpty) {
-                      return 'doctor.request_more_info.validation.required'.tr();
-                    }
-                    if (text.length < AppConstants.infoMessageMinLength) {
-                      return 'doctor.request_more_info.validation.min_length'.tr(
-                        namedArgs: {'min': AppConstants.infoMessageMinLength.toString()},
-                      );
-                    }
-                    if (text.length > AppConstants.infoMessageMaxLength) {
-                      return 'doctor.request_more_info.validation.max_length'.tr(
-                        namedArgs: {'max': AppConstants.infoMessageMaxLength.toString()},
-                      );
-                    }
-                    return null;
-                  },
+                KeyedSubtree(
+                  key: _messageKey,
+                  child: AppTextField(
+                    label: 'doctor.request_more_info.message_label'.tr(),
+                    controller: _messageController,
+                    maxLines: 4,
+                    hintText: 'doctor.request_more_info.message_hint'.tr(),
+                    onChanged: (_) => setState(() {}),
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'doctor.request_more_info.validation.required'.tr();
+                      }
+                      if (text.length < AppConstants.infoMessageMinLength) {
+                        return 'doctor.request_more_info.validation.min_length'.tr(
+                          namedArgs: {'min': AppConstants.infoMessageMinLength.toString()},
+                        );
+                      }
+                      if (text.length > AppConstants.infoMessageMaxLength) {
+                        return 'doctor.request_more_info.validation.max_length'.tr(
+                          namedArgs: {'max': AppConstants.infoMessageMaxLength.toString()},
+                        );
+                      }
+                      return null;
+                    },
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing8),
                 Align(
@@ -99,11 +115,13 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                           ? AppTheme.spacing12
                           : 0,
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: AppTextField(
+                    child: KeyedSubtree(
+                      key: _questionKeys[index],
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: AppTextField(
                             label: '${'doctor.request_more_info.question_label'.tr()} ${index + 1}',
                             controller: _questionControllers[index],
                             hintText: 'doctor.request_more_info.question_hint'.tr(),
@@ -127,22 +145,24 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                               }
                               return null;
                             },
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: AppTheme.spacing8),
-                        if (_questionControllers.length > 1)
-                          IconButton(
-                            tooltip: 'common.delete'.tr(),
-                            onPressed: () {
-                              setState(() {
-                                _questionControllers.removeAt(index).dispose();
-                                _questionFocusNodes.removeAt(index).dispose();
-                              });
-                            },
-                            icon: const Icon(Icons.remove_circle_outline),
-                            color: Theme.of(context).colorScheme.error,
-                          ),
-                      ],
+                          const SizedBox(width: AppTheme.spacing8),
+                          if (_questionControllers.length > 1)
+                            IconButton(
+                              tooltip: 'common.delete'.tr(),
+                              onPressed: () {
+                                setState(() {
+                                  _questionControllers.removeAt(index).dispose();
+                                  _questionFocusNodes.removeAt(index).dispose();
+                                  _questionKeys.removeAt(index);
+                                });
+                              },
+                              icon: const Icon(Icons.remove_circle_outline),
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                        ],
+                      ),
                     ),
                   );
                 }),
@@ -152,6 +172,7 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
                     setState(() {
                       _questionControllers.add(TextEditingController());
                       _questionFocusNodes.add(FocusNode());
+                      _questionKeys.add(GlobalKey());
                     });
                     // Move focus to the newly added field.
                     Future.delayed(const Duration(milliseconds: 100), () {
@@ -179,7 +200,10 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      _scrollHelper.scrollToFirstError(context);
+      return;
+    }
 
     setState(() => _isSubmitting = true);
     final controller = context.read<DoctorConsultationsController>();
