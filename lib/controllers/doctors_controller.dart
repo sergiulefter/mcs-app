@@ -54,6 +54,11 @@ class DoctorsController extends ChangeNotifier {
   // Filtered and sorted doctors
   List<DoctorModel> get filteredDoctors {
     var result = _doctors.where((doctor) {
+      // Only show doctors with complete profiles to patients
+      if (!doctor.isProfileComplete) {
+        return false;
+      }
+
       final specialtyKey = doctor.specialty.toString().split('.').last;
 
       // Search filter
