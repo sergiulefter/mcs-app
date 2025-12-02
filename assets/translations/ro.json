@@ -571,6 +571,7 @@
     "no_user_logged_in": "Niciun utilizator autentificat"
   },
   "common": {
+    "search": "Caută...",
     "skip": "Omite",
     "next": "Următorul",
     "save": "Salvează",

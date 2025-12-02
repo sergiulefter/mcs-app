@@ -571,6 +571,7 @@
     "no_user_logged_in": "No user logged in"
   },
   "common": {
+    "search": "Search...",
     "skip": "Skip",
     "next": "Next",
     "save": "Save",

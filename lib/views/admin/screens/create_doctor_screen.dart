@@ -8,8 +8,8 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
 import 'package:mcs_app/views/admin/widgets/multi_select_chip_field.dart';
+import 'package:mcs_app/views/admin/widgets/specialty_picker_field.dart';
 
 /// Screen for admin to create new doctor accounts or edit existing ones.
 /// In create mode: Creates Firebase Auth user + Firestore documents for doctors.
@@ -639,30 +639,23 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
   }
 
   Widget _buildProfessionalSection(BuildContext context) {
-    // Get specialty names for dropdown
-    final specialtyItems = MedicalSpecialty.values.map((s) => s.name).toList();
-
     return Column(
       children: [
-        // Specialty Dropdown
-        AppDropdownField(
+        // Specialty Picker (searchable bottom sheet)
+        SpecialtyPickerField(
           label: 'admin.create_doctor.field_specialty'.tr(),
           hintText: 'admin.create_doctor.field_specialty_hint'.tr(),
-          value: _selectedSpecialty?.name,
-          items: specialtyItems,
-          translationPrefix: 'specialties',
+          value: _selectedSpecialty,
           prefixIcon: Icons.medical_services_outlined,
           onChanged: (value) {
             setState(() {
-              _selectedSpecialty = value != null
-                  ? MedicalSpecialtyExtension.fromString(value)
-                  : null;
+              _selectedSpecialty = value;
               if (_specialtyError != null) _specialtyError = null;
             });
           },
           validator: (value) {
             if (_specialtyError != null) return _specialtyError;
-            if (value == null || value.isEmpty) {
+            if (value == null) {
               return 'admin.create_doctor.validation.specialty_required'.tr();
             }
             return null;
