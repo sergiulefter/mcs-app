@@ -88,7 +88,11 @@ class MyApp extends StatelessWidget {
                 ),
               );
 
-              return child ?? const SizedBox.shrink();
+              // Wrap with GestureDetector to dismiss keyboard on tap outside text fields
+              return GestureDetector(
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: child ?? const SizedBox.shrink(),
+              );
             },
           );
         },
