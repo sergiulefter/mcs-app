@@ -117,7 +117,7 @@
     "title": "Browse Doctors",
     "subtitle": "Find and connect with medical specialists",
     "placeholder_info": "Search for doctors by specialty, view their profiles, and request second opinions.",
-    "search_hint": "Search by doctor name or specialty",
+    "search_hint": "Search specialists",
     "results_title": "Available Specialists",
     "results_count": "{count} doctors",
     "view_profile": "View profile",

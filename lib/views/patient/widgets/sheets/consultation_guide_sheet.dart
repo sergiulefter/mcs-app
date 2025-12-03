@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 
 /// A modal bottom sheet that explains the consultation process
 /// with a carousel-style walkthrough.
@@ -13,7 +12,6 @@ class ConsultationGuideSheet extends StatefulWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => const ConsultationGuideSheet(),
     );
   }
@@ -78,26 +76,13 @@ class _ConsultationGuideSheetState extends State<ConsultationGuideSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.7,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppTheme.radiusXLarge),
-        ),
-      ),
       child: Column(
         children: [
-          // Handle bar
-          const Padding(
-            padding: EdgeInsets.only(top: AppTheme.spacing12),
-            child: ModalHandleBar(),
-          ),
-
           // Header with close button
           _buildHeader(context),
+          const SizedBox(height: AppTheme.sheetTitleSpacing),
 
           // Page content
           Expanded(
@@ -124,27 +109,15 @@ class _ConsultationGuideSheetState extends State<ConsultationGuideSheet> {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing16,
-        vertical: AppTheme.spacing8,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'consultation_guide.title'.tr(),
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.close),
-            style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            ),
-          ),
-        ],
+      padding: AppTheme.sheetHeaderPadding,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          'consultation_guide.title'.tr(),
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
       ),
     );
   }

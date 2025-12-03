@@ -12,7 +12,7 @@ import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/home/home_sections.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
-import 'package:mcs_app/views/doctor/widgets/doctor_request_card.dart';
+import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 
 /// Doctor home screen - Dashboard with stats, availability, and recent requests

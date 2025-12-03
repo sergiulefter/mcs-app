@@ -6,7 +6,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/doctor/screens/request_more_info_screen.dart';
 import 'package:mcs_app/views/doctor/screens/response_form_screen.dart';
-import 'package:mcs_app/views/doctor/widgets/patient_info_card.dart';
+import 'package:mcs_app/views/doctor/widgets/cards/patient_info_card.dart';
 import 'package:mcs_app/views/doctor/widgets/skeletons/request_review_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';

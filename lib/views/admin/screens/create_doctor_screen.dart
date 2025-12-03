@@ -9,8 +9,8 @@ import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'package:mcs_app/views/admin/widgets/multi_select_chip_field.dart';
-import 'package:mcs_app/views/admin/widgets/specialty_picker_field.dart';
+import 'package:mcs_app/views/admin/widgets/forms/multi_select_chip_field.dart';
+import 'package:mcs_app/views/admin/widgets/forms/specialty_picker_field.dart';
 
 /// Screen for admin to create new doctor accounts or edit existing ones.
 /// In create mode: Creates Firebase Auth user + Firestore documents for doctors.

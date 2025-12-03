@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/navigation_controller.dart';
-import 'package:mcs_app/utils/app_theme.dart';
 import 'home_screen.dart';
 import 'doctors_screen.dart';
 import 'consultations_screen.dart';
@@ -69,75 +68,33 @@ class _MainShellState extends State<MainShell> {
           index: currentIndex,
           children: List.generate(4, _buildScreen),
         ),
-        bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            splashFactory: NoSplash.splashFactory,
-          ),
-          child: BottomNavigationBar(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            elevation: 0,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Theme.of(context).colorScheme.primary,
-            unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-            selectedLabelStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+        bottomNavigationBar: NavigationBar(
+          key: ValueKey(locale.languageCode),
+          selectedIndex: currentIndex,
+          onDestinationSelected: _onTabTapped,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: 'common.home'.tr(),
             ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+            NavigationDestination(
+              icon: const Icon(Icons.search_outlined),
+              selectedIcon: const Icon(Icons.search),
+              label: 'navigation.doctors'.tr(),
             ),
-            key: ValueKey(locale.languageCode),
-            currentIndex: currentIndex,
-            onTap: _onTabTapped,
-            items: [
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.home_outlined, false),
-                activeIcon: _buildNavIcon(Icons.home, true),
-                label: 'common.home'.tr(),
-              ),
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.search_outlined, false),
-                activeIcon: _buildNavIcon(Icons.search, true),
-                label: 'navigation.doctors'.tr(),
-              ),
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.assignment_outlined, false),
-                activeIcon: _buildNavIcon(Icons.assignment, true),
-                label: 'navigation.consultations'.tr(),
-              ),
-              BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.person_outlined, false),
-                activeIcon: _buildNavIcon(Icons.person, true),
-                label: 'common.account'.tr(),
-              ),
-            ],
-          ),
+            NavigationDestination(
+              icon: const Icon(Icons.assignment_outlined),
+              selectedIcon: const Icon(Icons.assignment),
+              label: 'navigation.consultations'.tr(),
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outlined),
+              selectedIcon: const Icon(Icons.person),
+              label: 'common.account'.tr(),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildNavIcon(IconData icon, bool isActive) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = isActive ? colorScheme.primary : colorScheme.onSurfaceVariant;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing8,
-        vertical: AppTheme.spacing8,
-      ),
-      decoration: isActive
-          ? BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            )
-          : null,
-      child: Icon(
-        icon,
-        size: AppTheme.iconMedium,
-        color: color,
       ),
     );
   }

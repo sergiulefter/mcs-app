@@ -7,10 +7,8 @@ import 'package:mcs_app/views/patient/widgets/cards/doctor_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/doctor_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_search_bar.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
-import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 import 'doctor_profile_screen.dart';
 
 class DoctorsScreen extends StatefulWidget {
@@ -189,11 +187,26 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       _searchController.text = controller.searchQuery;
     }
 
-    return AppSearchBar(
+    return SearchBar(
       controller: _searchController,
       hintText: 'doctors.search_hint'.tr(),
       onChanged: (value) =>
           context.read<DoctorsController>().setSearchQuery(value),
+      leading: const Icon(Icons.search_outlined),
+      trailing: [
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: _searchController,
+          builder: (context, value, _) => value.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _searchController.clear();
+                    context.read<DoctorsController>().setSearchQuery('');
+                  },
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
     );
   }
 
@@ -258,110 +271,108 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               builder: (context, setModalState) {
                 return SafeArea(
                   child: Padding(
-                    padding: AppTheme.cardPadding.add(
-                      EdgeInsets.only(bottom: bottomInset),
-                    ),
+                    padding: EdgeInsets.only(bottom: bottomInset),
                     child: ListView(
                       controller: scrollController,
                       children: [
-                        // Handle bar
-                        const ModalHandleBar(),
-                        const SizedBox(height: AppTheme.spacing20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'doctors.filters.title'.tr(),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(fontWeight: FontWeight.w700),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                        // Title with sheet header padding
+                        Padding(
+                          padding: AppTheme.sheetHeaderPadding,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'doctors.filters.title'.tr(),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () => Navigator.of(sheetContext).pop(),
-                            ),
-                          ],
+                          ),
+                        ),
+                        const SizedBox(height: AppTheme.sheetTitleSpacing),
+                        // Content with sheet content padding
+                        Padding(
+                          padding: AppTheme.sheetContentPadding,
+                          child: _buildFiltersContent(
+                            context,
+                            controller: controller,
+                            selectedSpecialties: tempSelectedSpecialties,
+                            selectedExperienceRanges: tempSelectedExperienceRanges,
+                            availableOnly: tempAvailableOnly,
+                            onSpecialtyChanged: (value) {
+                              setModalState(() {
+                                if (value == 'all') {
+                                  tempSelectedSpecialties.clear();
+                                } else if (tempSelectedSpecialties
+                                    .contains(value)) {
+                                  tempSelectedSpecialties.remove(value);
+                                } else {
+                                  tempSelectedSpecialties.add(value);
+                                }
+                              });
+                            },
+                            onExperienceChanged: (value) {
+                              setModalState(() {
+                                if (tempSelectedExperienceRanges.contains(value)) {
+                                  tempSelectedExperienceRanges.remove(value);
+                                } else {
+                                  tempSelectedExperienceRanges.add(value);
+                                }
+                              });
+                            },
+                            onAvailabilityChanged: (value) {
+                              setModalState(() {
+                                tempAvailableOnly = value;
+                              });
+                            },
+                          ),
                         ),
                         const SizedBox(height: AppTheme.spacing16),
-                        _buildFiltersContent(
-                          context,
-                          controller: controller,
-                          selectedSpecialties: tempSelectedSpecialties,
-                          selectedExperienceRanges: tempSelectedExperienceRanges,
-                          availableOnly: tempAvailableOnly,
-                          onSpecialtyChanged: (value) {
-                            setModalState(() {
-                              if (value == 'all') {
-                                tempSelectedSpecialties.clear();
-                              } else if (tempSelectedSpecialties
-                                  .contains(value)) {
-                                tempSelectedSpecialties.remove(value);
-                              } else {
-                                tempSelectedSpecialties.add(value);
-                              }
-                            });
-                          },
-                          onExperienceChanged: (value) {
-                            setModalState(() {
-                              if (tempSelectedExperienceRanges.contains(value)) {
-                                tempSelectedExperienceRanges.remove(value);
-                              } else {
-                                tempSelectedExperienceRanges.add(value);
-                              }
-                            });
-                          },
-                          onAvailabilityChanged: (value) {
-                            setModalState(() {
-                              tempAvailableOnly = value;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: AppTheme.spacing16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setModalState(() {
-                                    tempSelectedSpecialties.clear();
-                                    tempSelectedExperienceRanges.clear();
-                                    tempAvailableOnly = false;
-                                  });
-                                  this
-                                      .context
-                                      .read<DoctorsController>()
-                                      .clearFilters();
-                                  Navigator.of(sheetContext).pop();
-                                },
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text('doctors.filters.clear'.tr()),
+                        Padding(
+                          padding: AppTheme.sheetContentPadding,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    setModalState(() {
+                                      tempSelectedSpecialties.clear();
+                                      tempSelectedExperienceRanges.clear();
+                                      tempAvailableOnly = false;
+                                    });
+                                    this
+                                        .context
+                                        .read<DoctorsController>()
+                                        .clearFilters();
+                                    Navigator.of(sheetContext).pop();
+                                  },
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text('doctors.filters.clear'.tr()),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: AppTheme.spacing12),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  this
-                                      .context
-                                      .read<DoctorsController>()
-                                      .applyFilters(
-                                        specialties: tempSelectedSpecialties,
-                                        experienceRanges:
-                                            tempSelectedExperienceRanges,
-                                        availableOnly: tempAvailableOnly,
-                                      );
-                                  Navigator.of(sheetContext).pop();
-                                },
-                                child: Text('common.apply'.tr()),
+                              const SizedBox(width: AppTheme.spacing12),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    this
+                                        .context
+                                        .read<DoctorsController>()
+                                        .applyFilters(
+                                          specialties: tempSelectedSpecialties,
+                                          experienceRanges:
+                                              tempSelectedExperienceRanges,
+                                          availableOnly: tempAvailableOnly,
+                                        );
+                                    Navigator.of(sheetContext).pop();
+                                  },
+                                  child: Text('common.apply'.tr()),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -523,13 +534,6 @@ class _SortDropdownState extends State<_SortDropdown> {
       controller: _menuController,
       onOpen: () => setState(() => _isOpen = true),
       onClose: () => setState(() => _isOpen = false),
-      style: MenuStyle(
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          ),
-        ),
-      ),
       menuChildren: sortOptions.map((option) {
         final isSelected = option['key'] == widget.selectedSort;
         return MenuItemButton(

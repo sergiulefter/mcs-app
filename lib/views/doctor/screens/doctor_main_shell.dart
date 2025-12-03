@@ -3,7 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/controllers/doctor_profile_controller.dart';
-import 'package:mcs_app/utils/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'doctor_home_screen.dart';
 import 'requests_list_screen.dart';
@@ -85,74 +84,32 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          splashFactory: NoSplash.splashFactory,
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          elevation: 0,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+      bottomNavigationBar: NavigationBar(
+        key: ValueKey(locale.languageCode),
+        selectedIndex: _currentIndex,
+        onDestinationSelected: _onTabTapped,
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.dashboard_outlined),
+            selectedIcon: const Icon(Icons.dashboard),
+            label: 'common.home'.tr(),
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+          NavigationDestination(
+            icon: const Icon(Icons.assignment_outlined),
+            selectedIcon: const Icon(Icons.assignment),
+            label: 'doctor.navigation.requests'.tr(),
           ),
-          key: ValueKey(locale.languageCode),
-          currentIndex: _currentIndex,
-          onTap: _onTabTapped,
-          items: [
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.dashboard_outlined, false),
-              activeIcon: _buildNavIcon(Icons.dashboard, true),
-              label: 'common.home'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.assignment_outlined, false),
-              activeIcon: _buildNavIcon(Icons.assignment, true),
-              label: 'doctor.navigation.requests'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.calendar_month_outlined, false),
-              activeIcon: _buildNavIcon(Icons.calendar_month, true),
-              label: 'doctor.navigation.calendar'.tr(),
-            ),
-            BottomNavigationBarItem(
-              icon: _buildNavIcon(Icons.person_outlined, false),
-              activeIcon: _buildNavIcon(Icons.person, true),
-              label: 'common.account'.tr(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavIcon(IconData icon, bool isActive) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final color = isActive ? colorScheme.primary : colorScheme.onSurfaceVariant;
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
-      ),
-      decoration: isActive
-          ? BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            )
-          : null,
-      child: Icon(
-        icon,
-        size: AppTheme.iconMedium,
-        color: color,
+          NavigationDestination(
+            icon: const Icon(Icons.calendar_month_outlined),
+            selectedIcon: const Icon(Icons.calendar_month),
+            label: 'doctor.navigation.calendar'.tr(),
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.person_outlined),
+            selectedIcon: const Icon(Icons.person),
+            label: 'common.account'.tr(),
+          ),
+        ],
       ),
     );
   }

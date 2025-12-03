@@ -10,7 +10,6 @@ import 'package:mcs_app/views/patient/widgets/cards/consultation_card_skeleton.d
 import 'package:mcs_app/views/patient/widgets/filters/consultation_segment_filter.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
-import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 import 'request_detail_screen.dart';
 
 class ConsultationsScreen extends StatefulWidget {
@@ -269,78 +268,86 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
     ];
 
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(AppTheme.spacing24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Handle bar
-            const ModalHandleBar(),
-            const SizedBox(height: AppTheme.spacing20),
-
-            // Title
-            Text(
-              'consultations.filter_title'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title
+          Padding(
+            padding: AppTheme.sheetHeaderPadding,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'consultations.filter_title'.tr(),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
             ),
-            const SizedBox(height: AppTheme.spacing20),
+          ),
+          const SizedBox(height: AppTheme.sheetTitleSpacing),
 
-            // Status filters
-            Text(
-              'consultations.filter_status'.tr(),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-            ),
-            const SizedBox(height: AppTheme.spacing12),
-            Wrap(
-              spacing: AppTheme.spacing8,
-              runSpacing: AppTheme.spacing8,
-              children: statuses.map((status) {
-                final isSelected = _selectedStatus == status['key'];
-                return ThemedFilterChip(
-                  label: status['label']!,
-                  selected: isSelected,
-                  onSelected: (_) {
-                    setState(() {
-                      _selectedStatus = status['key']!;
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: AppTheme.spacing32),
-
-            // Action buttons
-            Row(
+          // Content
+          Padding(
+            padding: AppTheme.sheetContentPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedStatus = 'all';
-                      });
-                    },
-                    child: Text('common.clear'.tr()),
-                  ),
+                // Status filters label
+                Text(
+                  'consultations.filter_status'.tr(),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                 ),
-                const SizedBox(width: AppTheme.spacing12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      widget.onStatusChanged(_selectedStatus);
-                      Navigator.of(context).pop();
-                    },
-                    child: Text('common.apply'.tr()),
-                  ),
+                const SizedBox(height: AppTheme.spacing12),
+                Wrap(
+                  spacing: AppTheme.spacing8,
+                  runSpacing: AppTheme.spacing8,
+                  children: statuses.map((status) {
+                    final isSelected = _selectedStatus == status['key'];
+                    return ThemedFilterChip(
+                      label: status['label']!,
+                      selected: isSelected,
+                      onSelected: (_) {
+                        setState(() {
+                          _selectedStatus = status['key']!;
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: AppTheme.spacing32),
+
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedStatus = 'all';
+                          });
+                        },
+                        child: Text('common.clear'.tr()),
+                      ),
+                    ),
+                    const SizedBox(width: AppTheme.spacing12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          widget.onStatusChanged(_selectedStatus);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('common.apply'.tr()),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

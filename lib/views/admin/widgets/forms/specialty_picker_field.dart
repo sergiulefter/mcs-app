@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/shared/widgets/modal_handle_bar.dart';
 
 /// A specialty picker field that opens a searchable bottom sheet.
 ///
@@ -44,7 +43,6 @@ class SpecialtyPickerField extends StatelessWidget {
     final result = await showModalBottomSheet<MedicalSpecialty>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => _SpecialtyPickerSheet(
         selectedValue: value,
       ),
@@ -194,78 +192,52 @@ class _SpecialtyPickerSheetState extends State<_SpecialtyPickerSheet> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.7,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(AppTheme.radiusXLarge),
-        ),
-      ),
       child: Column(
         children: [
-          // Handle bar
-          const Padding(
-            padding: EdgeInsets.only(top: AppTheme.spacing12),
-            child: ModalHandleBar(),
-          ),
           // Header
           Padding(
-            padding: const EdgeInsets.all(AppTheme.spacing16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'admin.create_doctor.field_specialty'.tr(),
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close),
-                  style: IconButton.styleFrom(
-                    backgroundColor: colorScheme.surfaceContainerHighest,
-                  ),
-                ),
-              ],
+            padding: AppTheme.sheetHeaderPadding,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'admin.create_doctor.field_specialty'.tr(),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
             ),
           ),
+          const SizedBox(height: AppTheme.sheetTitleSpacing),
           // Search field
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing16),
-            child: TextField(
+            padding: AppTheme.sheetContentPadding,
+            child: SearchBar(
               controller: _searchController,
+              hintText: 'common.search'.tr(),
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
                 });
               },
-              decoration: InputDecoration(
-                hintText: 'common.search'.tr(),
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                        icon: const Icon(Icons.clear),
-                      )
-                    : null,
-                filled: true,
-                fillColor: colorScheme.surfaceContainerLow,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  borderSide: BorderSide.none,
+              leading: const Icon(Icons.search_outlined),
+              trailing: [
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _searchController,
+                  builder: (context, value, _) => value.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : const SizedBox.shrink(),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppTheme.spacing16,
-                  vertical: AppTheme.spacing12,
-                ),
-              ),
+              ],
             ),
           ),
           const SizedBox(height: AppTheme.spacing8),

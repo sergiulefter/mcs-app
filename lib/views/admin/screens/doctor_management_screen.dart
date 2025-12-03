@@ -4,9 +4,8 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
-import 'package:mcs_app/views/admin/widgets/admin_doctor_card.dart';
-import 'package:mcs_app/views/admin/widgets/admin_doctor_card_skeleton.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_search_bar.dart';
+import 'package:mcs_app/views/admin/widgets/cards/admin_doctor_card.dart';
+import 'package:mcs_app/views/admin/widgets/skeletons/admin_doctor_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'create_doctor_screen.dart';
@@ -216,10 +215,25 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
         padding: AppTheme.screenPadding,
         children: [
           // Search bar
-          AppSearchBar(
+          SearchBar(
             controller: _searchController,
             hintText: 'admin.doctors.search_hint'.tr(),
             onChanged: (_) => setState(() {}),
+            leading: const Icon(Icons.search_outlined),
+            trailing: [
+              ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _searchController,
+                builder: (context, value, _) => value.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ),
           const SizedBox(height: AppTheme.spacing16),
 

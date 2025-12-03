@@ -147,17 +147,6 @@ class AppDatePickerField extends StatelessWidget {
       initialDate: effectiveInitialDate,
       firstDate: effectiveFirstDate,
       lastDate: effectiveLastDate,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: Theme.of(context).colorScheme.primary,
-                  onPrimary: Theme.of(context).colorScheme.onPrimary,
-                ),
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null) {

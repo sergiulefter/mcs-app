@@ -61,11 +61,10 @@ class DoctorsController extends ChangeNotifier {
 
       final specialtyKey = doctor.specialty.toString().split('.').last;
 
-      // Search filter
+      // Search filter (name only - specialty filtering via filter chips)
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
-        if (!doctor.fullName.toLowerCase().contains(query) &&
-            !specialtyKey.toLowerCase().contains(query)) {
+        if (!doctor.fullName.toLowerCase().contains(query)) {
           return false;
         }
       }

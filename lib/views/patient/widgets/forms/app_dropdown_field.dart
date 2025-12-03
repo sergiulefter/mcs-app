@@ -132,13 +132,6 @@ class _AppDropdownFieldState extends State<AppDropdownField> {
               controller: _menuController,
               onOpen: () => setState(() => _isOpen = true),
               onClose: () => setState(() => _isOpen = false),
-              style: MenuStyle(
-                shape: WidgetStatePropertyAll(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  ),
-                ),
-              ),
               menuChildren: widget.items.map((item) {
                 final isSelected = item == widget.value;
                 return MenuItemButton(

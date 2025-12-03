@@ -101,6 +101,21 @@ class AppTheme {
     vertical: spacing20,
   );
 
+  /// Standard padding for modal bottom sheet headers (title area).
+  /// Uses horizontal padding only to maintain proper spacing from the
+  /// system drag handle (showDragHandle: true adds ~22px internal padding).
+  static const EdgeInsets sheetHeaderPadding = EdgeInsets.symmetric(
+    horizontal: spacing16,
+  );
+
+  /// Standard padding for modal bottom sheet content (below the header).
+  static const EdgeInsets sheetContentPadding = EdgeInsets.symmetric(
+    horizontal: spacing16,
+  );
+
+  /// Standard spacing between sheet title and content.
+  static const double sheetTitleSpacing = spacing16;
+
   // ============================================================================
   // BORDER RADIUS
   // ============================================================================
@@ -199,7 +214,7 @@ class AppTheme {
         elevation: elevationLow,
         shadowColor: textPrimary.withValues(alpha: 0.06),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
         ),
         margin: const EdgeInsets.all(spacing8),
       ),
@@ -214,7 +229,7 @@ class AppTheme {
           padding: buttonPadding,
           minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radiusMedium),
+            borderRadius: BorderRadius.circular(radiusLarge),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
@@ -232,7 +247,7 @@ class AppTheme {
           padding: buttonPadding,
           minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radiusMedium),
+            borderRadius: BorderRadius.circular(radiusLarge),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
@@ -264,23 +279,23 @@ class AppTheme {
         fillColor: backgroundWhite,
         contentPadding: cardPadding,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: dividerColor, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: dividerColor, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: primaryBlue, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: errorRed, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: errorRed, width: 2),
         ),
         labelStyle: const TextStyle(
@@ -300,7 +315,7 @@ class AppTheme {
         errorMaxLines: 2,
       ),
 
-      // Bottom Navigation Bar Theme
+      // Bottom Navigation Bar Theme (legacy - kept for compatibility)
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: backgroundWhite,
         selectedItemColor: primaryBlue,
@@ -314,6 +329,109 @@ class AppTheme {
         unselectedLabelStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // Navigation Bar Theme (Material 3)
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: backgroundWhite,
+        elevation: 0,
+        height: 80,
+        indicatorColor: primaryBlue.withValues(alpha: 0.12),
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLarge),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: primaryBlue,
+            );
+          }
+          return const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: textSecondary,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(
+              size: iconMedium,
+              color: primaryBlue,
+            );
+          }
+          return const IconThemeData(
+            size: iconMedium,
+            color: textSecondary,
+          );
+        }),
+      ),
+
+      // Bottom Sheet Theme (Material 3)
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: backgroundWhite,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(radiusXLarge),
+          ),
+        ),
+        dragHandleColor: textTertiary,
+        dragHandleSize: Size(40, 4),
+        showDragHandle: true,
+      ),
+
+      // Switch Theme (Material 3)
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return backgroundWhite;
+          }
+          return textTertiary;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryBlue;
+          }
+          return dividerColor;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.transparent;
+          }
+          return textTertiary;
+        }),
+      ),
+
+      // Search Bar Theme (Material 3)
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: const WidgetStatePropertyAll(backgroundWhite),
+        elevation: const WidgetStatePropertyAll(0),
+        shadowColor: const WidgetStatePropertyAll(Colors.transparent),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusLarge),
+            side: const BorderSide(color: dividerColor),
+          ),
+        ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: spacing16),
+        ),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(
+            fontSize: 16,
+            color: textPrimary,
+          ),
+        ),
+        hintStyle: const WidgetStatePropertyAll(
+          TextStyle(
+            fontSize: 16,
+            color: textSecondary,
+          ),
         ),
       ),
 
@@ -379,6 +497,47 @@ class AppTheme {
           color: textSecondary,
           fontSize: 14,
           height: 1.5,
+        ),
+      ),
+
+      // Date Picker Theme (Material 3)
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: backgroundWhite,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: surfaceColor,
+        headerForegroundColor: textPrimary,
+        dayStyle: const TextStyle(color: textPrimary),
+        todayBorder: const BorderSide(color: primaryBlue),
+        todayForegroundColor: const WidgetStatePropertyAll(primaryBlue),
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return textOnPrimary;
+          }
+          return textPrimary;
+        }),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryBlueLight;
+          }
+          return Colors.transparent;
+        }),
+        yearForegroundColor: const WidgetStatePropertyAll(textPrimary),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLarge),
+        ),
+      ),
+
+      // Menu Theme (Material 3 - for dropdowns)
+      menuTheme: MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: const WidgetStatePropertyAll(surfaceColor),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          elevation: const WidgetStatePropertyAll(elevationMedium),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radiusMedium),
+            ),
+          ),
         ),
       ),
 
@@ -555,7 +714,7 @@ class AppTheme {
         elevation: elevationNone, // No shadows in dark mode
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           side: BorderSide(
             color: dividerDark, // Theme divider to avoid harsh white edges
             width: 1,
@@ -574,7 +733,7 @@ class AppTheme {
           padding: buttonPadding,
           minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radiusMedium),
+            borderRadius: BorderRadius.circular(radiusLarge),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
@@ -592,7 +751,7 @@ class AppTheme {
           padding: buttonPadding,
           minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(radiusMedium),
+            borderRadius: BorderRadius.circular(radiusLarge),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
@@ -624,23 +783,23 @@ class AppTheme {
         fillColor: surfaceDarkElevated,
         contentPadding: cardPadding,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: dividerDark, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: dividerDark, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: primaryBlueDarkMode, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: errorRedDark, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusMedium),
+          borderRadius: BorderRadius.circular(radiusLarge),
           borderSide: const BorderSide(color: errorRedDark, width: 2),
         ),
         labelStyle: const TextStyle(
@@ -660,7 +819,7 @@ class AppTheme {
         errorMaxLines: 2,
       ),
 
-      // Bottom Navigation Bar Theme
+      // Bottom Navigation Bar Theme (legacy - kept for compatibility)
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surfaceDark,
         selectedItemColor: primaryBlueDarkMode,
@@ -674,6 +833,109 @@ class AppTheme {
         unselectedLabelStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
+        ),
+      ),
+
+      // Navigation Bar Theme (Material 3)
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceDark,
+        elevation: 0,
+        height: 80,
+        indicatorColor: primaryBlueDarkMode.withValues(alpha: 0.12),
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLarge),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: primaryBlueDarkMode,
+            );
+          }
+          return const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: textSecondaryDark,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(
+              size: iconMedium,
+              color: primaryBlueDarkMode,
+            );
+          }
+          return const IconThemeData(
+            size: iconMedium,
+            color: textSecondaryDark,
+          );
+        }),
+      ),
+
+      // Bottom Sheet Theme (Material 3)
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: surfaceDark,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(radiusXLarge),
+          ),
+        ),
+        dragHandleColor: textTertiaryDark,
+        dragHandleSize: Size(40, 4),
+        showDragHandle: true,
+      ),
+
+      // Switch Theme (Material 3)
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return backgroundDark;
+          }
+          return textTertiaryDark;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryBlueDarkMode;
+          }
+          return dividerDark;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.transparent;
+          }
+          return textTertiaryDark;
+        }),
+      ),
+
+      // Search Bar Theme (Material 3)
+      searchBarTheme: SearchBarThemeData(
+        backgroundColor: const WidgetStatePropertyAll(surfaceDark),
+        elevation: const WidgetStatePropertyAll(0),
+        shadowColor: const WidgetStatePropertyAll(Colors.transparent),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(radiusLarge),
+            side: const BorderSide(color: dividerDark),
+          ),
+        ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: spacing16),
+        ),
+        textStyle: const WidgetStatePropertyAll(
+          TextStyle(
+            fontSize: 16,
+            color: textPrimaryDark,
+          ),
+        ),
+        hintStyle: const WidgetStatePropertyAll(
+          TextStyle(
+            fontSize: 16,
+            color: textSecondaryDark,
+          ),
         ),
       ),
 
@@ -739,6 +1001,47 @@ class AppTheme {
           color: textSecondaryDark,
           fontSize: 14,
           height: 1.5,
+        ),
+      ),
+
+      // Date Picker Theme (Material 3)
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: surfaceDark,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: surfaceDark,
+        headerForegroundColor: textPrimaryDark,
+        dayStyle: const TextStyle(color: textPrimaryDark),
+        todayBorder: const BorderSide(color: primaryBlueDarkMode),
+        todayForegroundColor: const WidgetStatePropertyAll(primaryBlueDarkMode),
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return textOnPrimaryDark;
+          }
+          return textPrimaryDark;
+        }),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return primaryBlueDarkMode;
+          }
+          return Colors.transparent;
+        }),
+        yearForegroundColor: const WidgetStatePropertyAll(textPrimaryDark),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLarge),
+        ),
+      ),
+
+      // Menu Theme (Material 3 - for dropdowns)
+      menuTheme: MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: const WidgetStatePropertyAll(surfaceDark),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          elevation: const WidgetStatePropertyAll(elevationMedium),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(radiusMedium),
+            ),
+          ),
         ),
       ),
 

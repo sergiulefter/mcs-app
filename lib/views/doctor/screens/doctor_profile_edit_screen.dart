@@ -13,7 +13,7 @@ import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
-import 'package:mcs_app/views/admin/widgets/multi_select_chip_field.dart';
+import 'package:mcs_app/views/admin/widgets/forms/multi_select_chip_field.dart';
 import 'package:mcs_app/views/doctor/widgets/skeletons/doctor_profile_edit_skeleton.dart';
 
 /// Doctor profile edit screen - Edit bio, price, languages, education

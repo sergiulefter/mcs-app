@@ -7,7 +7,7 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
-import 'package:mcs_app/views/doctor/widgets/doctor_request_card.dart';
+import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
