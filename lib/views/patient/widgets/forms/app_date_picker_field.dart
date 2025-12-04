@@ -142,11 +142,44 @@ class AppDatePickerField extends StatelessWidget {
     final effectiveInitialDate =
         initialDate ?? selectedDate ?? initialFallback;
 
+    final theme = Theme.of(context);
+    final datePickerTheme = theme.datePickerTheme;
+
+    final selectedBg = datePickerTheme.dayBackgroundColor?.resolve({WidgetState.selected}) ??
+        theme.colorScheme.primary.withValues(alpha: 0.15);
+    final selectedFg = datePickerTheme.dayForegroundColor?.resolve({WidgetState.selected}) ??
+        theme.colorScheme.onPrimary;
+
     final picked = await showDatePicker(
       context: context,
       initialDate: effectiveInitialDate,
       firstDate: effectiveFirstDate,
       lastDate: effectiveLastDate,
+      builder: (dialogContext, child) {
+        return Theme(
+          data: theme.copyWith(
+            datePickerTheme: datePickerTheme.copyWith(
+              dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return selectedFg;
+                return datePickerTheme.dayForegroundColor?.resolve(states) ??
+                    theme.textTheme.bodyMedium?.color;
+              }),
+              dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return selectedBg;
+                return datePickerTheme.dayBackgroundColor?.resolve(states) ??
+                    Colors.transparent;
+              }),
+              todayForegroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) return selectedFg;
+                return datePickerTheme.todayForegroundColor?.resolve(states) ??
+                    datePickerTheme.dayForegroundColor?.resolve(states) ??
+                    theme.colorScheme.primary;
+              }),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null) {
