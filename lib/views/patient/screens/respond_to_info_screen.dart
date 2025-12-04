@@ -340,7 +340,8 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
         SnackBar(content: Text(successText)),
       );
       navigator.pop(true);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error submitting response: $e');
       messenger.showSnackBar(
         SnackBar(
           backgroundColor: errorColor,

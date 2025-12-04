@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../models/doctor_model.dart';
 import '../models/medical_specialty.dart';
 import '../services/doctor_service.dart';
@@ -16,13 +18,13 @@ class DoctorSeeder {
     for (final doctor in sampleDoctors) {
       try {
         await _doctorService.createDoctorProfile(doctor);
-        print('✓ Created doctor: ${doctor.fullName}');
+        debugPrint('Created doctor: ${doctor.fullName}');
       } catch (e) {
-        print('✗ Error creating doctor ${doctor.fullName}: $e');
+        debugPrint('Error creating doctor ${doctor.fullName}: $e');
       }
     }
 
-    print('Seeding complete!');
+    debugPrint('Seeding complete!');
   }
 
   /// Get list of sample doctors
@@ -240,4 +242,3 @@ class DoctorSeeder {
     ];
   }
 }
-// ignore_for_file: avoid_print

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../models/consultation_model.dart';
 import '../models/doctor_model.dart';
 import '../models/medical_specialty.dart';
@@ -18,7 +19,7 @@ class DevDataSeeder {
     required int consultationsPerUser,
     required String patientId,
   }) async {
-    print('Dev seeder will DELETE doctors & consultations collections...');
+    debugPrint('Dev seeder will DELETE doctors & consultations collections...');
     await _clearCollection('doctors');
     await _clearCollection('consultations');
 
@@ -29,7 +30,7 @@ class DevDataSeeder {
       count: consultationsPerUser,
     );
 
-    print('Seeding complete: ${doctors.length} doctors, $consultationsPerUser consultations for patient $patientId');
+    debugPrint('Seeding complete: ${doctors.length} doctors, $consultationsPerUser consultations for patient $patientId');
   }
 
   Future<void> _clearCollection(String collection) async {
@@ -297,5 +298,3 @@ Future<void> runDevSeeder({
     patientId: patientId,
   );
 }
-// ignore_for_file: avoid_print
-

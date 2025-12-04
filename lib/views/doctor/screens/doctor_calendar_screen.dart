@@ -61,7 +61,8 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
         _selectedDay ??= DateTime.now();
         _focusedDay = _selectedDay!;
       });
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error loading doctor data: $e');
       if (!mounted) return;
       setState(() {
         _isDoctorLoading = false;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/admin_service.dart';
+import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/admin/widgets/cards/admin_doctor_card.dart';
@@ -20,6 +21,7 @@ class DoctorManagementScreen extends StatefulWidget {
 
 class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
   final AdminService _adminService = AdminService();
+  final DoctorService _doctorService = DoctorService();
   final TextEditingController _searchController = TextEditingController();
 
   List<DoctorModel> _allDoctors = [];
@@ -54,7 +56,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
     });
 
     try {
-      final doctors = await _adminService.fetchAllDoctors();
+      final doctors = await _doctorService.fetchAllDoctors();
       if (mounted) {
         setState(() {
           _allDoctors = doctors;

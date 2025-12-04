@@ -229,7 +229,8 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
         ),
       );
       navigator.pop(true);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Error requesting more info: $e');
       messenger.showSnackBar(
         SnackBar(
           backgroundColor: errorColor,
