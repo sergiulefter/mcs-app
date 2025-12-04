@@ -4,11 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/user_model.dart';
+import 'package:mcs_app/utils/constants.dart';
 import 'package:uuid/uuid.dart';
+
+import 'mixins/consultation_filter_mixin.dart';
 
 /// Controller for doctor-side consultation management.
 /// Handles live Firestore stream, status updates, responses, and info requests.
-class DoctorConsultationsController extends ChangeNotifier {
+class DoctorConsultationsController extends ChangeNotifier
+    with ConsultationFilterMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final List<ConsultationModel> _consultations = [];
@@ -36,17 +40,20 @@ class DoctorConsultationsController extends ChangeNotifier {
 
     switch (_selectedSegment) {
       case 'new':
-        segmentFiltered =
-            consultations.where((c) => c.status == 'pending').toList();
+        segmentFiltered = consultations
+            .where((c) => c.status == AppConstants.statusPending)
+            .toList();
         break;
       case 'in_progress':
         segmentFiltered = consultations
-            .where((c) => c.status == 'in_review' || c.status == 'info_requested')
+            .where((c) =>
+                c.status == AppConstants.statusInReview ||
+                c.status == AppConstants.statusInfoRequested)
             .toList();
         break;
       case 'completed':
         segmentFiltered = consultations
-            .where((c) => c.status == 'completed' || c.status == 'cancelled')
+            .where((c) => ConsultationFilterMixin.isFinishedStatus(c.status))
             .toList();
         break;
       default:
@@ -63,14 +70,28 @@ class DoctorConsultationsController extends ChangeNotifier {
   }
 
   /// Counts for segment badges
-  int get newCount =>
-      consultations.where((c) => c.status == 'pending').length;
+  int get newCount => consultations
+      .where((c) => c.status == AppConstants.statusPending)
+      .length;
+
   int get inProgressCount => consultations
-      .where((c) => c.status == 'in_review' || c.status == 'info_requested')
+      .where((c) =>
+          c.status == AppConstants.statusInReview ||
+          c.status == AppConstants.statusInfoRequested)
       .length;
+
   int get completedCount => consultations
-      .where((c) => c.status == 'completed' || c.status == 'cancelled')
+      .where((c) => ConsultationFilterMixin.isFinishedStatus(c.status))
       .length;
+
+  /// Recent pending consultations for doctor home screen
+  List<ConsultationModel> get recentPendingConsultations {
+    final pending = consultations
+        .where((c) => c.status == AppConstants.statusPending)
+        .toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return pending;
+  }
 
   List<ConsultationModel> get filteredConsultations {
     if (_selectedStatus == 'all') return consultations;
@@ -91,7 +112,7 @@ class DoctorConsultationsController extends ChangeNotifier {
     await _subscription?.cancel();
 
     _subscription = _firestore
-        .collection('consultations')
+        .collection(AppConstants.collectionConsultations)
         .where('doctorId', isEqualTo: doctorId)
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -142,7 +163,10 @@ class DoctorConsultationsController extends ChangeNotifier {
 
   Future<void> updateStatus(String consultationId, String status) async {
     try {
-      await _firestore.collection('consultations').doc(consultationId).update({
+      await _firestore
+          .collection(AppConstants.collectionConsultations)
+          .doc(consultationId)
+          .update({
         'status': status,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -177,9 +201,12 @@ class DoctorConsultationsController extends ChangeNotifier {
     );
 
     try {
-      await _firestore.collection('consultations').doc(consultationId).update({
+      await _firestore
+          .collection(AppConstants.collectionConsultations)
+          .doc(consultationId)
+          .update({
         'doctorResponse': response.toMap(),
-        'status': 'completed',
+        'status': AppConstants.statusCompleted,
         'completedAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -187,7 +214,7 @@ class DoctorConsultationsController extends ChangeNotifier {
       _patchConsultation(
         consultationId,
         (current) => current.copyWith(
-          status: 'completed',
+          status: AppConstants.statusCompleted,
           doctorResponse: response,
           completedAt: DateTime.now(),
           updatedAt: DateTime.now(),
@@ -214,8 +241,11 @@ class DoctorConsultationsController extends ChangeNotifier {
     );
 
     try {
-      await _firestore.collection('consultations').doc(consultationId).update({
-        'status': 'info_requested',
+      await _firestore
+          .collection(AppConstants.collectionConsultations)
+          .doc(consultationId)
+          .update({
+        'status': AppConstants.statusInfoRequested,
         'updatedAt': FieldValue.serverTimestamp(),
         'infoRequests': FieldValue.arrayUnion([infoRequest.toMap()]),
       });
@@ -223,7 +253,7 @@ class DoctorConsultationsController extends ChangeNotifier {
       _patchConsultation(
         consultationId,
         (current) => current.copyWith(
-          status: 'info_requested',
+          status: AppConstants.statusInfoRequested,
           updatedAt: DateTime.now(),
           infoRequests: [...current.infoRequests, infoRequest],
         ),
@@ -241,7 +271,8 @@ class DoctorConsultationsController extends ChangeNotifier {
 
     for (final id in idsToLoad) {
       try {
-        final doc = await _firestore.collection('users').doc(id).get();
+        final doc =
+            await _firestore.collection(AppConstants.collectionUsers).doc(id).get();
         if (doc.exists) {
           _patientsCache[id] =
               UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);

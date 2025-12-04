@@ -56,4 +56,16 @@ class AppConstants {
   // UI Display Thresholds
   static const int descriptionCounterThreshold = 200;
   static const int messagePreviewTruncate = 150;
+
+  // ===== CONSULTATION STATUS CONSTANTS =====
+  static const String statusPending = 'pending';
+  static const String statusInReview = 'in_review';
+  static const String statusCompleted = 'completed';
+  static const String statusCancelled = 'cancelled';
+  static const String statusInfoRequested = 'info_requested';
+
+  // ===== FIRESTORE COLLECTION NAMES =====
+  static const String collectionUsers = 'users';
+  static const String collectionDoctors = 'doctors';
+  static const String collectionConsultations = 'consultations';
 }

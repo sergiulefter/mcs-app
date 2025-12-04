@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/consultation_model.dart';
 import '../models/doctor_model.dart';
+import '../utils/constants.dart';
+import 'mixins/consultation_filter_mixin.dart';
 
-class ConsultationsController extends ChangeNotifier {
+class ConsultationsController extends ChangeNotifier with ConsultationFilterMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   List<ConsultationModel> _consultations = [];
@@ -23,17 +25,27 @@ class ConsultationsController extends ChangeNotifier {
 
   // Computed counts for segment badges
   int get activeCount => _consultations
-      .where((c) =>
-          c.status == 'pending' ||
-          c.status == 'in_review' ||
-          c.status == 'info_requested')
+      .where((c) => ConsultationFilterMixin.isActiveStatus(c.status))
       .length;
 
-  int get completedCount =>
-      _consultations.where((c) => c.status == 'completed').length;
+  int get completedCount => _consultations
+      .where((c) => c.status == AppConstants.statusCompleted)
+      .length;
 
-  int get cancelledCount =>
-      _consultations.where((c) => c.status == 'cancelled').length;
+  int get cancelledCount => _consultations
+      .where((c) => c.status == AppConstants.statusCancelled)
+      .length;
+
+  // Computed property for home screen statistics
+  int get pendingCount => _consultations
+      .where((c) => c.status == AppConstants.statusPending)
+      .length;
+
+  // Recent active consultations for home screen (top 3)
+  List<ConsultationModel> get recentActiveConsultations => _consultations
+      .where((c) => ConsultationFilterMixin.isActiveStatus(c.status))
+      .take(3)
+      .toList();
   bool hasDataForUser(String userId) =>
       _hasPrimedForUser && _loadedUserId == userId;
 
@@ -55,7 +67,7 @@ class ConsultationsController extends ChangeNotifier {
 
     try {
       final querySnapshot = await _firestore
-          .collection('consultations')
+          .collection(AppConstants.collectionConsultations)
           .where('patientId', isEqualTo: userId)
           .orderBy('createdAt', descending: true)
           .get();
@@ -93,7 +105,7 @@ class ConsultationsController extends ChangeNotifier {
       if (consultation.doctorId != null) {
         try {
           final doctorDoc = await _firestore
-              .collection('doctors')
+              .collection(AppConstants.collectionDoctors)
               .doc(consultation.doctorId)
               .get();
 
@@ -130,13 +142,12 @@ class ConsultationsController extends ChangeNotifier {
     switch (_selectedSegment) {
       case 'active':
         return _consultations
-            .where((c) =>
-                c.status == 'pending' ||
-                c.status == 'in_review' ||
-                c.status == 'info_requested')
+            .where((c) => ConsultationFilterMixin.isActiveStatus(c.status))
             .toList();
       case 'completed':
-        return _consultations.where((c) => c.status == 'completed').toList();
+        return _consultations
+            .where((c) => c.status == AppConstants.statusCompleted)
+            .toList();
       case 'all':
       default:
         return _consultations;
@@ -163,8 +174,11 @@ class ConsultationsController extends ChangeNotifier {
   // Cancel a consultation
   Future<void> cancelConsultation(String consultationId) async {
     try {
-      await _firestore.collection('consultations').doc(consultationId).update({
-        'status': 'cancelled',
+      await _firestore
+          .collection(AppConstants.collectionConsultations)
+          .doc(consultationId)
+          .update({
+        'status': AppConstants.statusCancelled,
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
@@ -172,7 +186,7 @@ class ConsultationsController extends ChangeNotifier {
       final index = _consultations.indexWhere((c) => c.id == consultationId);
       if (index != -1) {
         _consultations[index] = _consultations[index].copyWith(
-          status: 'cancelled',
+          status: AppConstants.statusCancelled,
           updatedAt: DateTime.now(),
         );
         notifyListeners();
@@ -211,8 +225,11 @@ class ConsultationsController extends ChangeNotifier {
       }).toList();
 
       // Update Firestore
-      await _firestore.collection('consultations').doc(consultationId).update({
-        'status': 'in_review',
+      await _firestore
+          .collection(AppConstants.collectionConsultations)
+          .doc(consultationId)
+          .update({
+        'status': AppConstants.statusInReview,
         'updatedAt': FieldValue.serverTimestamp(),
         'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
       });
@@ -221,7 +238,7 @@ class ConsultationsController extends ChangeNotifier {
       final index = _consultations.indexWhere((c) => c.id == consultationId);
       if (index != -1) {
         _consultations[index] = _consultations[index].copyWith(
-          status: 'in_review',
+          status: AppConstants.statusInReview,
           updatedAt: DateTime.now(),
           infoRequests: updatedInfoRequests,
         );

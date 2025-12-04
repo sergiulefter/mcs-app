@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/doctor_model.dart';
 import '../models/user_model.dart';
+import '../utils/constants.dart';
 import 'doctor_service.dart';
 
 /// Service for admin-specific operations
@@ -9,11 +10,6 @@ class AdminService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final DoctorService _doctorService = DoctorService();
-
-  // Collection references
-  static const String _usersCollection = 'users';
-  static const String _doctorsCollection = 'doctors';
-  static const String _consultationsCollection = 'consultations';
 
   /// Create a new doctor account with Firebase Auth and Firestore documents
   ///
@@ -76,7 +72,10 @@ class AdminService {
     final user = _auth.currentUser;
     if (user == null) return false;
 
-    final userDoc = await _firestore.collection('users').doc(user.uid).get();
+    final userDoc = await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(user.uid)
+        .get();
     if (!userDoc.exists) return false;
 
     final data = userDoc.data();
@@ -85,7 +84,10 @@ class AdminService {
 
   /// Get the user type of a user by UID
   Future<String?> getUserType(String uid) async {
-    final userDoc = await _firestore.collection(_usersCollection).doc(uid).get();
+    final userDoc = await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(uid)
+        .get();
     if (!userDoc.exists) return null;
 
     final data = userDoc.data();
@@ -122,7 +124,7 @@ class AdminService {
 
   Future<int> _getPatientCount() async {
     final snapshot = await _firestore
-        .collection(_usersCollection)
+        .collection(AppConstants.collectionUsers)
         .where('userType', isEqualTo: 'patient')
         .count()
         .get();
@@ -131,7 +133,7 @@ class AdminService {
 
   Future<int> _getDoctorCount() async {
     final snapshot = await _firestore
-        .collection(_doctorsCollection)
+        .collection(AppConstants.collectionDoctors)
         .count()
         .get();
     return snapshot.count ?? 0;
@@ -140,28 +142,28 @@ class AdminService {
   Future<Map<String, int>> _getConsultationCounts() async {
     // Get total count
     final totalSnapshot = await _firestore
-        .collection(_consultationsCollection)
+        .collection(AppConstants.collectionConsultations)
         .count()
         .get();
 
     // Get pending count
     final pendingSnapshot = await _firestore
-        .collection(_consultationsCollection)
-        .where('status', isEqualTo: 'pending')
+        .collection(AppConstants.collectionConsultations)
+        .where('status', isEqualTo: AppConstants.statusPending)
         .count()
         .get();
 
     // Get in_review count
     final inReviewSnapshot = await _firestore
-        .collection(_consultationsCollection)
-        .where('status', isEqualTo: 'in_review')
+        .collection(AppConstants.collectionConsultations)
+        .where('status', isEqualTo: AppConstants.statusInReview)
         .count()
         .get();
 
     // Get completed count
     final completedSnapshot = await _firestore
-        .collection(_consultationsCollection)
-        .where('status', isEqualTo: 'completed')
+        .collection(AppConstants.collectionConsultations)
+        .where('status', isEqualTo: AppConstants.statusCompleted)
         .count()
         .get();
 
@@ -180,7 +182,7 @@ class AdminService {
   /// Fetch all patients (users with userType == 'patient')
   Future<List<UserModel>> fetchAllPatients() async {
     final snapshot = await _firestore
-        .collection(_usersCollection)
+        .collection(AppConstants.collectionUsers)
         .where('userType', isEqualTo: 'patient')
         .orderBy('createdAt', descending: true)
         .get();
@@ -195,7 +197,10 @@ class AdminService {
   /// For MVP, we delete the Firestore document only
   Future<void> deleteUser(String uid) async {
     // Delete user document from Firestore
-    await _firestore.collection(_usersCollection).doc(uid).delete();
+    await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(uid)
+        .delete();
 
     // Note: To fully delete the user, you would need:
     // 1. A Cloud Function with Admin SDK to delete from Firebase Auth
@@ -209,14 +214,20 @@ class AdminService {
 
   /// Update a doctor's profile
   Future<void> updateDoctor(String uid, Map<String, dynamic> data) async {
-    await _firestore.collection(_doctorsCollection).doc(uid).update(data);
+    await _firestore
+        .collection(AppConstants.collectionDoctors)
+        .doc(uid)
+        .update(data);
   }
 
   /// Delete a doctor - hard delete from Firestore
   /// Note: Firebase Auth account deletion requires Admin SDK or Cloud Function
   Future<void> deleteDoctor(String uid) async {
     // Delete doctor document from Firestore
-    await _firestore.collection(_doctorsCollection).doc(uid).delete();
+    await _firestore
+        .collection(AppConstants.collectionDoctors)
+        .doc(uid)
+        .delete();
 
     // Note: To fully delete the doctor, you would need:
     // 1. A Cloud Function with Admin SDK to delete from Firebase Auth

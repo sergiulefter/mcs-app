@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/doctor_model.dart';
 import '../models/medical_specialty.dart';
+import '../utils/constants.dart';
 
 class DoctorService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static const String _collection = 'doctors';
 
   /// Fetch all doctors from Firestore
   Future<List<DoctorModel>> fetchAllDoctors() async {
-    final querySnapshot = await _firestore.collection(_collection).get();
+    final querySnapshot = await _firestore.collection(AppConstants.collectionDoctors).get();
     return querySnapshot.docs
         .map((doc) => DoctorModel.fromMap(
               doc.data(),
@@ -23,7 +23,7 @@ class DoctorService {
     bool serverOnly = false,
   }) async {
     final docSnapshot = await _firestore
-        .collection(_collection)
+        .collection(AppConstants.collectionDoctors)
         .doc(uid)
         .get(serverOnly ? const GetOptions(source: Source.server) : null);
     if (!docSnapshot.exists) return null;
@@ -36,7 +36,7 @@ class DoctorService {
 
   /// Stream all doctors (real-time updates)
   Stream<List<DoctorModel>> streamAllDoctors() {
-    return _firestore.collection(_collection).snapshots().map(
+    return _firestore.collection(AppConstants.collectionDoctors).snapshots().map(
           (snapshot) => snapshot.docs
               .map((doc) => DoctorModel.fromMap(
                     doc.data(),
@@ -49,7 +49,7 @@ class DoctorService {
   /// Stream a single doctor (real-time updates)
   Stream<DoctorModel?> streamDoctor(String uid) {
     return _firestore
-        .collection(_collection)
+        .collection(AppConstants.collectionDoctors)
         .doc(uid)
         .snapshots(includeMetadataChanges: true)
         .map((snapshot) {
@@ -65,7 +65,7 @@ class DoctorService {
   Future<List<DoctorModel>> fetchDoctorsBySpecialty(
       MedicalSpecialty specialty) async {
     final querySnapshot = await _firestore
-        .collection(_collection)
+        .collection(AppConstants.collectionDoctors)
         .where('specialty', isEqualTo: specialty.name)
         .get();
 
@@ -80,7 +80,7 @@ class DoctorService {
   /// Fetch only available doctors
   Future<List<DoctorModel>> fetchAvailableDoctors() async {
     final querySnapshot = await _firestore
-        .collection(_collection)
+        .collection(AppConstants.collectionDoctors)
         .where('isAvailable', isEqualTo: true)
         .get();
 
@@ -134,12 +134,12 @@ class DoctorService {
 
   /// Update doctor profile (for doctor self-editing)
   Future<void> updateDoctorProfile(String uid, Map<String, dynamic> data) async {
-    await _firestore.collection(_collection).doc(uid).update(data);
+    await _firestore.collection(AppConstants.collectionDoctors).doc(uid).update(data);
   }
 
   /// Update doctor availability status
   Future<void> updateAvailability(String uid, bool isAvailable) async {
-    await _firestore.collection(_collection).doc(uid).update({
+    await _firestore.collection(AppConstants.collectionDoctors).doc(uid).update({
       'isAvailable': isAvailable,
       'lastActive': DateTime.now().toIso8601String(),
     });
@@ -155,7 +155,7 @@ class DoctorService {
 
     final updatedVacations = [...doctor.vacationPeriods, vacationPeriod];
 
-    await _firestore.collection(_collection).doc(uid).update({
+    await _firestore.collection(AppConstants.collectionDoctors).doc(uid).update({
       'vacationPeriods': updatedVacations.map((e) => e.toMap()).toList(),
     });
   }
@@ -173,19 +173,19 @@ class DoctorService {
       updatedVacations.removeAt(vacationIndex);
     }
 
-    await _firestore.collection(_collection).doc(uid).update({
+    await _firestore.collection(AppConstants.collectionDoctors).doc(uid).update({
       'vacationPeriods': updatedVacations.map((e) => e.toMap()).toList(),
     });
   }
 
   /// Create a new doctor profile (admin function)
   Future<void> createDoctorProfile(DoctorModel doctor) async {
-    await _firestore.collection(_collection).doc(doctor.uid).set(doctor.toMap());
+    await _firestore.collection(AppConstants.collectionDoctors).doc(doctor.uid).set(doctor.toMap());
   }
 
   /// Delete doctor profile (admin function)
   Future<void> deleteDoctorProfile(String uid) async {
-    await _firestore.collection(_collection).doc(uid).delete();
+    await _firestore.collection(AppConstants.collectionDoctors).doc(uid).delete();
   }
 
   /// Get doctors sorted by experience

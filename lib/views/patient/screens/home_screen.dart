@@ -56,17 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final consultationsController = context.watch<ConsultationsController>();
     final user = authController.currentUser;
 
-    // Calculate stats from real consultation data
-    final consultations = consultationsController.consultations;
-    final totalCount = consultations.length;
-    final pendingCount = consultations.where((c) => c.status == 'pending').length;
-    final completedCount = consultations.where((c) => c.status == 'completed').length;
+    // Use controller's computed properties for statistics
+    final totalCount = consultationsController.consultations.length;
+    final pendingCount = consultationsController.pendingCount;
+    final completedCount = consultationsController.completedCount;
 
-    // Get active consultations (pending or in_review) for display
-    final activeConsultations = consultations
-        .where((c) => c.status == 'pending' || c.status == 'in_review' || c.status == 'info_requested')
-        .take(3)
-        .toList();
+    // Get active consultations for display (computed in controller)
+    final activeConsultations = consultationsController.recentActiveConsultations;
 
     return Scaffold(
       body: SafeArea(

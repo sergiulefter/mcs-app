@@ -222,7 +222,7 @@ class AuthController extends ChangeNotifier {
       };
 
       await _firestore
-          .collection('users')
+          .collection(AppConstants.collectionUsers)
           .doc(_currentUser!.uid)
           .update(profileData);
 
@@ -258,7 +258,7 @@ class AuthController extends ChangeNotifier {
 
     try {
       await _firestore
-          .collection('users')
+          .collection(AppConstants.collectionUsers)
           .doc(_currentUser!.uid)
           .update({'preferredLanguage': languageCode});
 

@@ -221,11 +221,10 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     BuildContext context,
     DoctorConsultationsController controller,
   ) {
+    // Use controller's computed properties
     final total = controller.consultations.length;
-    final pending =
-        controller.consultations.where((c) => c.status == 'pending').length;
-    final completed =
-        controller.consultations.where((c) => c.status == 'completed').length;
+    final pending = controller.newCount;
+    final completed = controller.completedCount;
 
     final semantic = Theme.of(context).extension<AppSemanticColors>()!;
     final colorScheme = Theme.of(context).colorScheme;
@@ -276,11 +275,8 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
     BuildContext context,
     DoctorConsultationsController controller,
   ) {
-    final pending = controller.consultations
-        .where((c) => c.status == 'pending')
-        .toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    final recentPending = pending.take(3).toList();
+    // Use controller's computed property for recent pending consultations
+    final recentPending = controller.recentPendingConsultations.take(3).toList();
 
     if (recentPending.isEmpty) {
       return SurfaceCard(

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../utils/constants.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -45,7 +46,10 @@ class AuthService {
       preferredLanguage: preferredLanguage ?? 'en',
     );
 
-    await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
+    await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(user.uid)
+        .set(userModel.toMap());
 
     return userModel;
   }
@@ -64,14 +68,20 @@ class AuthService {
     if (user == null) return null;
 
     // First check if user exists in 'users' collection
-    DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+    DocumentSnapshot userDoc = await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(user.uid)
+        .get();
 
     if (userDoc.exists) {
       return UserModel.fromMap(userDoc.data() as Map<String, dynamic>, user.uid);
     }
 
     // Check if user exists in 'doctors' collection
-    DocumentSnapshot doctorDoc = await _firestore.collection('doctors').doc(user.uid).get();
+    DocumentSnapshot doctorDoc = await _firestore
+        .collection(AppConstants.collectionDoctors)
+        .doc(user.uid)
+        .get();
 
     if (doctorDoc.exists) {
       // Create a UserModel from doctor data with isDoctor flag
@@ -90,7 +100,10 @@ class AuthService {
 
     // If user document doesn't exist in either collection, create one in 'users'
     UserModel userModel = UserModel.fromFirebaseUser(user);
-    await _firestore.collection('users').doc(user.uid).set(userModel.toMap());
+    await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(user.uid)
+        .set(userModel.toMap());
     return userModel;
   }
 
@@ -107,13 +120,19 @@ class AuthService {
   // Get user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
     // First check 'users' collection
-    DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
+    DocumentSnapshot userDoc = await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(uid)
+        .get();
     if (userDoc.exists) {
       return UserModel.fromMap(userDoc.data() as Map<String, dynamic>, uid);
     }
 
     // Check 'doctors' collection
-    DocumentSnapshot doctorDoc = await _firestore.collection('doctors').doc(uid).get();
+    DocumentSnapshot doctorDoc = await _firestore
+        .collection(AppConstants.collectionDoctors)
+        .doc(uid)
+        .get();
     if (doctorDoc.exists) {
       final doctorData = doctorDoc.data() as Map<String, dynamic>;
       return UserModel(
@@ -160,7 +179,10 @@ class AuthService {
 
     // Update Firestore document if there are changes
     if (updates.isNotEmpty) {
-      await _firestore.collection('users').doc(uid).update(updates);
+      await _firestore
+          .collection(AppConstants.collectionUsers)
+          .doc(uid)
+          .update(updates);
     }
 
     // Fetch and return updated user data
