@@ -10,6 +10,7 @@ import 'package:mcs_app/views/doctor/widgets/cards/patient_info_card.dart';
 import 'package:mcs_app/views/doctor/widgets/skeletons/request_review_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
+import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/shared/widgets/status_badge.dart';
 import 'package:mcs_app/views/shared/widgets/urgency_badge.dart';
 import 'package:provider/provider.dart';
@@ -92,6 +93,10 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                 const SizedBox(height: AppTheme.sectionSpacing),
                 _buildInfoRequests(context, consultation.infoRequests),
               ],
+              if (consultation.doctorResponse != null) ...[
+                const SizedBox(height: AppTheme.sectionSpacing),
+                _buildDoctorResponse(context, consultation.doctorResponse!),
+              ],
               const SizedBox(height: AppTheme.sectionSpacing),
               _buildActions(context, consultation),
             ],
@@ -143,6 +148,157 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                   ),
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDoctorResponse(
+    BuildContext context,
+    DoctorResponseModel response,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(title: 'request_detail.doctor_response.title'.tr()),
+        const SizedBox(height: AppTheme.spacing16),
+        SurfaceCard(
+          padding: AppTheme.cardPadding,
+          backgroundColor: colorScheme.secondary.withValues(alpha: 0.05),
+          borderColor: colorScheme.secondary.withValues(alpha: 0.2),
+          showShadow: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppTheme.spacing8),
+                    decoration: BoxDecoration(
+                      color: colorScheme.secondary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                    ),
+                    child: Icon(
+                      Icons.medical_information_outlined,
+                      size: AppTheme.iconMedium,
+                      color: colorScheme.secondary,
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.spacing12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'request_detail.doctor_response.from_doctor'.tr(),
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        Text(
+                          DateFormat.yMMMMd().format(response.respondedAt),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacing16),
+              Text(
+                response.text,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.6,
+                    ),
+              ),
+              if (response.recommendations != null &&
+                  response.recommendations!.isNotEmpty) ...[
+                const SizedBox(height: AppTheme.spacing16),
+                Container(
+                  padding: const EdgeInsets.all(AppTheme.spacing12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.lightbulb_outline,
+                            size: AppTheme.iconSmall,
+                            color: colorScheme.primary,
+                          ),
+                          const SizedBox(width: AppTheme.spacing8),
+                          Text(
+                            'request_detail.doctor_response.recommendations_label'
+                                .tr(),
+                            style:
+                                Theme.of(context).textTheme.labelLarge?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppTheme.spacing8),
+                      Text(
+                        response.recommendations!,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppTheme.spacing16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.refresh_outlined,
+                    size: AppTheme.iconSmall,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: AppTheme.spacing8),
+                  Expanded(
+                    child: Text(
+                      'request_detail.doctor_response.follow_up_needed'.tr(),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacing8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacing12,
+                  vertical: AppTheme.spacing4,
+                ),
+                decoration: BoxDecoration(
+                  color: (response.followUpNeeded
+                          ? colorScheme.secondary
+                          : colorScheme.error)
+                      .withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                ),
+                child: Text(
+                  response.followUpNeeded ? 'common.yes'.tr() : 'common.no'.tr(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: response.followUpNeeded
+                            ? colorScheme.secondary
+                            : colorScheme.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
