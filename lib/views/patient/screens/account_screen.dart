@@ -7,7 +7,6 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/seed_dev_data.dart';
-import 'package:mcs_app/utils/seed_doctors.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/patient/widgets/cards/action_tile.dart';
 import 'package:mcs_app/views/patient/widgets/cards/language_selection_card.dart';
@@ -227,8 +226,8 @@ class AccountScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: colorScheme.errorContainer,
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppTheme.radiusMedium),
-                topRight: Radius.circular(AppTheme.radiusMedium),
+                topLeft: Radius.circular(AppTheme.radiusSmall),
+                topRight: Radius.circular(AppTheme.radiusSmall),
               ),
             ),
             child: Row(
@@ -247,12 +246,6 @@ class AccountScreen extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          ActionTile(
-            icon: Icons.medical_services_outlined,
-            title: 'Seed Doctors Database',
-            subtitle: 'Add 7 sample doctors to Firestore (requires admin)',
-            onTap: () => _handleSeedDoctors(context),
           ),
           ActionTile(
             icon: Icons.cloud_download_outlined,
@@ -284,56 +277,6 @@ class AccountScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _handleSeedDoctors(BuildContext context) async {
-    // Show loading dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.all(AppTheme.spacing24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: AppTheme.spacing16),
-                Text('Seeding doctors...'),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    try {
-      final seeder = DoctorSeeder();
-      await seeder.seedDoctors();
-
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('✓ Successfully seeded 7 doctors!'),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        Navigator.of(context).pop(); // Close loading dialog
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✗ Error seeding doctors: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    }
   }
 
   void _showLanguageDialog(BuildContext context) {
@@ -407,7 +350,9 @@ class AccountScreen extends StatelessWidget {
 
     try {
       // Run the seeder script (requires Firebase initialized)
-      await Future.sync(() => runDevSeeder(patientId: currentUser.uid));
+      // Using specific patient UUID for dev testing
+      const devPatientId = 'cX0vbVAD3CYbdy4mX2uIB6ABCWm1';
+      await Future.sync(() => runDevSeeder(patientId: devPatientId));
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
