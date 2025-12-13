@@ -102,11 +102,11 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
     await fetchUserConsultations(userId);
   }
 
-  /// Fetch doctor information for consultations.
+  /// Fetch doctor information for consultations in parallel.
   /// Errors here are logged but not thrown - this is supplementary data.
   Future<void> _fetchDoctorInfo() async {
-    for (var consultation in _consultations) {
-      if (consultation.doctorId != null) {
+    await Future.wait(
+      _consultations.where((c) => c.doctorId != null).map((consultation) async {
         try {
           final doctorDoc = await _firestore
               .collection(AppConstants.collectionDoctors)
@@ -125,8 +125,8 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
           // If doctor fetch fails, just continue with null values
           debugPrint('Error fetching doctor info: $e');
         }
-      }
-    }
+      }),
+    );
   }
 
   // Set filter status

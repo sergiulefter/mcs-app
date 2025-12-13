@@ -252,25 +252,29 @@ class DoctorConsultationsController extends ChangeNotifier
     );
   }
 
-  /// Preload patient profiles for display.
+  /// Preload patient profiles for display in parallel.
   /// Errors here are logged but not thrown - this is supplementary data.
   Future<void> _preloadPatients(Set<String> patientIds) async {
-    final idsToLoad = patientIds.where((id) => !_patientsCache.containsKey(id));
+    final idsToLoad = patientIds.where((id) => !_patientsCache.containsKey(id)).toList();
     if (idsToLoad.isEmpty) return;
 
-    for (final id in idsToLoad) {
-      try {
-        final doc =
-            await _firestore.collection(AppConstants.collectionUsers).doc(id).get();
-        if (doc.exists) {
-          _patientsCache[id] =
-              UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+    await Future.wait(
+      idsToLoad.map((id) async {
+        try {
+          final doc = await _firestore
+              .collection(AppConstants.collectionUsers)
+              .doc(id)
+              .get();
+          if (doc.exists) {
+            _patientsCache[id] =
+                UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+          }
+        } catch (e) {
+          // Best-effort enrichment; do not block UI on errors.
+          debugPrint('DoctorConsultationsController: patient fetch failed $e');
         }
-      } catch (e) {
-        // Best-effort enrichment; do not block UI on errors.
-        debugPrint('DoctorConsultationsController: patient fetch failed $e');
-      }
-    }
+      }),
+    );
     notifyListeners();
   }
 
