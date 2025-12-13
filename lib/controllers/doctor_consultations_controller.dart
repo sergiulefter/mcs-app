@@ -19,6 +19,8 @@ class DoctorConsultationsController extends ChangeNotifier
   final Set<ConsultationModel> _consultations = SplayTreeSet(
     (a, b) => b.createdAt.compareTo(a.createdAt), // newest first
   );
+  // HashMap index for O(1) lookup by ID
+  final Map<String, ConsultationModel> _consultationsMap = {};
   final Map<String, UserModel> _patientsCache = {};
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
@@ -118,9 +120,12 @@ class DoctorConsultationsController extends ChangeNotifier
         .listen(
       (snapshot) async {
         _consultations.clear();
-        _consultations.addAll(
-          snapshot.docs.map((doc) => ConsultationModel.fromFirestore(doc)),
-        );
+        _consultationsMap.clear();
+        for (final doc in snapshot.docs) {
+          final consultation = ConsultationModel.fromFirestore(doc);
+          _consultations.add(consultation);
+          _consultationsMap[consultation.id] = consultation;
+        }
 
         _hasPrimed = true;
         _isLoading = false;
@@ -153,12 +158,9 @@ class DoctorConsultationsController extends ChangeNotifier
     notifyListeners();
   }
 
-  ConsultationModel? consultationById(String consultationId) {
-    for (final consultation in _consultations) {
-      if (consultation.id == consultationId) return consultation;
-    }
-    return null;
-  }
+  /// O(1) lookup by consultation ID
+  ConsultationModel? consultationById(String consultationId) =>
+      _consultationsMap[consultationId];
 
   /// Update consultation status.
   /// Throws exceptions on failure - UI should catch and display.
@@ -280,6 +282,7 @@ class DoctorConsultationsController extends ChangeNotifier
 
   void clear() {
     _consultations.clear();
+    _consultationsMap.clear();
     _patientsCache.clear();
     _selectedSegment = 'in_progress';
     _selectedStatus = 'all';
@@ -288,17 +291,19 @@ class DoctorConsultationsController extends ChangeNotifier
     notifyListeners();
   }
 
-  /// Update consultation in Set - remove old, add updated (Set pattern)
+  /// Update consultation in Set and Map - remove old, add updated
   void _patchConsultation(
     String consultationId,
     ConsultationModel Function(ConsultationModel current) updater,
   ) {
-    final consultation = _consultations.firstWhere(
-      (c) => c.id == consultationId,
-      orElse: () => throw Exception('Consultation not found'),
-    );
+    final consultation = _consultationsMap[consultationId];
+    if (consultation == null) {
+      throw Exception('Consultation not found');
+    }
+    final updated = updater(consultation);
     _consultations.remove(consultation);
-    _consultations.add(updater(consultation));
+    _consultations.add(updated);
+    _consultationsMap[consultationId] = updated;
     notifyListeners();
   }
 
