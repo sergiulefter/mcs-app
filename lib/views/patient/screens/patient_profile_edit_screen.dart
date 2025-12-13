@@ -12,6 +12,7 @@ import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/patient/widgets/skeletons/patient_profile_edit_skeleton.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 
 /// Patient profile edit screen - dedicated screen for editing profile
 /// (separate from the onboarding CompleteProfileScreen)
@@ -128,37 +129,28 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
     final authController = context.read<AuthController>();
     final currentLanguage = context.locale.languageCode;
 
-    final success = await authController.completeUserProfile(
-      displayName: _nameController.text.trim(),
-      dateOfBirth: _selectedDateOfBirth!,
-      gender: _selectedGender!,
-      phone: _phoneController.text.trim().isEmpty
-          ? null
-          : _phoneController.text.trim(),
-      preferredLanguage: currentLanguage,
-    );
-
-    if (!mounted) return;
-
-    setState(() => _isSaving = false);
-
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('profile.edit.success'.tr()),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-        ),
+    try {
+      await authController.completeUserProfile(
+        displayName: _nameController.text.trim(),
+        dateOfBirth: _selectedDateOfBirth!,
+        gender: _selectedGender!,
+        phone: _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
+        preferredLanguage: currentLanguage,
       );
+
+      if (!mounted) return;
+
+      NotificationsHelper().showSuccess('profile.edit.success'.tr(), context: context);
       Navigator.of(context).pop();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            authController.errorMessage ?? 'profile.edit.error'.tr(),
-          ),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
+    } catch (e) {
+      if (!mounted) return;
+      NotificationsHelper().showError(e.toString(), context: context);
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 

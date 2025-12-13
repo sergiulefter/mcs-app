@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/consultation_model.dart';
@@ -5,20 +7,23 @@ import '../models/doctor_model.dart';
 import '../utils/constants.dart';
 import 'mixins/consultation_filter_mixin.dart';
 
+/// Patient consultations controller
 class ConsultationsController extends ChangeNotifier with ConsultationFilterMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  List<ConsultationModel> _consultations = [];
+  // State - SplayTreeSet for automatic deduplication and sorting
+  final Set<ConsultationModel> _consultations = SplayTreeSet(
+    (a, b) => b.createdAt.compareTo(a.createdAt), // newest first
+  );
   bool _isLoading = false;
-  String? _error;
   String? _loadedUserId;
   bool _hasPrimedForUser = false;
-  String _selectedStatus = 'all'; // 'all' | 'pending' | 'in_review' | 'completed' | 'cancelled'
-  String _selectedSegment = 'active'; // 'active' | 'completed' | 'all'
+  String _selectedStatus = 'all';
+  String _selectedSegment = 'active';
 
-  List<ConsultationModel> get consultations => _consultations;
+  // Getters - return List for UI compatibility
+  List<ConsultationModel> get consultations => List.from(_consultations);
   bool get isLoading => _isLoading;
-  String? get error => _error;
   String get selectedStatus => _selectedStatus;
   String get selectedSegment => _selectedSegment;
   bool get hasPrimedForUser => _hasPrimedForUser;
@@ -46,23 +51,24 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
       .where((c) => ConsultationFilterMixin.isActiveStatus(c.status))
       .take(3)
       .toList();
+
   bool hasDataForUser(String userId) =>
       _hasPrimedForUser && _loadedUserId == userId;
 
   // Get filtered consultations based on selected status
   List<ConsultationModel> get filteredConsultations {
     if (_selectedStatus == 'all') {
-      return _consultations;
+      return List.from(_consultations);
     }
     return _consultations
         .where((consultation) => consultation.status == _selectedStatus)
         .toList();
   }
 
-  // Fetch consultations for a specific user
+  /// Fetch consultations for a specific user.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> fetchUserConsultations(String userId) async {
     _isLoading = true;
-    _error = null;
     notifyListeners();
 
     try {
@@ -72,26 +78,23 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
           .orderBy('createdAt', descending: true)
           .get();
 
-      _consultations = querySnapshot.docs
-          .map((doc) => ConsultationModel.fromFirestore(doc))
-          .toList();
+      _consultations.clear();
+      _consultations.addAll(
+        querySnapshot.docs.map((doc) => ConsultationModel.fromFirestore(doc)),
+      );
 
       // Fetch doctor info for each consultation
       await _fetchDoctorInfo();
 
       _loadedUserId = userId;
       _hasPrimedForUser = true;
+    } finally {
       _isLoading = false;
-      _error = null;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      _error = e.toString();
       notifyListeners();
     }
   }
 
-  // Prime data for a given user; skips network if already loaded for same user unless forced.
+  /// Prime data for a given user; skips network if already loaded for same user unless forced.
   Future<void> primeForUser(String userId, {bool force = false}) async {
     if (!force && _hasPrimedForUser && _loadedUserId == userId) {
       return;
@@ -99,7 +102,8 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
     await fetchUserConsultations(userId);
   }
 
-  // Fetch doctor information for consultations
+  /// Fetch doctor information for consultations.
+  /// Errors here are logged but not thrown - this is supplementary data.
   Future<void> _fetchDoctorInfo() async {
     for (var consultation in _consultations) {
       if (consultation.doctorId != null) {
@@ -150,104 +154,93 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
             .toList();
       case 'all':
       default:
-        return _consultations;
+        return List.from(_consultations);
     }
   }
 
-  // Refresh consultations
+  /// Refresh consultations.
   Future<void> refresh(String userId) async {
     await fetchUserConsultations(userId);
   }
 
-  // Clear data (e.g., on logout)
+  /// Clear data (e.g., on logout).
   void clear() {
-    _consultations = [];
+    _consultations.clear();
     _isLoading = false;
     _loadedUserId = null;
     _hasPrimedForUser = false;
-    _error = null;
     _selectedStatus = 'all';
     _selectedSegment = 'active';
     notifyListeners();
   }
 
-  // Cancel a consultation
+  /// Cancel a consultation.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> cancelConsultation(String consultationId) async {
-    try {
-      await _firestore
-          .collection(AppConstants.collectionConsultations)
-          .doc(consultationId)
-          .update({
-        'status': AppConstants.statusCancelled,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+    await _firestore
+        .collection(AppConstants.collectionConsultations)
+        .doc(consultationId)
+        .update({
+      'status': AppConstants.statusCancelled,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
 
-      // Update local state
-      final index = _consultations.indexWhere((c) => c.id == consultationId);
-      if (index != -1) {
-        _consultations[index] = _consultations[index].copyWith(
-          status: AppConstants.statusCancelled,
-          updatedAt: DateTime.now(),
-        );
-        notifyListeners();
-      }
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      rethrow;
-    }
+    // Update local state - find, remove, update, re-add (Set pattern)
+    final consultation = _consultations.firstWhere(
+      (c) => c.id == consultationId,
+      orElse: () => throw Exception('Consultation not found'),
+    );
+    _consultations.remove(consultation);
+    _consultations.add(consultation.copyWith(
+      status: AppConstants.statusCancelled,
+      updatedAt: DateTime.now(),
+    ));
+    notifyListeners();
   }
 
-  // Submit patient response to an info request
+  /// Submit patient response to an info request.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> submitInfoResponse(
     String consultationId,
     String infoRequestId, {
     required List<String> answers,
     String? additionalInfo,
   }) async {
-    try {
-      // Find the consultation
-      final consultation = _consultations.firstWhere(
-        (c) => c.id == consultationId,
-        orElse: () => throw Exception('Consultation not found'),
-      );
+    // Find the consultation
+    final consultation = _consultations.firstWhere(
+      (c) => c.id == consultationId,
+      orElse: () => throw Exception('Consultation not found'),
+    );
 
-      // Find and update the info request
-      final updatedInfoRequests = consultation.infoRequests.map((request) {
-        if (request.id == infoRequestId) {
-          return request.copyWith(
-            answers: answers,
-            additionalInfo: additionalInfo,
-            respondedAt: DateTime.now(),
-          );
-        }
-        return request;
-      }).toList();
-
-      // Update Firestore
-      await _firestore
-          .collection(AppConstants.collectionConsultations)
-          .doc(consultationId)
-          .update({
-        'status': AppConstants.statusInReview,
-        'updatedAt': FieldValue.serverTimestamp(),
-        'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
-      });
-
-      // Update local state
-      final index = _consultations.indexWhere((c) => c.id == consultationId);
-      if (index != -1) {
-        _consultations[index] = _consultations[index].copyWith(
-          status: AppConstants.statusInReview,
-          updatedAt: DateTime.now(),
-          infoRequests: updatedInfoRequests,
+    // Find and update the info request
+    final updatedInfoRequests = consultation.infoRequests.map((request) {
+      if (request.id == infoRequestId) {
+        return request.copyWith(
+          answers: answers,
+          additionalInfo: additionalInfo,
+          respondedAt: DateTime.now(),
         );
-        notifyListeners();
       }
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      rethrow;
-    }
+      return request;
+    }).toList();
+
+    // Update Firestore
+    await _firestore
+        .collection(AppConstants.collectionConsultations)
+        .doc(consultationId)
+        .update({
+      'status': AppConstants.statusInReview,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
+    });
+
+    // Update local state - remove old, add updated (Set pattern)
+    _consultations.remove(consultation);
+    _consultations.add(consultation.copyWith(
+      status: AppConstants.statusInReview,
+      updatedAt: DateTime.now(),
+      infoRequests: updatedInfoRequests,
+    ));
+    notifyListeners();
   }
 }

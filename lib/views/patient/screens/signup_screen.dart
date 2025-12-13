@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'complete_profile_screen.dart';
@@ -32,10 +33,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordKey = GlobalKey();
   final _confirmPasswordKey = GlobalKey();
 
-  // Inline error messages from Firebase auth
-  String? _emailError;
-  String? _passwordError;
-
   @override
   void dispose() {
     _scrollHelper.dispose();
@@ -47,12 +44,8 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
-    // Clear previous auth errors before validation
+    // Clear previous errors before validation
     _scrollHelper.clearErrors();
-    setState(() {
-      _emailError = null;
-      _passwordError = null;
-    });
 
     if (!_formKey.currentState!.validate()) {
       _scrollHelper.scrollToFirstError(context);
@@ -64,14 +57,16 @@ class _SignupScreenState extends State<SignupScreen> {
     // Get the current language from EasyLocalization (set in LanguageSelectionScreen)
     final currentLanguage = context.locale.languageCode;
 
-    final success = await authController.signUp(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-      displayName: _nameController.text.trim(),
-      preferredLanguage: currentLanguage,
-    );
+    try {
+      await authController.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        displayName: _nameController.text.trim(),
+        preferredLanguage: currentLanguage,
+      );
 
-    if (success && mounted) {
+      if (!mounted) return;
+
       // Navigate to MainShell first, then push CompleteProfileScreen on top
       final navigator = Navigator.of(context);
 
@@ -85,28 +80,9 @@ class _SignupScreenState extends State<SignupScreen> {
           MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
         );
       });
-    } else if (mounted) {
-      // Map Firebase error to appropriate field
-      final errorCode = authController.errorCode;
-      final errorMessage = authController.errorMessage ?? 'errors.signup_failed'.tr();
-
-      setState(() {
-        if (errorCode == 'email-already-in-use' || errorCode == 'invalid-email') {
-          _emailError = errorMessage;
-          _scrollHelper.setError('email');
-        } else if (errorCode == 'weak-password') {
-          _passwordError = errorMessage;
-          _scrollHelper.setError('password');
-        } else {
-          // For other errors, show under email field as general error
-          _emailError = errorMessage;
-          _scrollHelper.setError('email');
-        }
-      });
-
-      // Trigger form revalidation to show the inline error
-      _formKey.currentState!.validate();
-      _scrollHelper.scrollToFirstError(context);
+    } catch (e) {
+      if (!mounted) return;
+      NotificationsHelper().showError(e.toString(), context: context);
     }
   }
 
@@ -160,15 +136,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     prefixIcon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    validator: (value) {
-                      if (_emailError != null) return _emailError;
-                      return Validators.validateEmail(value);
-                    },
-                    onChanged: (_) {
-                      if (_emailError != null) {
-                        setState(() => _emailError = null);
-                      }
-                    },
+                    validator: Validators.validateEmail,
                   ),
                 ),
                 const SizedBox(height: AppTheme.spacing16),
@@ -269,11 +237,6 @@ class _SignupScreenState extends State<SignupScreen> {
           controller: _passwordController,
           obscureText: _obscurePassword,
           textInputAction: TextInputAction.next,
-          onChanged: (_) {
-            if (_passwordError != null) {
-              setState(() => _passwordError = null);
-            }
-          },
           decoration: InputDecoration(
             hintText: 'auth.create_password_hint'.tr(),
             prefixIcon: const Icon(
@@ -292,10 +255,7 @@ class _SignupScreenState extends State<SignupScreen> {
               },
             ),
           ),
-          validator: (value) {
-            if (_passwordError != null) return _passwordError;
-            return Validators.validatePassword(value);
-          },
+          validator: Validators.validatePassword,
         ),
       ],
     );

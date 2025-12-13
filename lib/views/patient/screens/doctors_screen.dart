@@ -5,7 +5,6 @@ import 'package:mcs_app/controllers/doctors_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/cards/doctor_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/doctor_card_skeleton.dart';
-import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -43,9 +42,7 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
       body: SafeArea(
         child: controller.isLoading && !controller.hasPrimed
             ? _buildLoadingState(context, controller)
-            : controller.error != null && !controller.hasPrimed
-                ? _buildErrorState(context)
-                : _buildContent(context, controller),
+            : _buildContent(context, controller),
       ),
     );
   }
@@ -70,54 +67,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildErrorState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: AppTheme.screenPadding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SurfaceCard(
-              padding: const EdgeInsets.all(AppTheme.spacing16),
-              backgroundColor:
-                  Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-              borderColor:
-                  Theme.of(context).colorScheme.error.withValues(alpha: 0.3),
-              showShadow: false,
-              child: Icon(
-                Icons.error_outline,
-                size: 36,
-                color: Theme.of(context).colorScheme.error,
-              ),
-            ),
-            const SizedBox(height: AppTheme.spacing16),
-            Text(
-              'doctors.error_loading_title'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: AppTheme.spacing8),
-            Text(
-              'doctors.error_loading_subtitle'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppTheme.spacing24),
-            ElevatedButton.icon(
-              onPressed: () => context.read<DoctorsController>().fetchDoctors(),
-              icon: const Icon(Icons.refresh),
-              label: Text('common.retry'.tr()),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(200, 56),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

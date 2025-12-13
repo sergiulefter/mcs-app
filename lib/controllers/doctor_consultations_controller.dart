@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +10,15 @@ import 'package:uuid/uuid.dart';
 
 import 'mixins/consultation_filter_mixin.dart';
 
-/// Controller for doctor-side consultation management.
-/// Handles live Firestore stream, status updates, responses, and info requests.
+/// Controller for doctor-side consultation management
 class DoctorConsultationsController extends ChangeNotifier
     with ConsultationFilterMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  final List<ConsultationModel> _consultations = [];
+  // State - SplayTreeSet for automatic deduplication and sorting
+  final Set<ConsultationModel> _consultations = SplayTreeSet(
+    (a, b) => b.createdAt.compareTo(a.createdAt), // newest first
+  );
   final Map<String, UserModel> _patientsCache = {};
 
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
@@ -24,15 +27,14 @@ class DoctorConsultationsController extends ChangeNotifier
   bool _hasPrimed = false;
   String _selectedSegment = 'in_progress';
   String _selectedStatus = 'all';
-  String? _error;
   String? _doctorId;
 
-  List<ConsultationModel> get consultations => List.unmodifiable(_consultations);
+  // Getters - return List for UI compatibility
+  List<ConsultationModel> get consultations => List.from(_consultations);
   bool get isLoading => _isLoading;
   bool get hasPrimed => _hasPrimed;
   String get selectedSegment => _selectedSegment;
   String get selectedStatus => _selectedStatus;
-  String? get error => _error;
 
   /// Get consultations filtered by segment (New, In Progress, Completed)
   List<ConsultationModel> get segmentFilteredConsultations {
@@ -40,24 +42,24 @@ class DoctorConsultationsController extends ChangeNotifier
 
     switch (_selectedSegment) {
       case 'new':
-        segmentFiltered = consultations
+        segmentFiltered = _consultations
             .where((c) => c.status == AppConstants.statusPending)
             .toList();
         break;
       case 'in_progress':
-        segmentFiltered = consultations
+        segmentFiltered = _consultations
             .where((c) =>
                 c.status == AppConstants.statusInReview ||
                 c.status == AppConstants.statusInfoRequested)
             .toList();
         break;
       case 'completed':
-        segmentFiltered = consultations
+        segmentFiltered = _consultations
             .where((c) => ConsultationFilterMixin.isFinishedStatus(c.status))
             .toList();
         break;
       default:
-        segmentFiltered = consultations;
+        segmentFiltered = List.from(_consultations);
     }
 
     // Apply additional status filter if not 'all'
@@ -70,32 +72,30 @@ class DoctorConsultationsController extends ChangeNotifier
   }
 
   /// Counts for segment badges
-  int get newCount => consultations
+  int get newCount => _consultations
       .where((c) => c.status == AppConstants.statusPending)
       .length;
 
-  int get inProgressCount => consultations
+  int get inProgressCount => _consultations
       .where((c) =>
           c.status == AppConstants.statusInReview ||
           c.status == AppConstants.statusInfoRequested)
       .length;
 
-  int get completedCount => consultations
+  int get completedCount => _consultations
       .where((c) => ConsultationFilterMixin.isFinishedStatus(c.status))
       .length;
 
   /// Recent pending consultations for doctor home screen
   List<ConsultationModel> get recentPendingConsultations {
-    final pending = consultations
+    return _consultations
         .where((c) => c.status == AppConstants.statusPending)
-        .toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return pending;
+        .toList(); // SplayTreeSet already sorts by createdAt desc
   }
 
   List<ConsultationModel> get filteredConsultations {
-    if (_selectedStatus == 'all') return consultations;
-    return consultations.where((c) => c.status == _selectedStatus).toList();
+    if (_selectedStatus == 'all') return List.from(_consultations);
+    return _consultations.where((c) => c.status == _selectedStatus).toList();
   }
 
   UserModel? patientProfile(String patientId) => _patientsCache[patientId];
@@ -106,7 +106,6 @@ class DoctorConsultationsController extends ChangeNotifier
 
     _doctorId = doctorId;
     _isLoading = true;
-    _error = null;
     notifyListeners();
 
     await _subscription?.cancel();
@@ -118,11 +117,10 @@ class DoctorConsultationsController extends ChangeNotifier
         .snapshots()
         .listen(
       (snapshot) async {
-        _consultations
-          ..clear()
-          ..addAll(snapshot.docs
-              .map((doc) => ConsultationModel.fromFirestore(doc))
-              .toList());
+        _consultations.clear();
+        _consultations.addAll(
+          snapshot.docs.map((doc) => ConsultationModel.fromFirestore(doc)),
+        );
 
         _hasPrimed = true;
         _isLoading = false;
@@ -132,8 +130,9 @@ class DoctorConsultationsController extends ChangeNotifier
         await _preloadPatients(_consultations.map((c) => c.patientId).toSet());
       },
       onError: (e) {
+        // Log stream errors but don't store - streams auto-recover
+        debugPrint('DoctorConsultationsController stream error: $e');
         _isLoading = false;
-        _error = e.toString();
         notifyListeners();
       },
     );
@@ -161,30 +160,28 @@ class DoctorConsultationsController extends ChangeNotifier
     return null;
   }
 
+  /// Update consultation status.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> updateStatus(String consultationId, String status) async {
-    try {
-      await _firestore
-          .collection(AppConstants.collectionConsultations)
-          .doc(consultationId)
-          .update({
-        'status': status,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+    await _firestore
+        .collection(AppConstants.collectionConsultations)
+        .doc(consultationId)
+        .update({
+      'status': status,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
 
-      _patchConsultation(
-        consultationId,
-        (current) => current.copyWith(
-          status: status,
-          updatedAt: DateTime.now(),
-        ),
-      );
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      rethrow;
-    }
+    _patchConsultation(
+      consultationId,
+      (current) => current.copyWith(
+        status: status,
+        updatedAt: DateTime.now(),
+      ),
+    );
   }
 
+  /// Add doctor response to consultation.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> addDoctorResponse(
     String consultationId, {
     required String responseText,
@@ -200,33 +197,29 @@ class DoctorConsultationsController extends ChangeNotifier
       respondedAt: DateTime.now(),
     );
 
-    try {
-      await _firestore
-          .collection(AppConstants.collectionConsultations)
-          .doc(consultationId)
-          .update({
-        'doctorResponse': response.toMap(),
-        'status': AppConstants.statusCompleted,
-        'completedAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+    await _firestore
+        .collection(AppConstants.collectionConsultations)
+        .doc(consultationId)
+        .update({
+      'doctorResponse': response.toMap(),
+      'status': AppConstants.statusCompleted,
+      'completedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
 
-      _patchConsultation(
-        consultationId,
-        (current) => current.copyWith(
-          status: AppConstants.statusCompleted,
-          doctorResponse: response,
-          completedAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      );
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      rethrow;
-    }
+    _patchConsultation(
+      consultationId,
+      (current) => current.copyWith(
+        status: AppConstants.statusCompleted,
+        doctorResponse: response,
+        completedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    );
   }
 
+  /// Request more information from patient.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> requestMoreInfo(
     String consultationId, {
     required String message,
@@ -240,31 +233,27 @@ class DoctorConsultationsController extends ChangeNotifier
       requestedAt: DateTime.now(),
     );
 
-    try {
-      await _firestore
-          .collection(AppConstants.collectionConsultations)
-          .doc(consultationId)
-          .update({
-        'status': AppConstants.statusInfoRequested,
-        'updatedAt': FieldValue.serverTimestamp(),
-        'infoRequests': FieldValue.arrayUnion([infoRequest.toMap()]),
-      });
+    await _firestore
+        .collection(AppConstants.collectionConsultations)
+        .doc(consultationId)
+        .update({
+      'status': AppConstants.statusInfoRequested,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'infoRequests': FieldValue.arrayUnion([infoRequest.toMap()]),
+    });
 
-      _patchConsultation(
-        consultationId,
-        (current) => current.copyWith(
-          status: AppConstants.statusInfoRequested,
-          updatedAt: DateTime.now(),
-          infoRequests: [...current.infoRequests, infoRequest],
-        ),
-      );
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      rethrow;
-    }
+    _patchConsultation(
+      consultationId,
+      (current) => current.copyWith(
+        status: AppConstants.statusInfoRequested,
+        updatedAt: DateTime.now(),
+        infoRequests: [...current.infoRequests, infoRequest],
+      ),
+    );
   }
 
+  /// Preload patient profiles for display.
+  /// Errors here are logged but not thrown - this is supplementary data.
   Future<void> _preloadPatients(Set<String> patientIds) async {
     final idsToLoad = patientIds.where((id) => !_patientsCache.containsKey(id));
     if (idsToLoad.isEmpty) return;
@@ -292,18 +281,20 @@ class DoctorConsultationsController extends ChangeNotifier
     _selectedStatus = 'all';
     _isLoading = false;
     _hasPrimed = false;
-    _error = null;
     notifyListeners();
   }
 
+  /// Update consultation in Set - remove old, add updated (Set pattern)
   void _patchConsultation(
     String consultationId,
     ConsultationModel Function(ConsultationModel current) updater,
   ) {
-    final index = _consultations.indexWhere((c) => c.id == consultationId);
-    if (index == -1) return;
-
-    _consultations[index] = updater(_consultations[index]);
+    final consultation = _consultations.firstWhere(
+      (c) => c.id == consultationId,
+      orElse: () => throw Exception('Consultation not found'),
+    );
+    _consultations.remove(consultation);
+    _consultations.add(updater(consultation));
     notifyListeners();
   }
 

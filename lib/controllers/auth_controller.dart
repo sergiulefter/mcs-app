@@ -1,25 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../services/auth_service.dart';
 import '../models/user_model.dart';
 import '../utils/constants.dart';
 
+/// Authentication controller
 class AuthController extends ChangeNotifier {
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   UserModel? _currentUser;
   bool _isLoading = false;
-  String? _errorMessage;
-  String? _errorCode;
   bool _authStateInitialized = false;
 
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-  String? get errorCode => _errorCode;
   bool get isAuthenticated => _currentUser != null;
   bool get authStateInitialized => _authStateInitialized;
 
@@ -27,37 +23,34 @@ class AuthController extends ChangeNotifier {
     _initAuthListener();
   }
 
-  // Listen to authentication state changes
+  /// Listen to authentication state changes.
+  /// Errors here are logged but not stored - auth state changes are passive.
   void _initAuthListener() {
     _authService.authStateChanges.listen((User? user) async {
       if (user != null) {
         try {
           _currentUser = await _authService.getUserData(user.uid);
-          _authStateInitialized = true;
-          notifyListeners();
         } catch (e) {
-          _errorMessage = e.toString();
-          _authStateInitialized = true;
-          notifyListeners();
+          debugPrint('Error fetching user data: $e');
+          // Don't store error - this is a passive listener
         }
       } else {
         _currentUser = null;
-        _authStateInitialized = true;
-        notifyListeners();
       }
+      _authStateInitialized = true;
+      notifyListeners();
     });
   }
 
-  // Sign up
-  Future<bool> signUp({
+  /// Sign up a new user.
+  /// Throws exceptions on failure - UI should catch and display.
+  Future<void> signUp({
     required String email,
     required String password,
     String? displayName,
     String? preferredLanguage,
   }) async {
     _isLoading = true;
-    _errorMessage = null;
-    _errorCode = null;
     notifyListeners();
 
     try {
@@ -67,32 +60,19 @@ class AuthController extends ChangeNotifier {
         displayName: displayName,
         preferredLanguage: preferredLanguage,
       );
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _errorCode = e.code;
-      _errorMessage = _handleAuthException(e);
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _errorCode = 'unknown';
-      _errorMessage = 'An unexpected error occurred: $e';
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
   }
 
-  // Sign in
-  Future<bool> signIn({
+  /// Sign in an existing user.
+  /// Throws exceptions on failure - UI should catch and display.
+  Future<void> signIn({
     required String email,
     required String password,
   }) async {
     _isLoading = true;
-    _errorMessage = null;
-    _errorCode = null;
     notifyListeners();
 
     try {
@@ -100,25 +80,14 @@ class AuthController extends ChangeNotifier {
         email: email,
         password: password,
       );
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _errorCode = e.code;
-      _errorMessage = _handleAuthException(e);
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _errorCode = 'unknown';
-      _errorMessage = 'An unexpected error occurred: $e';
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
   }
 
-  // Sign out
+  /// Sign out the current user.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> signOut() async {
     _isLoading = true;
     notifyListeners();
@@ -126,53 +95,37 @@ class AuthController extends ChangeNotifier {
     try {
       await _authService.signOut();
       _currentUser = null;
-      _errorMessage = null; // Clear any previous error messages
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _errorMessage = e.toString();
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  // Reset password
-  Future<bool> resetPassword(String email) async {
+  /// Send password reset email.
+  /// Throws exceptions on failure - UI should catch and display.
+  Future<void> resetPassword(String email) async {
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
 
     try {
       await _authService.resetPassword(email);
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return true;
-    } on FirebaseAuthException catch (e) {
-      _errorMessage = _handleAuthException(e);
-      _isLoading = false;
-      notifyListeners();
-      return false;
-    } catch (e) {
-      _errorMessage = 'An unexpected error occurred: $e';
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
   }
 
-  // Update user profile
-  Future<bool> updateUserProfile({
+  /// Update user profile (displayName, photoUrl).
+  /// Throws exceptions on failure - UI should catch and display.
+  Future<void> updateUserProfile({
     String? displayName,
     String? photoUrl,
   }) async {
     if (_currentUser == null) {
-      _errorMessage = 'No user logged in';
-      notifyListeners();
-      return false;
+      throw Exception('No user logged in');
     }
 
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -181,19 +134,15 @@ class AuthController extends ChangeNotifier {
         displayName: displayName,
         photoUrl: photoUrl,
       );
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
   }
 
-  // Complete user profile with extended fields
-  Future<bool> completeUserProfile({
+  /// Complete user profile with extended fields.
+  /// Throws exceptions on failure - UI should catch and display.
+  Future<void> completeUserProfile({
     required String displayName,
     required DateTime dateOfBirth,
     required String gender,
@@ -201,13 +150,10 @@ class AuthController extends ChangeNotifier {
     required String preferredLanguage,
   }) async {
     if (_currentUser == null) {
-      _errorMessage = 'No user logged in';
-      notifyListeners();
-      return false;
+      throw Exception('No user logged in');
     }
 
     _isLoading = true;
-    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -236,70 +182,26 @@ class AuthController extends ChangeNotifier {
 
       // Refresh current user data
       _currentUser = await _authService.getUserData(_currentUser!.uid);
-
+    } finally {
       _isLoading = false;
       notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      _isLoading = false;
-      notifyListeners();
-      return false;
     }
   }
 
-  // Update preferred language
-  Future<bool> updatePreferredLanguage(String languageCode) async {
+  /// Update preferred language.
+  /// Throws exceptions on failure - UI should catch and display.
+  Future<void> updatePreferredLanguage(String languageCode) async {
     if (_currentUser == null) {
-      _errorMessage = 'No user logged in';
-      notifyListeners();
-      return false;
+      throw Exception('No user logged in');
     }
 
-    try {
-      await _firestore
-          .collection(AppConstants.collectionUsers)
-          .doc(_currentUser!.uid)
-          .update({'preferredLanguage': languageCode});
+    await _firestore
+        .collection(AppConstants.collectionUsers)
+        .doc(_currentUser!.uid)
+        .update({'preferredLanguage': languageCode});
 
-      // Refresh current user data
-      _currentUser = await _authService.getUserData(_currentUser!.uid);
-      notifyListeners();
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
-
-  // Clear error message
-  void clearError() {
-    _errorMessage = null;
+    // Refresh current user data
+    _currentUser = await _authService.getUserData(_currentUser!.uid);
     notifyListeners();
-  }
-
-  // Handle Firebase Auth exceptions and convert to user-friendly messages
-  String _handleAuthException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        return 'errors.auth.weak_password'.tr(
-          namedArgs: {'min': AppConstants.passwordMinLength.toString()},
-        );
-      case 'email-already-in-use':
-        return 'errors.auth.email_in_use'.tr();
-      case 'user-not-found':
-      case 'wrong-password':
-      case 'invalid-credential':
-        return 'errors.auth.invalid_credentials'.tr();
-      case 'invalid-email':
-        return 'errors.auth.invalid_email'.tr();
-      case 'user-disabled':
-        return 'errors.auth.account_disabled'.tr();
-      case 'too-many-requests':
-        return 'errors.auth.too_many_attempts'.tr();
-      default:
-        return 'errors.auth.generic'.tr();
-    }
   }
 }

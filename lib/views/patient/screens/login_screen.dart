@@ -5,6 +5,7 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
@@ -32,10 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailKey = GlobalKey();
   final _passwordKey = GlobalKey();
 
-  // Inline error messages from Firebase auth
-  String? _emailError;
-  String? _passwordError;
-
   @override
   void dispose() {
     _scrollHelper.dispose();
@@ -45,12 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    // Clear previous auth errors before validation
+    // Clear previous errors before validation
     _scrollHelper.clearErrors();
-    setState(() {
-      _emailError = null;
-      _passwordError = null;
-    });
 
     if (!_formKey.currentState!.validate()) {
       _scrollHelper.scrollToFirstError(context);
@@ -60,12 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final authController = context.read<AuthController>();
     final consultationsController = context.read<ConsultationsController>();
 
-    final success = await authController.signIn(
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+    try {
+      await authController.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
 
-    if (success && mounted) {
+      if (!mounted) return;
+
       setState(() => _isPrefetching = true);
 
       final user = authController.currentUser;
@@ -106,34 +101,13 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         }
       }
-
+    } catch (e) {
+      if (!mounted) return;
+      NotificationsHelper().showError(e.toString(), context: context);
+    } finally {
       if (mounted) {
         setState(() => _isPrefetching = false);
       }
-    } else if (mounted) {
-      setState(() => _isPrefetching = false);
-
-      // Map Firebase error to appropriate field
-      final errorCode = authController.errorCode;
-      final errorMessage = authController.errorMessage ?? 'auth.login_failed'.tr();
-
-      setState(() {
-        if (errorCode == 'wrong-password' || errorCode == 'invalid-credential') {
-          _passwordError = errorMessage;
-          _scrollHelper.setError('password');
-        } else if (errorCode == 'user-not-found' || errorCode == 'invalid-email') {
-          _emailError = errorMessage;
-          _scrollHelper.setError('email');
-        } else {
-          // For other errors, show under email field as general error
-          _emailError = errorMessage;
-          _scrollHelper.setError('email');
-        }
-      });
-
-      // Trigger form revalidation to show the inline error
-      _formKey.currentState!.validate();
-      _scrollHelper.scrollToFirstError(context);
     }
   }
 
@@ -233,17 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
       prefixIcon: Icons.email_outlined,
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
-      validator: (value) {
-        // Show Firebase auth error if present
-        if (_emailError != null) return _emailError;
-        return Validators.validateEmail(value);
-      },
-      onChanged: (_) {
-        // Clear auth error when user starts typing
-        if (_emailError != null) {
-          setState(() => _emailError = null);
-        }
-      },
+      validator: Validators.validateEmail,
     );
   }
 
@@ -264,17 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _handleLogin(),
-      validator: (value) {
-        // Show Firebase auth error if present
-        if (_passwordError != null) return _passwordError;
-        return Validators.validatePassword(value);
-      },
-      onChanged: (_) {
-        // Clear auth error when user starts typing
-        if (_passwordError != null) {
-          setState(() => _passwordError = null);
-        }
-      },
+      validator: Validators.validatePassword,
     );
   }
 

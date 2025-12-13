@@ -1,14 +1,22 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import '../models/doctor_model.dart';
 import '../services/doctor_service.dart';
 
+/// Doctors list controller
 class DoctorsController extends ChangeNotifier {
   final DoctorService _doctorService = DoctorService();
 
-  // State
-  List<DoctorModel> _doctors = [];
+  // State - SplayTreeSet for automatic deduplication and sorting
+  final Set<DoctorModel> _doctors = SplayTreeSet((a, b) {
+    // Default sort: available first, then by name
+    if (a.isCurrentlyAvailable != b.isCurrentlyAvailable) {
+      return a.isCurrentlyAvailable ? -1 : 1;
+    }
+    return a.fullName.compareTo(b.fullName);
+  });
   bool _isLoading = false;
-  String? _error;
   bool _hasPrimed = false;
 
   // Filters
@@ -18,10 +26,9 @@ class DoctorsController extends ChangeNotifier {
   String _selectedSort = 'availability';
   String _searchQuery = '';
 
-  // Getters
-  List<DoctorModel> get doctors => _doctors;
+  // Getters - return List for UI compatibility
+  List<DoctorModel> get doctors => List.from(_doctors);
   bool get isLoading => _isLoading;
-  String? get error => _error;
   bool get hasPrimed => _hasPrimed;
   Set<String> get selectedSpecialties => _selectedSpecialties;
   Set<String> get selectedExperienceRanges => _selectedExperienceRanges;
@@ -91,7 +98,7 @@ class DoctorsController extends ChangeNotifier {
       return true;
     }).toList();
 
-    // Apply sorting
+    // Apply sorting (SplayTreeSet has default sort, but user can change it)
     switch (_selectedSort) {
       case 'availability':
         result.sort((a, b) {
@@ -130,18 +137,17 @@ class DoctorsController extends ChangeNotifier {
     }
   }
 
-  // Actions
+  /// Fetch all doctors.
+  /// Throws exceptions on failure - UI should catch and display.
   Future<void> fetchDoctors() async {
     _isLoading = true;
-    _error = null;
     notifyListeners();
 
     try {
-      _doctors = await _doctorService.fetchAllDoctors();
-      _error = null;
+      final fetchedDoctors = await _doctorService.fetchAllDoctors();
+      _doctors.clear();
+      _doctors.addAll(fetchedDoctors);
       _hasPrimed = true;
-    } catch (e) {
-      _error = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -209,17 +215,16 @@ class DoctorsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Refresh doctors list
+  /// Refresh doctors list.
   Future<void> refresh() async {
     await fetchDoctors();
   }
 
-  /// Clear data (e.g., on logout)
+  /// Clear data (e.g., on logout).
   void clear() {
-    _doctors = [];
+    _doctors.clear();
     _isLoading = false;
     _hasPrimed = false;
-    _error = null;
     _selectedSpecialties = {};
     _selectedExperienceRanges = {};
     _availableOnly = false;

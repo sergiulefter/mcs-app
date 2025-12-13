@@ -7,6 +7,7 @@ import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -107,26 +108,24 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     // Get the current language from EasyLocalization (already set at signup)
     final currentLanguage = context.locale.languageCode;
 
-    final success = await authController.completeUserProfile(
-      displayName: _nameController.text.trim(),
-      dateOfBirth: _selectedDateOfBirth!,
-      gender: _selectedGender!,
-      phone: _phoneController.text.trim().isEmpty
-          ? null
-          : _phoneController.text.trim(),
-      preferredLanguage: currentLanguage,
-    );
-
-    if (success && mounted) {
-      Navigator.of(context).pop();
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              Text(authController.errorMessage ?? 'errors.profile_save_failed'.tr()),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+    try {
+      await authController.completeUserProfile(
+        displayName: _nameController.text.trim(),
+        dateOfBirth: _selectedDateOfBirth!,
+        gender: _selectedGender!,
+        phone: _phoneController.text.trim().isEmpty
+            ? null
+            : _phoneController.text.trim(),
+        preferredLanguage: currentLanguage,
       );
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        NotificationsHelper().showError(e.toString(), context: context);
+      }
     }
   }
 

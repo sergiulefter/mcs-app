@@ -198,4 +198,11 @@ class DoctorModel {
       lastActive: lastActive ?? this.lastActive,
     );
   }
+
+  /// Value-based equality for Set deduplication
+  @override
+  bool operator ==(Object other) => other is DoctorModel && other.uid == uid;
+
+  @override
+  int get hashCode => uid.hashCode;
 }

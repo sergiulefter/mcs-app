@@ -147,6 +147,13 @@ class ConsultationModel {
       patientEmail: patientEmail ?? this.patientEmail,
     );
   }
+
+  /// Value-based equality for Set deduplication
+  @override
+  bool operator ==(Object other) => other is ConsultationModel && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 // Attachment model for uploaded files

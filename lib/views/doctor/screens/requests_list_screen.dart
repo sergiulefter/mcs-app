@@ -139,17 +139,7 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
                   },
                 ),
         ),
-        // Error display
-        if (controller.error != null)
-          Padding(
-            padding: AppTheme.screenPadding,
-            child: Text(
-              controller.error!,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
-            ),
-          ),
+        // Error display removed - errors now handled at point of use via NotificationsHelper
       ],
     );
   }

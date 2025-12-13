@@ -118,4 +118,11 @@ class UserModel {
       isDoctor: isDoctor ?? this.isDoctor,
     );
   }
+
+  /// Value-based equality for Set deduplication
+  @override
+  bool operator ==(Object other) => other is UserModel && other.uid == uid;
+
+  @override
+  int get hashCode => uid.hashCode;
 }

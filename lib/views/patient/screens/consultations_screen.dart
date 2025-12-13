@@ -49,9 +49,7 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
       ),
       body: consultationsController.isLoading && !consultationsController.hasPrimedForUser
           ? _buildLoadingState()
-          : consultationsController.error != null && !consultationsController.hasPrimedForUser
-              ? _buildErrorState()
-              : _buildConsultationsContent(consultationsController),
+          : _buildConsultationsContent(consultationsController),
     );
   }
 
@@ -79,32 +77,6 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Center(
-      child: Padding(
-        padding: AppTheme.screenPadding,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AppEmptyState(
-              icon: Icons.error_outline,
-              title: 'consultations.error_title'.tr(),
-              subtitle: 'consultations.error_subtitle'.tr(),
-              iconColor:
-                  Theme.of(context).extension<AppSemanticColors>()?.error ??
-                      Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: AppTheme.spacing24),
-            ElevatedButton(
-              onPressed: _fetchConsultations,
-              child: Text('common.retry'.tr()),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
