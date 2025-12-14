@@ -200,6 +200,19 @@ class _AppCalendarPickerDialogState extends State<_AppCalendarPickerDialog> {
                 ),
               ),
               const SizedBox(height: AppTheme.spacing16),
+              if (_selectedDate != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
+                  child: Text(
+                    DateFormat('dd MMMM yyyy', context.locale.languageCode)
+                        .format(_selectedDate!),
+                    style: textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
