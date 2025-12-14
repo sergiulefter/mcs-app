@@ -95,144 +95,144 @@ class _AppCalendarPickerDialogState extends State<_AppCalendarPickerDialog> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Dialog(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400),
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacing16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacing16,
+        vertical: AppTheme.spacing24,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        AppTheme.spacing16,
+        AppTheme.spacing8,
+        AppTheme.spacing16,
+        AppTheme.spacing16,
+      ),
+      title: Text(
+        widget.title,
+        style: textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      content: SizedBox(
+        width: 320,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (widget.subtitle != null) ...[
               Text(
-                widget.title,
-                style: textTheme.titleLarge?.copyWith(
+                widget.subtitle!,
+                style: textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacing12),
+            ],
+            TableCalendar(
+              firstDay: widget.firstDate,
+              lastDay: widget.lastDate,
+              focusedDay: _focusedDay,
+              locale: context.locale.languageCode,
+              calendarFormat: CalendarFormat.month,
+              availableGestures: AvailableGestures.horizontalSwipe,
+              availableCalendarFormats: const {CalendarFormat.month: 'Month'},
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              selectedDayPredicate: (day) {
+                if (_hasRangeStart) {
+                  return _isRangeStart(day) || _isRangeEnd(day);
+                }
+                return _selectedDate != null && isSameDay(day, _selectedDate);
+              },
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDate = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+              },
+              onPageChanged: (focusedDay) {
+                setState(() => _focusedDay = focusedDay);
+              },
+              headerStyle: HeaderStyle(
+                titleCentered: true,
+                formatButtonVisible: false,
+                titleTextStyle:
+                    (textTheme.titleMedium ?? const TextStyle()).copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                leftChevronIcon: const Icon(Icons.chevron_left, size: 24),
+                rightChevronIcon: const Icon(Icons.chevron_right, size: 24),
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: textTheme.labelMedium!.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                weekendStyle: textTheme.labelMedium!.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              if (widget.subtitle != null) ...[
-                const SizedBox(height: AppTheme.spacing8),
-                Text(
-                  widget.subtitle!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
+              calendarStyle: CalendarStyle(
+                outsideDaysVisible: false,
+                cellMargin: const EdgeInsets.all(2),
+                defaultTextStyle: textTheme.bodyMedium!,
+                weekendTextStyle: textTheme.bodyMedium!,
+                todayDecoration: BoxDecoration(
+                  border: Border.all(color: colorScheme.primary),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                 ),
-              ],
-              const SizedBox(height: AppTheme.spacing16),
-              TableCalendar(
-                firstDay: widget.firstDate,
-                lastDay: widget.lastDate,
-                focusedDay: _focusedDay,
-                locale: context.locale.languageCode,
-                calendarFormat: CalendarFormat.month,
-                availableGestures: AvailableGestures.horizontalSwipe,
-                availableCalendarFormats: const {CalendarFormat.month: 'Month'},
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                selectedDayPredicate: (day) {
-                  if (_hasRangeStart) {
-                    return _isRangeStart(day) || _isRangeEnd(day);
-                  }
-                  return _selectedDate != null && isSameDay(day, _selectedDate);
-                },
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDate = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                },
-                onPageChanged: (focusedDay) {
-                  setState(() => _focusedDay = focusedDay);
-                },
-                headerStyle: HeaderStyle(
-                  titleCentered: true,
-                  formatButtonVisible: false,
-                  titleTextStyle:
-                      (textTheme.titleMedium ?? const TextStyle()).copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  leftChevronIcon: const Icon(Icons.chevron_left, size: 24),
-                  rightChevronIcon: const Icon(Icons.chevron_right, size: 24),
+                todayTextStyle: textTheme.bodyMedium!.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
                 ),
-                daysOfWeekStyle: DaysOfWeekStyle(
-                  weekdayStyle: textTheme.labelMedium!.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  weekendStyle: textTheme.labelMedium!.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                selectedDecoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
                 ),
-                calendarStyle: CalendarStyle(
-                  outsideDaysVisible: false,
-                  cellMargin: const EdgeInsets.all(2),
-                  defaultTextStyle: textTheme.bodyMedium!,
-                  weekendTextStyle: textTheme.bodyMedium!,
-                  todayDecoration: BoxDecoration(
-                    border: Border.all(color: colorScheme.primary),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                  ),
-                  todayTextStyle: textTheme.bodyMedium!.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  selectedDecoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                  ),
-                  selectedTextStyle: textTheme.bodyMedium!.copyWith(
-                    color: colorScheme.onPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, focusedDay) {
-                    return _buildDayCell(context, day);
-                  },
-                  todayBuilder: (context, day, focusedDay) {
-                    return _buildDayCell(context, day, isToday: true);
-                  },
-                  selectedBuilder: (context, day, focusedDay) {
-                    return _buildDayCell(context, day, isSelected: true);
-                  },
-                  disabledBuilder: (context, day, focusedDay) {
-                    return _buildDayCell(context, day, isDisabled: true);
-                  },
+                selectedTextStyle: textTheme.bodyMedium!.copyWith(
+                  color: colorScheme.onPrimary,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: AppTheme.spacing16),
-              if (_selectedDate != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
-                  child: Text(
-                    DateFormat('dd MMMM yyyy', context.locale.languageCode)
-                        .format(_selectedDate!),
-                    style: textTheme.titleMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(context, day);
+                },
+                todayBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(context, day, isToday: true);
+                },
+                selectedBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(context, day, isSelected: true);
+                },
+                disabledBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(context, day, isDisabled: true);
+                },
+              ),
+            ),
+            if (_selectedDate != null) ...[
+              const SizedBox(height: AppTheme.spacing12),
+              Text(
+                DateFormat('dd MMMM yyyy', context.locale.languageCode)
+                    .format(_selectedDate!),
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
                 ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('common.cancel'.tr()),
-                  ),
-                  const SizedBox(width: AppTheme.spacing8),
-                  ElevatedButton(
-                    onPressed: _selectedDate != null
-                        ? () => Navigator.of(context).pop(_selectedDate)
-                        : null,
-                    child: Text('common.confirm'.tr()),
-                  ),
-                ],
+                textAlign: TextAlign.center,
               ),
             ],
-          ),
+          ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('common.cancel'.tr()),
+        ),
+        ElevatedButton(
+          onPressed: _selectedDate != null
+              ? () => Navigator.of(context).pop(_selectedDate)
+              : null,
+          child: Text('common.confirm'.tr()),
+        ),
+      ],
     );
   }
 
