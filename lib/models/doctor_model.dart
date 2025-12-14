@@ -112,6 +112,18 @@ class DoctorModel {
   /// Get formatted languages string
   String get languagesLabel => languages.join(' • ');
 
+  /// Parse DateTime from various formats (String, Timestamp, or null)
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    // Handle Firestore Timestamp (has toDate() method)
+    if (value.runtimeType.toString().contains('Timestamp')) {
+      return (value as dynamic).toDate();
+    }
+    return null;
+  }
+
   /// Create DoctorModel from Firestore document
   factory DoctorModel.fromMap(Map<String, dynamic> map, String uid) {
     return DoctorModel(
@@ -134,11 +146,8 @@ class DoctorModel {
               ?.map((e) => DateRange.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
-      createdAt: DateTime.parse(
-          map['createdAt'] ?? DateTime.now().toIso8601String()),
-      lastActive: map['lastActive'] != null
-          ? DateTime.parse(map['lastActive'])
-          : null,
+      createdAt: _parseDateTime(map['createdAt']) ?? DateTime.now(),
+      lastActive: _parseDateTime(map['lastActive']),
     );
   }
 

@@ -1,73 +1,152 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/doctor_model.dart';
 import '../models/user_model.dart';
 import '../utils/constants.dart';
-import 'doctor_service.dart';
 
-/// Service for admin-specific operations
+/// Service for admin-specific operations.
+///
+/// This service uses Cloud Functions for privileged operations like
+/// creating/deleting users and doctors, which require Firebase Admin SDK.
 class AdminService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final DoctorService _doctorService = DoctorService();
+  final FirebaseFunctions _functions =
+      FirebaseFunctions.instanceFor(region: 'europe-west1');
 
-  /// Create a new doctor account with Firebase Auth and Firestore documents
+  // ============================================
+  // CLOUD FUNCTION - DOCTOR CREATION
+  // ============================================
+
+  /// Create a new doctor account using Cloud Function.
   ///
-  /// This method:
-  /// 1. Creates a Firebase Auth user with the provided email/password
-  /// 2. Re-authenticates as admin (since createUserWithEmailAndPassword switches context)
-  /// 3. Creates a doctor profile in the 'doctors' collection ONLY
+  /// This method calls the `createDoctor` Cloud Function which:
+  /// 1. Creates a Firebase Auth account for the doctor
+  /// 2. Creates a Firestore document in the 'doctors' collection
   ///
   /// Note: Doctors are stored ONLY in the 'doctors' collection.
   /// The 'users' collection is for patients and admins only.
-  /// Doctor identity is determined by presence in 'doctors' collection at sign-in.
-  ///
-  /// Requires admin credentials to re-authenticate after creating the doctor's auth account.
   ///
   /// Returns the UID of the created doctor
-  /// Throws an exception if any step fails
-  Future<String> createDoctorWithAuth({
+  /// Throws a [FirebaseFunctionsException] if the operation fails
+  Future<String> createDoctor({
     required String email,
     required String password,
     required DoctorModel doctorData,
-    required String adminEmail,
-    required String adminPassword,
   }) async {
-    String? uid;
+    final callable = _functions.httpsCallable('createDoctor');
 
-    try {
-      // 1. Create Firebase Auth account for the doctor
-      // NOTE: This automatically signs in as the new doctor!
-      final credential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      uid = credential.user!.uid;
+    final result = await callable.call<Map<String, dynamic>>({
+      'email': email,
+      'password': password,
+      'doctorData': {
+        'fullName': doctorData.fullName,
+        'specialty': doctorData.specialty.name,
+        'subspecialties': doctorData.subspecialties,
+        'experienceYears': doctorData.experienceYears,
+        'consultationPrice': doctorData.consultationPrice,
+        'languages': doctorData.languages,
+        'bio': doctorData.bio,
+        'education': doctorData.education
+            .map((e) => {
+                  'institution': e.institution,
+                  'degree': e.degree,
+                  'year': e.year,
+                })
+            .toList(),
+      },
+    });
 
-      // 2. CRITICAL: Sign back in as admin before writing to Firestore
-      // This is required because createUserWithEmailAndPassword switches auth context
-      await _auth.signInWithEmailAndPassword(
-        email: adminEmail,
-        password: adminPassword,
-      );
-
-      // 3. Create doctor profile ONLY (no user document - doctors are not in 'users' collection)
-      final doctor = doctorData.copyWith(
-        uid: uid,
-        email: email,
-        isAvailable: false,
-      );
-      await _doctorService.createDoctorProfile(doctor);
-
-      return uid;
-    } catch (e) {
-      // If we created the auth account but failed on Firestore, try to clean up
-      // Note: We may not be able to delete the auth account without admin SDK
-      rethrow;
-    }
+    return result.data['uid'] as String;
   }
 
-  /// Check if the current user is an admin
+  // ============================================
+  // CLOUD FUNCTION - USER/DOCTOR DELETION
+  // ============================================
+
+  /// Delete a user (patient) using Cloud Function.
+  ///
+  /// This method calls the `deleteUser` Cloud Function which:
+  /// 1. Deletes the Firebase Auth account
+  /// 2. Deletes the Firestore user document
+  ///
+  /// Throws a [FirebaseFunctionsException] if the operation fails
+  Future<void> deleteUser(String uid) async {
+    final callable = _functions.httpsCallable('deleteUser');
+    await callable.call<Map<String, dynamic>>({'userId': uid});
+  }
+
+  /// Delete a doctor using Cloud Function.
+  ///
+  /// This method calls the `deleteDoctor` Cloud Function which:
+  /// 1. Deletes the Firebase Auth account
+  /// 2. Deletes the Firestore doctor document
+  ///
+  /// Note: Consultations are NOT deleted - they remain with the original
+  /// doctorId reference. The app should handle displaying these appropriately.
+  ///
+  /// Throws a [FirebaseFunctionsException] if the operation fails
+  Future<void> deleteDoctor(String uid) async {
+    final callable = _functions.httpsCallable('deleteDoctor');
+    await callable.call<Map<String, dynamic>>({'doctorId': uid});
+  }
+
+  // ============================================
+  // CLOUD FUNCTION - ADMIN MANAGEMENT
+  // ============================================
+
+  /// Set admin custom claim on a user using Cloud Function.
+  ///
+  /// This method calls the `setAdminClaim` Cloud Function which sets
+  /// the isAdmin custom claim on the target user's Firebase Auth token.
+  ///
+  /// The target user will need to re-authenticate (or refresh their token)
+  /// for the claim to take effect.
+  ///
+  /// Throws a [FirebaseFunctionsException] if the operation fails
+  Future<void> setAdminClaim({
+    required String targetUserId,
+    required bool isAdmin,
+  }) async {
+    final callable = _functions.httpsCallable('setAdminClaim');
+    await callable.call<Map<String, dynamic>>({
+      'targetUserId': targetUserId,
+      'isAdmin': isAdmin,
+    });
+  }
+
+  /// Bootstrap the first admin user using Cloud Function.
+  ///
+  /// This method should only be used ONCE to set up the first admin.
+  /// It requires a secret key that must be configured in Firebase Functions.
+  ///
+  /// After the first admin is created, use [setAdminClaim] to add more admins.
+  ///
+  /// Throws a [FirebaseFunctionsException] if:
+  /// - The secret key is invalid
+  /// - An admin already exists
+  /// - The target user doesn't exist
+  Future<void> bootstrapAdmin({
+    required String secretKey,
+    required String targetUserId,
+  }) async {
+    final callable = _functions.httpsCallable('bootstrapAdmin');
+    await callable.call<Map<String, dynamic>>({
+      'secretKey': secretKey,
+      'targetUserId': targetUserId,
+    });
+  }
+
+  // ============================================
+  // LOCAL OPERATIONS (No Cloud Function needed)
+  // ============================================
+
+  /// Check if the current user is an admin.
+  ///
+  /// This checks the Firestore user document for userType == 'admin'.
+  /// Note: For security-critical operations, the Cloud Functions also
+  /// verify the isAdmin custom claim on the auth token.
   Future<bool> isCurrentUserAdmin() async {
     final user = _auth.currentUser;
     if (user == null) return false;
@@ -92,6 +171,17 @@ class AdminService {
 
     final data = userDoc.data();
     return data?['userType'] as String?;
+  }
+
+  /// Update a doctor's profile.
+  ///
+  /// This is a direct Firestore update, protected by Firestore security rules.
+  /// Only admins (verified by custom claim) can update doctor profiles.
+  Future<void> updateDoctor(String uid, Map<String, dynamic> data) async {
+    await _firestore
+        .collection(AppConstants.collectionDoctors)
+        .doc(uid)
+        .update(data);
   }
 
   // ============================================
@@ -192,46 +282,25 @@ class AdminService {
         .toList();
   }
 
-  /// Delete a user (patient) - hard delete from Firestore
-  /// Note: Firebase Auth account deletion requires Admin SDK or Cloud Function
-  /// For MVP, we delete the Firestore document only
-  Future<void> deleteUser(String uid) async {
-    // Delete user document from Firestore
-    await _firestore
-        .collection(AppConstants.collectionUsers)
-        .doc(uid)
-        .delete();
-
-    // Note: To fully delete the user, you would need:
-    // 1. A Cloud Function with Admin SDK to delete from Firebase Auth
-    // 2. Or disable the user via custom claims
-    // For MVP, the Firestore doc deletion is sufficient
-  }
-
   // ============================================
-  // DOCTOR MANAGEMENT METHODS
+  // DEPRECATED METHODS (Kept for backwards compatibility)
   // ============================================
 
-  /// Update a doctor's profile
-  Future<void> updateDoctor(String uid, Map<String, dynamic> data) async {
-    await _firestore
-        .collection(AppConstants.collectionDoctors)
-        .doc(uid)
-        .update(data);
-  }
-
-  /// Delete a doctor - hard delete from Firestore
-  /// Note: Firebase Auth account deletion requires Admin SDK or Cloud Function
-  Future<void> deleteDoctor(String uid) async {
-    // Delete doctor document from Firestore
-    await _firestore
-        .collection(AppConstants.collectionDoctors)
-        .doc(uid)
-        .delete();
-
-    // Note: To fully delete the doctor, you would need:
-    // 1. A Cloud Function with Admin SDK to delete from Firebase Auth
-    // 2. Consider also deleting/anonymizing their consultations
-    // For MVP, the Firestore doc deletion is sufficient
+  /// @deprecated Use [createDoctor] instead.
+  /// This method is kept for backwards compatibility but should not be used.
+  @Deprecated('Use createDoctor() instead - no admin password required')
+  Future<String> createDoctorWithAuth({
+    required String email,
+    required String password,
+    required DoctorModel doctorData,
+    required String adminEmail,
+    required String adminPassword,
+  }) async {
+    // Simply delegate to the new method, ignoring admin credentials
+    return createDoctor(
+      email: email,
+      password: password,
+      doctorData: doctorData,
+    );
   }
 }

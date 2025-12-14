@@ -649,6 +649,7 @@
     "price_max": "Price cannot exceed {max} RON"
   },
   "errors": {
+    "generic": "An error occurred. Please try again.",
     "signup_failed": "Signup failed",
     "login_failed": "Login failed",
     "profile_save_failed": "Failed to save profile",
@@ -714,10 +715,7 @@
       "error_weak_password": "Password is too weak. Please use a stronger password.",
       "error_invalid_email": "Please enter a valid email address.",
       "error_not_logged_in": "You must be logged in as admin to create doctors.",
-      "error_wrong_admin_password": "Incorrect admin password. Please try again.",
-      "confirm_password_title": "Confirm Your Password",
-      "confirm_password_message": "For security, please enter your admin password to create this doctor account.",
-      "confirm_password_label": "Your Password",
+      "error_not_authorized": "You do not have permission to create doctor accounts.",
       "validation": {
         "specialty_required": "Please select a specialty",
         "languages_required": "Please select at least one language"

@@ -7,6 +7,18 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Parse DateTime from various formats (String, Timestamp, or null)
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value);
+    // Handle Firestore Timestamp (has toDate() method)
+    if (value.runtimeType.toString().contains('Timestamp')) {
+      return (value as dynamic).toDate();
+    }
+    return null;
+  }
+
   // Get current user
   User? get currentUser => _auth.currentUser;
 
@@ -91,9 +103,7 @@ class AuthService {
         email: doctorData['email'] ?? user.email ?? '',
         displayName: doctorData['fullName'],
         photoUrl: doctorData['photoUrl'],
-        createdAt: doctorData['createdAt'] != null
-            ? DateTime.parse(doctorData['createdAt'])
-            : DateTime.now(),
+        createdAt: _parseDateTime(doctorData['createdAt']) ?? DateTime.now(),
         isDoctor: true,
       );
     }
@@ -140,9 +150,7 @@ class AuthService {
         email: doctorData['email'] ?? '',
         displayName: doctorData['fullName'],
         photoUrl: doctorData['photoUrl'],
-        createdAt: doctorData['createdAt'] != null
-            ? DateTime.parse(doctorData['createdAt'])
-            : DateTime.now(),
+        createdAt: _parseDateTime(doctorData['createdAt']) ?? DateTime.now(),
         isDoctor: true,
       );
     }

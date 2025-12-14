@@ -1,6 +1,6 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/services/admin_service.dart';
@@ -113,75 +113,6 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
     });
   }
 
-  /// Show dialog to confirm admin password before creating doctor
-  /// Returns the password if confirmed, null if cancelled
-  Future<String?> _showAdminPasswordDialog() async {
-    final passwordController = TextEditingController();
-    bool obscurePassword = true;
-
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text('admin.create_doctor.confirm_password_title'.tr()),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'admin.create_doctor.confirm_password_message'.tr(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: AppTheme.spacing16),
-              TextField(
-                controller: passwordController,
-                obscureText: obscurePassword,
-                decoration: InputDecoration(
-                  labelText: 'admin.create_doctor.confirm_password_label'.tr(),
-                  prefixIcon: const Icon(Icons.lock_outlined),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      obscurePassword
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined,
-                    ),
-                    onPressed: () {
-                      setDialogState(() {
-                        obscurePassword = !obscurePassword;
-                      });
-                    },
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-                autofocus: true,
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    Navigator.of(dialogContext).pop(value);
-                  }
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(null),
-              child: Text('common.cancel'.tr()),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (passwordController.text.isNotEmpty) {
-                  Navigator.of(dialogContext).pop(passwordController.text);
-                }
-              },
-              child: Text('common.confirm'.tr()),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _handleSubmit() async {
     // Clear previous errors
     _scrollHelper.clearErrors();
@@ -224,31 +155,13 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       return;
     }
 
-    // For edit mode, we don't need admin password - just update
+    // For edit mode, just update
     if (_isEditMode) {
       await _handleUpdate();
       return;
     }
 
-    // Create mode: Get admin email
-    final adminEmail = FirebaseAuth.instance.currentUser?.email;
-    if (adminEmail == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('admin.create_doctor.error_not_logged_in'.tr()),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-      return;
-    }
-
-    // Prompt for admin password confirmation
-    final adminPassword = await _showAdminPasswordDialog();
-    if (adminPassword == null) {
-      // User cancelled
-      return;
-    }
-
+    // Create mode: Use Cloud Function (no admin password needed)
     setState(() {
       _isSubmitting = true;
     });
@@ -260,7 +173,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
       // Create doctor data
       final doctorData = DoctorModel(
-        uid: '', // Will be set by AdminService
+        uid: '', // Will be set by Cloud Function
         email: _emailController.text.trim(),
         fullName: _fullNameController.text.trim(),
         specialty: _selectedSpecialty!,
@@ -272,13 +185,11 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
         createdAt: DateTime.now(),
       );
 
-      // Create doctor with Firebase Auth and Firestore
-      await _adminService.createDoctorWithAuth(
+      // Create doctor via Cloud Function
+      await _adminService.createDoctor(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         doctorData: doctorData,
-        adminEmail: adminEmail,
-        adminPassword: adminPassword,
       );
 
       if (mounted) {
@@ -293,38 +204,39 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
         // Clear form for next doctor
         _clearForm();
       }
-    } catch (e) {
+    } on FirebaseFunctionsException catch (e) {
       if (mounted) {
-        // Map Firebase Auth errors to appropriate fields
-        final errorString = e.toString();
+        // Map Cloud Function errors to appropriate fields
+        final errorCode = e.code;
 
-        if (errorString.contains('email-already-in-use')) {
+        if (errorCode == 'already-exists') {
           setState(() {
             _emailError = 'admin.create_doctor.error_email_exists'.tr();
           });
           _scrollHelper.setError('email');
           _formKey.currentState!.validate();
           _scrollHelper.scrollToFirstError(context);
-        } else if (errorString.contains('invalid-email')) {
+        } else if (errorCode == 'invalid-argument' &&
+            e.message?.contains('email') == true) {
           setState(() {
             _emailError = 'admin.create_doctor.error_invalid_email'.tr();
           });
           _scrollHelper.setError('email');
           _formKey.currentState!.validate();
           _scrollHelper.scrollToFirstError(context);
-        } else if (errorString.contains('weak-password')) {
+        } else if (errorCode == 'invalid-argument' &&
+            e.message?.contains('password') == true) {
           setState(() {
             _passwordError = 'admin.create_doctor.error_weak_password'.tr();
           });
           _scrollHelper.setError('password');
           _formKey.currentState!.validate();
           _scrollHelper.scrollToFirstError(context);
-        } else if (errorString.contains('wrong-password') ||
-            errorString.contains('invalid-credential')) {
-          // Admin password error - show in SnackBar since it's in a dialog
+        } else if (errorCode == 'permission-denied') {
+          // Admin not authorized - show in SnackBar
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('admin.create_doctor.error_wrong_admin_password'.tr()),
+              content: Text('admin.create_doctor.error_not_authorized'.tr()),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
@@ -337,6 +249,16 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
             ),
           );
         }
+      }
+    } catch (e) {
+      if (mounted) {
+        // Generic error - show in SnackBar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('admin.create_doctor.error_generic'.tr()),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
       }
     } finally {
       if (mounted) {

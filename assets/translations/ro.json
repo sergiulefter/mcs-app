@@ -649,6 +649,7 @@
     "price_max": "Prețul nu poate depăși {max} RON"
   },
   "errors": {
+    "generic": "A apărut o eroare. Te rugăm să încerci din nou.",
     "signup_failed": "Înregistrarea a eșuat",
     "login_failed": "Autentificarea a eșuat",
     "profile_save_failed": "Salvarea profilului a eșuat",
@@ -714,10 +715,7 @@
       "error_weak_password": "Parola este prea slabă. Te rugăm să folosești o parolă mai puternică.",
       "error_invalid_email": "Te rugăm să introduci o adresă de email validă.",
       "error_not_logged_in": "Trebuie să fii autentificat ca admin pentru a crea medici.",
-      "error_wrong_admin_password": "Parolă admin incorectă. Te rugăm să încerci din nou.",
-      "confirm_password_title": "Confirmă Parola",
-      "confirm_password_message": "Pentru securitate, te rugăm să introduci parola ta de admin pentru a crea acest cont de medic.",
-      "confirm_password_label": "Parola Ta",
+      "error_not_authorized": "Nu ai permisiunea de a crea conturi de medici.",
       "validation": {
         "specialty_required": "Te rugăm să selectezi o specialitate",
         "languages_required": "Te rugăm să selectezi cel puțin o limbă"
