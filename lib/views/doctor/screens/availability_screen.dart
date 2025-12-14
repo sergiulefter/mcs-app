@@ -8,7 +8,7 @@ import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
+import 'package:mcs_app/views/patient/widgets/forms/app_date_range_end_picker_dialog.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 
 /// Availability management screen - Toggle availability and manage vacation periods
@@ -456,6 +456,85 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     );
   }
 
+  Widget _buildDatePickerField({
+    required BuildContext context,
+    required String label,
+    required String dialogTitle,
+    String? dialogSubtitle,
+    required DateTime? selectedDate,
+    required String? errorText,
+    required ValueChanged<DateTime> onDateSelected,
+    DateTime? firstDate,
+    DateTime? lastDate,
+    DateTime? rangeStartDate,
+    bool enabled = true,
+    String? disabledHint,
+  }) {
+    final dateFormat = DateFormat('dd/MM/yyyy');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTheme.spacing8),
+        InkWell(
+          onTap: !enabled
+              ? null
+              : () async {
+                  final picked = await showAppCalendarPickerDialog(
+                    context: context,
+                    title: dialogTitle,
+                    subtitle: dialogSubtitle,
+                    initialDate: selectedDate,
+                    firstDate: firstDate,
+                    lastDate: lastDate,
+                    rangeStartDate: rangeStartDate,
+                  );
+                  if (picked != null) {
+                    onDateSelected(picked);
+                  }
+                },
+          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              hintText: 'dd/MM/yyyy',
+              prefixIcon: const Icon(Icons.calendar_today_outlined),
+              suffixIcon: const Icon(Icons.arrow_drop_down),
+              errorText: errorText,
+            ),
+            child: Text(
+              selectedDate != null ? dateFormat.format(selectedDate) : 'dd/MM/yyyy',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: selectedDate != null
+                        ? Theme.of(context).colorScheme.onSurface
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ),
+        ),
+        if (!enabled && disabledHint != null)
+          Padding(
+            padding: const EdgeInsets.only(top: AppTheme.spacing4),
+            child: Text(
+              disabledHint,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).hintColor,
+                  ),
+            ),
+          ),
+      ],
+    );
+  }
+
   void _showAddVacationDialog() {
     DateTime? startDate;
     DateTime? endDate;
@@ -476,11 +555,13 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                AppDatePickerField(
-                  label: 'doctor.availability.start_date'.tr(),
-                  hintText: 'dd/MM/yyyy',
-                  selectedDate: startDate,
-                  onDateSelected: (date) {
+                  _buildDatePickerField(
+                    context: context,
+                    label: 'doctor.availability.start_date'.tr(),
+                    dialogTitle: 'doctor.availability.select_start_date'.tr(),
+                    selectedDate: startDate,
+                    errorText: startDateError,
+                    onDateSelected: (date) {
                       setDialogState(() {
                         startDate = date;
                         startDateError = null;
@@ -488,27 +569,37 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                         if (endDate != null && endDate!.isBefore(date)) {
                           endDate = null;
                         }
-                    });
-                  },
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-                  errorText: startDateError,
-                ),
-                const SizedBox(height: AppTheme.spacing16),
-                AppDatePickerField(
-                  label: 'doctor.availability.end_date'.tr(),
-                    hintText: 'dd/MM/yyyy',
+                      });
+                    },
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+                  ),
+                  const SizedBox(height: AppTheme.spacing16),
+                  _buildDatePickerField(
+                    context: context,
+                    label: 'doctor.availability.end_date'.tr(),
+                    dialogTitle: 'doctor.availability.select_end_date'.tr(),
+                    dialogSubtitle: startDate != null
+                        ? 'doctor.availability.range_hint'.tr(
+                            namedArgs: {
+                              'date': DateFormat('dd MMM yyyy').format(startDate!),
+                            },
+                          )
+                        : null,
                     selectedDate: endDate,
+                    errorText: endDateError,
                     onDateSelected: (date) {
-                    setDialogState(() {
-                      endDate = date;
-                      endDateError = null;
-                    });
-                  },
-                  firstDate: startDate ?? DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-                  errorText: endDateError,
-                ),
+                      setDialogState(() {
+                        endDate = date;
+                        endDateError = null;
+                      });
+                    },
+                    firstDate: startDate ?? DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+                    rangeStartDate: startDate,
+                    enabled: startDate != null,
+                    disabledHint: 'doctor.availability.validation.start_date_required'.tr(),
+                  ),
                   const SizedBox(height: AppTheme.spacing16),
                   AppTextField(
                     label: 'doctor.availability.reason'.tr(),

@@ -984,6 +984,9 @@
       "availability_updated": "Availability updated",
       "info_title": "How availability works",
       "info_text": "When you're unavailable or on vacation, patients cannot request new consultations with you. Existing consultations are not affected.",
+      "select_start_date": "Select Start Date",
+      "select_end_date": "Select End Date",
+      "range_hint": "Vacation starts on {date}",
       "validation": {
         "start_date_required": "Start date is required",
         "end_date_required": "End date is required",

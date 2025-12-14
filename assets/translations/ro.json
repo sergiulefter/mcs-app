@@ -984,6 +984,9 @@
       "availability_updated": "Disponibilitate actualizată",
       "info_title": "Cum funcționează disponibilitatea",
       "info_text": "Când ești indisponibil sau în concediu, pacienții nu pot solicita consultații noi. Consultațiile existente nu sunt afectate.",
+      "select_start_date": "Selectează Data de Început",
+      "select_end_date": "Selectează Data de Sfârșit",
+      "range_hint": "Concediul începe pe {date}",
       "validation": {
         "start_date_required": "Data de început este obligatorie",
         "end_date_required": "Data de sfârșit este obligatorie",
