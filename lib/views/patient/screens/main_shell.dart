@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/navigation_controller.dart';
+import 'package:mcs_app/views/shared/widgets/connectivity_banner.dart';
 import 'home_screen.dart';
 import 'doctors_screen.dart';
 import 'consultations_screen.dart';
@@ -64,9 +65,16 @@ class _MainShellState extends State<MainShell> {
         });
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: currentIndex,
-          children: List.generate(4, _buildScreen),
+        body: Column(
+          children: [
+            const ConnectivityBanner(),
+            Expanded(
+              child: IndexedStack(
+                index: currentIndex,
+                children: List.generate(4, _buildScreen),
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: NavigationBar(
           key: ValueKey(locale.languageCode),

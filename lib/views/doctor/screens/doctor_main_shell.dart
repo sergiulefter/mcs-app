@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/controllers/doctor_profile_controller.dart';
+import 'package:mcs_app/views/shared/widgets/connectivity_banner.dart';
 import 'package:provider/provider.dart';
 import 'doctor_home_screen.dart';
 import 'requests_list_screen.dart';
@@ -80,9 +81,16 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
     final locale = context.locale;
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
+      body: Column(
+        children: [
+          const ConnectivityBanner(),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: _screens,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         key: ValueKey(locale.languageCode),

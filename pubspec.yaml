@@ -55,6 +55,9 @@ dependencies:
   easy_localization: ^3.0.7
   uuid: ^4.5.2
 
+  # Connectivity
+  connectivity_plus: ^6.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

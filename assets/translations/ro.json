@@ -591,6 +591,7 @@
     "yes": "Da",
     "no": "Nu",
     "retry": "Reîncearcă",
+    "no_internet": "Fără conexiune la internet",
     "refresh": "Actualizează",
     "all": "Toate",
     "total": "Total",
@@ -650,6 +651,8 @@
   },
   "errors": {
     "generic": "A apărut o eroare. Te rugăm să încerci din nou.",
+    "network": "Fără conexiune la internet. Verifică rețeaua.",
+    "permission_denied": "Nu ai permisiunea să efectuezi această acțiune.",
     "signup_failed": "Înregistrarea a eșuat",
     "login_failed": "Autentificarea a eșuat",
     "profile_save_failed": "Salvarea profilului a eșuat",

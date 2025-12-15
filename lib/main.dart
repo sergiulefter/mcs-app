@@ -8,6 +8,7 @@ import 'controllers/auth_controller.dart';
 import 'controllers/theme_controller.dart';
 import 'controllers/consultations_controller.dart';
 import 'controllers/doctors_controller.dart';
+import 'services/connectivity_service.dart';
 import 'views/patient/screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeController()),
         ChangeNotifierProvider(create: (_) => ConsultationsController()),
         ChangeNotifierProvider(create: (_) => DoctorsController()),
+        ChangeNotifierProvider(create: (_) => ConnectivityService()),
       ],
       child: Consumer<ThemeController>(
         builder: (context, themeController, child) {

@@ -591,6 +591,7 @@
     "yes": "Yes",
     "no": "No",
     "retry": "Retry",
+    "no_internet": "No internet connection",
     "refresh": "Refresh",
     "all": "All",
     "total": "Total",
@@ -650,6 +651,8 @@
   },
   "errors": {
     "generic": "An error occurred. Please try again.",
+    "network": "No internet connection. Please check your network.",
+    "permission_denied": "You don't have permission to perform this action.",
     "signup_failed": "Signup failed",
     "login_failed": "Login failed",
     "profile_save_failed": "Failed to save profile",
