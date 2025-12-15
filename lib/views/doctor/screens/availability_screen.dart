@@ -7,6 +7,7 @@ import 'package:mcs_app/models/medical_specialty.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_date_range_end_picker_dialog.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -63,21 +64,14 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       await _loadDoctorData();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('doctor.availability.vacation_added'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
+        NotificationsHelper().showSuccess(
+          'doctor.availability.vacation_added'.tr(),
+          context: context,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('common.error'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     }
   }
@@ -91,21 +85,14 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
       await _loadDoctorData();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('doctor.availability.vacation_removed'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
+        NotificationsHelper().showSuccess(
+          'doctor.availability.vacation_removed'.tr(),
+          context: context,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('common.error'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     }
   }

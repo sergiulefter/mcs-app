@@ -5,6 +5,7 @@ import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/admin/widgets/cards/admin_doctor_card.dart';
 import 'package:mcs_app/views/admin/widgets/skeletons/admin_doctor_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
@@ -128,22 +129,15 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
       try {
         await _adminService.deleteDoctor(doctor.uid);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('admin.doctors.delete_success'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-            ),
+          NotificationsHelper().showSuccess(
+            'admin.doctors.delete_success'.tr(),
+            context: context,
           );
           _loadDoctors();
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('admin.doctors.delete_error'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          NotificationsHelper().showError(e.toString(), context: context);
         }
       }
     }

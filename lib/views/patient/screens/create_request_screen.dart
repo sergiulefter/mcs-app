@@ -9,6 +9,7 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/screens/main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 
@@ -125,27 +126,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
     return isValid;
   }
 
-  void _showError(String message) {
-    final semanticColors = Theme.of(context).extension<AppSemanticColors>();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor:
-            semanticColors?.error ?? Theme.of(context).colorScheme.error,
-      ),
-    );
-  }
-
-  void _showSuccess(String message) {
-    final semanticColors = Theme.of(context).extension<AppSemanticColors>();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor:
-            semanticColors?.success ?? Theme.of(context).colorScheme.primary,
-      ),
-    );
-  }
 
   Future<void> _submitRequest() async {
     setState(() {
@@ -198,7 +178,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
       if (mounted) {
         // Show success and navigate
-        _showSuccess('create_request.success_message'.tr());
+        NotificationsHelper().showSuccess(
+          'create_request.success_message'.tr(),
+          context: context,
+        );
 
         // Navigate to consultations tab with bottom navigation visible
         Navigator.of(context).pushAndRemoveUntil(
@@ -212,7 +195,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       setState(() {
         _isSubmitting = false;
       });
-      _showError('create_request.error_message'.tr());
+      if (mounted) {
+        NotificationsHelper().showError(e.toString(), context: context);
+      }
     }
   }
 

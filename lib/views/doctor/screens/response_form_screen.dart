@@ -5,6 +5,7 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -149,11 +150,7 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
 
     setState(() => _isSubmitting = true);
     final controller = context.read<DoctorConsultationsController>();
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final successText = 'doctor.response_form.success'.tr();
-    final errorText = 'doctor.response_form.error'.tr();
-    final errorColor = Theme.of(context).colorScheme.error;
 
     try {
       await controller.addDoctorResponse(
@@ -166,20 +163,17 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
         attachments: const <AttachmentModel>[],
       );
 
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(successText),
-        ),
-      );
+      if (mounted) {
+        NotificationsHelper().showSuccess(
+          'doctor.response_form.success'.tr(),
+          context: this.context,
+        );
+      }
       navigator.pop(true);
     } catch (e) {
-      debugPrint('Error submitting response: $e');
-      messenger.showSnackBar(
-        SnackBar(
-          backgroundColor: errorColor,
-          content: Text(errorText),
-        ),
-      );
+      if (mounted) {
+        NotificationsHelper().showError(e.toString(), context: this.context);
+      }
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);

@@ -4,6 +4,7 @@ import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -211,11 +212,7 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
         .map((c) => c.text.trim())
         .where((text) => text.isNotEmpty)
         .toList();
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final successText = 'doctor.request_more_info.success'.tr();
-    final errorText = 'doctor.request_more_info.error'.tr();
-    final errorColor = Theme.of(context).colorScheme.error;
 
     try {
       await controller.requestMoreInfo(
@@ -223,20 +220,17 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
         message: _messageController.text.trim(),
         questions: questions,
       );
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(successText),
-        ),
-      );
+      if (mounted) {
+        NotificationsHelper().showSuccess(
+          'doctor.request_more_info.success'.tr(),
+          context: this.context,
+        );
+      }
       navigator.pop(true);
     } catch (e) {
-      debugPrint('Error requesting more info: $e');
-      messenger.showSnackBar(
-        SnackBar(
-          backgroundColor: errorColor,
-          content: Text(errorText),
-        ),
-      );
+      if (mounted) {
+        NotificationsHelper().showError(e.toString(), context: this.context);
+      }
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);

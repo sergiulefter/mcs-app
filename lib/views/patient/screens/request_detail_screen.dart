@@ -8,6 +8,7 @@ import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/badge_colors.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/patient/widgets/skeletons/request_detail_skeleton.dart';
@@ -1071,11 +1072,9 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           _isProcessing = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('request_detail.cancel_success'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
+        NotificationsHelper().showSuccess(
+          'request_detail.cancel_success'.tr(),
+          context: context,
         );
 
         Navigator.of(context).pop();
@@ -1086,12 +1085,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           _isProcessing = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('request_detail.cancel_error'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     }
   }

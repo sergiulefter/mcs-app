@@ -9,6 +9,7 @@ import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
@@ -190,22 +191,15 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
       await _doctorService.updateDoctorProfile(userId, updateData);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('doctor.profile_edit.profile_updated'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
+        NotificationsHelper().showSuccess(
+          'doctor.profile_edit.profile_updated'.tr(),
+          context: context,
         );
         Navigator.of(context).pop(true); // Return true to indicate success
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('doctor.profile_edit.profile_update_error'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     } finally {
       if (mounted) {

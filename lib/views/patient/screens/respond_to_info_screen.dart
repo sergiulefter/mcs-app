@@ -6,6 +6,7 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
@@ -323,11 +324,7 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
     final additionalInfo = _additionalInfoController.text.trim().isNotEmpty
         ? _additionalInfoController.text.trim()
         : null;
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
-    final successText = 'info_response.success'.tr();
-    final errorText = 'info_response.error'.tr();
-    final errorColor = Theme.of(context).colorScheme.error;
 
     try {
       await controller.submitInfoResponse(
@@ -336,18 +333,17 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
         answers: answers,
         additionalInfo: additionalInfo,
       );
-      messenger.showSnackBar(
-        SnackBar(content: Text(successText)),
-      );
+      if (mounted) {
+        NotificationsHelper().showSuccess(
+          'info_response.success'.tr(),
+          context: context,
+        );
+      }
       navigator.pop(true);
     } catch (e) {
-      debugPrint('Error submitting response: $e');
-      messenger.showSnackBar(
-        SnackBar(
-          backgroundColor: errorColor,
-          content: Text(errorText),
-        ),
-      );
+      if (mounted) {
+        NotificationsHelper().showError(e.toString(), context: context);
+      }
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);

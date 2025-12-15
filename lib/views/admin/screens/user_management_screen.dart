@@ -4,6 +4,7 @@ import 'package:mcs_app/models/user_model.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/admin/widgets/cards/admin_user_card.dart';
 import 'package:mcs_app/views/admin/widgets/skeletons/admin_user_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
@@ -108,22 +109,15 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       try {
         await _adminService.deleteUser(user.uid);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('admin.users.delete_success'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-            ),
+          NotificationsHelper().showSuccess(
+            'admin.users.delete_success'.tr(),
+            context: context,
           );
           _loadUsers();
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('admin.users.delete_error'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          NotificationsHelper().showError(e.toString(), context: context);
         }
       }
     }

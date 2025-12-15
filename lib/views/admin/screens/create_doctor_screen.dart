@@ -7,6 +7,7 @@ import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
+import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/admin/widgets/forms/multi_select_chip_field.dart';
@@ -194,11 +195,9 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
       if (mounted) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('admin.create_doctor.success'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
+        NotificationsHelper().showSuccess(
+          'admin.create_doctor.success'.tr(),
+          context: context,
         );
 
         // Clear form for next doctor
@@ -233,32 +232,20 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           _formKey.currentState!.validate();
           _scrollHelper.scrollToFirstError(context);
         } else if (errorCode == 'permission-denied') {
-          // Admin not authorized - show in SnackBar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('admin.create_doctor.error_not_authorized'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
+          // Admin not authorized
+          NotificationsHelper().showError(
+            'admin.create_doctor.error_not_authorized'.tr(),
+            context: context,
           );
         } else {
-          // Generic error - show in SnackBar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('admin.create_doctor.error_generic'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          // Generic error
+          NotificationsHelper().showError(e.toString(), context: context);
         }
       }
     } catch (e) {
       if (mounted) {
-        // Generic error - show in SnackBar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('admin.create_doctor.error_generic'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        // Generic error
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     } finally {
       if (mounted) {
@@ -314,11 +301,9 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
 
       if (mounted) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('admin.edit_doctor.success'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
+        NotificationsHelper().showSuccess(
+          'admin.edit_doctor.success'.tr(),
+          context: context,
         );
 
         // Navigate back to doctor management
@@ -326,12 +311,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('admin.edit_doctor.error'.tr()),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     } finally {
       if (mounted) {
