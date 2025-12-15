@@ -105,25 +105,43 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
                       _buildEmptyStateContent(controller),
                     ],
                   )
-                : ListView.separated(
-                    padding: AppTheme.screenPadding,
-                    itemCount: consultations.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: AppTheme.spacing16),
-                    itemBuilder: (context, index) {
-                      final consultation = consultations[index];
-                      return ConsultationCard(
-                        consultation: consultation,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  RequestDetailScreen(consultation: consultation),
-                            ),
-                          );
-                        },
-                      );
+                : NotificationListener<ScrollNotification>(
+                    onNotification: (scrollInfo) {
+                      // Load more when user scrolls near the bottom
+                      if (scrollInfo.metrics.pixels >=
+                          scrollInfo.metrics.maxScrollExtent - 200) {
+                        controller.fetchMore();
+                      }
+                      return false;
                     },
+                    child: ListView.separated(
+                      padding: AppTheme.screenPadding,
+                      itemCount: consultations.length + (controller.hasMore ? 1 : 0),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: AppTheme.spacing16),
+                      itemBuilder: (context, index) {
+                        // Loading indicator at the end
+                        if (index == consultations.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: AppTheme.spacing16),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        final consultation = consultations[index];
+                        return ConsultationCard(
+                          consultation: consultation,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RequestDetailScreen(consultation: consultation),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
           ),
         ],

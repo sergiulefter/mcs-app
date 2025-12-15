@@ -11,6 +11,9 @@ import 'mixins/consultation_filter_mixin.dart';
 class ConsultationsController extends ChangeNotifier with ConsultationFilterMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Default page size for pagination
+  static const int _pageSize = 20;
+
   // State - SplayTreeSet for automatic deduplication and sorting
   final Set<ConsultationModel> _consultations = SplayTreeSet(
     (a, b) => b.createdAt.compareTo(a.createdAt), // newest first
@@ -21,12 +24,17 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
   String _selectedStatus = 'all';
   String _selectedSegment = 'active';
 
+  // Pagination state
+  DocumentSnapshot? _lastDocument;
+  bool _hasMore = true;
+
   // Getters - return List for UI compatibility
   List<ConsultationModel> get consultations => List.from(_consultations);
   bool get isLoading => _isLoading;
   String get selectedStatus => _selectedStatus;
   String get selectedSegment => _selectedSegment;
   bool get hasPrimedForUser => _hasPrimedForUser;
+  bool get hasMore => _hasMore;
 
   // Computed counts for segment badges
   int get activeCount => _consultations
@@ -65,10 +73,13 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
         .toList();
   }
 
-  /// Fetch consultations for a specific user.
+  /// Fetch initial page of consultations for a specific user (resets pagination).
   /// Throws exceptions on failure - UI should catch and display.
   Future<void> fetchUserConsultations(String userId) async {
     _isLoading = true;
+    _consultations.clear();
+    _lastDocument = null;
+    _hasMore = true;
     notifyListeners();
 
     try {
@@ -76,18 +87,58 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
           .collection(AppConstants.collectionConsultations)
           .where('patientId', isEqualTo: userId)
           .orderBy('createdAt', descending: true)
+          .limit(_pageSize)
           .get();
 
-      _consultations.clear();
       _consultations.addAll(
         querySnapshot.docs.map((doc) => ConsultationModel.fromFirestore(doc)),
       );
+
+      _lastDocument = querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      _hasMore = querySnapshot.docs.length >= _pageSize;
 
       // Fetch doctor info for each consultation
       await _fetchDoctorInfo();
 
       _loadedUserId = userId;
       _hasPrimedForUser = true;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Fetch more consultations (next page).
+  /// Does nothing if already loading or no more data.
+  Future<void> fetchMore() async {
+    if (_isLoading || !_hasMore || _loadedUserId == null) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      var query = _firestore
+          .collection(AppConstants.collectionConsultations)
+          .where('patientId', isEqualTo: _loadedUserId)
+          .orderBy('createdAt', descending: true)
+          .limit(_pageSize);
+
+      if (_lastDocument != null) {
+        query = query.startAfterDocument(_lastDocument!);
+      }
+
+      final querySnapshot = await query.get();
+
+      final newConsultations = querySnapshot.docs
+          .map((doc) => ConsultationModel.fromFirestore(doc))
+          .toList();
+
+      _consultations.addAll(newConsultations);
+      _lastDocument = querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      _hasMore = querySnapshot.docs.length >= _pageSize;
+
+      // Fetch doctor info for new consultations
+      await _fetchDoctorInfoForList(newConsultations);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -102,11 +153,16 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
     await fetchUserConsultations(userId);
   }
 
-  /// Fetch doctor information for consultations in parallel.
+  /// Fetch doctor information for all consultations in parallel.
   /// Errors here are logged but not thrown - this is supplementary data.
   Future<void> _fetchDoctorInfo() async {
+    await _fetchDoctorInfoForList(_consultations.toList());
+  }
+
+  /// Fetch doctor information for a specific list of consultations.
+  Future<void> _fetchDoctorInfoForList(List<ConsultationModel> consultations) async {
     await Future.wait(
-      _consultations.where((c) => c.doctorId != null).map((consultation) async {
+      consultations.where((c) => c.doctorId != null).map((consultation) async {
         try {
           final doctorDoc = await _firestore
               .collection(AppConstants.collectionDoctors)
@@ -169,6 +225,8 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
     _isLoading = false;
     _loadedUserId = null;
     _hasPrimedForUser = false;
+    _lastDocument = null;
+    _hasMore = true;
     _selectedStatus = 'all';
     _selectedSegment = 'active';
     notifyListeners();

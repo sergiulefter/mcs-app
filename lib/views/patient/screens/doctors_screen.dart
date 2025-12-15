@@ -73,39 +73,54 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   Widget _buildContent(BuildContext context, DoctorsController controller) {
     final filteredDoctors = controller.filteredDoctors;
 
-    return RefreshIndicator(
-      onRefresh: () => context.read<DoctorsController>().refresh(),
-      child: ListView(
-        padding: AppTheme.screenPadding,
-        children: [
-          _buildHeader(context),
-          const SizedBox(height: AppTheme.sectionSpacing),
-          _buildSearchField(context, controller),
-          const SizedBox(height: AppTheme.spacing16),
-          _buildSortAndFilterRow(context, controller),
-          const SizedBox(height: AppTheme.sectionSpacing),
-          _buildResultsHeader(context, filteredDoctors.length),
-          const SizedBox(height: AppTheme.spacing16),
-          if (filteredDoctors.isEmpty)
-            _buildEmptyState(context)
-          else
-            ...filteredDoctors.map((doctor) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppTheme.spacing20),
-                child: DoctorCard(
-                  doctor: doctor,
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            DoctorProfileScreen(doctor: doctor),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }),
-        ],
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollInfo) {
+        // Load more when user scrolls near the bottom
+        if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
+          controller.fetchMore();
+        }
+        return false;
+      },
+      child: RefreshIndicator(
+        onRefresh: () => context.read<DoctorsController>().refresh(),
+        child: ListView(
+          padding: AppTheme.screenPadding,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: AppTheme.sectionSpacing),
+            _buildSearchField(context, controller),
+            const SizedBox(height: AppTheme.spacing16),
+            _buildSortAndFilterRow(context, controller),
+            const SizedBox(height: AppTheme.sectionSpacing),
+            _buildResultsHeader(context, filteredDoctors.length),
+            const SizedBox(height: AppTheme.spacing16),
+            if (filteredDoctors.isEmpty)
+              _buildEmptyState(context)
+            else
+              ...filteredDoctors.map((doctor) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppTheme.spacing20),
+                  child: DoctorCard(
+                    doctor: doctor,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DoctorProfileScreen(doctor: doctor),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
+            // Loading indicator for pagination
+            if (controller.hasMore && filteredDoctors.isNotEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppTheme.spacing16),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
       ),
     );
   }

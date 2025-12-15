@@ -6,6 +6,9 @@ import '../utils/constants.dart';
 class DoctorService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  /// Default page size for pagination
+  static const int defaultPageSize = 20;
+
   /// Fetch all doctors from Firestore
   Future<List<DoctorModel>> fetchAllDoctors() async {
     final querySnapshot = await _firestore.collection(AppConstants.collectionDoctors).get();
@@ -15,6 +18,33 @@ class DoctorService {
               doc.id,
             ))
         .toList();
+  }
+
+  /// Fetch a page of doctors with cursor-based pagination.
+  /// Returns a tuple of (doctors, lastDocument) for pagination.
+  Future<({List<DoctorModel> doctors, DocumentSnapshot? lastDoc})> fetchDoctorsPage({
+    int pageSize = defaultPageSize,
+    DocumentSnapshot? startAfterDoc,
+  }) async {
+    Query query = _firestore
+        .collection(AppConstants.collectionDoctors)
+        .where('isProfileComplete', isEqualTo: true)
+        .orderBy('fullName')
+        .limit(pageSize);
+
+    if (startAfterDoc != null) {
+      query = query.startAfterDocument(startAfterDoc);
+    }
+
+    final querySnapshot = await query.get();
+    final doctors = querySnapshot.docs
+        .map((doc) => DoctorModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+
+    return (
+      doctors: doctors,
+      lastDoc: querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null,
+    );
   }
 
   /// Fetch a single doctor by UID

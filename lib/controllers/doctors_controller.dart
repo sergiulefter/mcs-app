@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../models/doctor_model.dart';
 import '../services/doctor_service.dart';
@@ -19,6 +20,10 @@ class DoctorsController extends ChangeNotifier {
   bool _isLoading = false;
   bool _hasPrimed = false;
 
+  // Pagination state
+  DocumentSnapshot? _lastDocument;
+  bool _hasMore = true;
+
   // Filters
   Set<String> _selectedSpecialties = {};
   Set<String> _selectedExperienceRanges = {};
@@ -30,6 +35,7 @@ class DoctorsController extends ChangeNotifier {
   List<DoctorModel> get doctors => List.from(_doctors);
   bool get isLoading => _isLoading;
   bool get hasPrimed => _hasPrimed;
+  bool get hasMore => _hasMore;
   Set<String> get selectedSpecialties => _selectedSpecialties;
   Set<String> get selectedExperienceRanges => _selectedExperienceRanges;
   bool get availableOnly => _availableOnly;
@@ -137,17 +143,42 @@ class DoctorsController extends ChangeNotifier {
     }
   }
 
-  /// Fetch all doctors.
+  /// Fetch initial page of doctors (resets pagination).
   /// Throws exceptions on failure - UI should catch and display.
   Future<void> fetchDoctors() async {
+    _isLoading = true;
+    _doctors.clear();
+    _lastDocument = null;
+    _hasMore = true;
+    notifyListeners();
+
+    try {
+      final result = await _doctorService.fetchDoctorsPage();
+      _doctors.addAll(result.doctors);
+      _lastDocument = result.lastDoc;
+      _hasMore = result.doctors.length >= DoctorService.defaultPageSize;
+      _hasPrimed = true;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Fetch more doctors (next page).
+  /// Does nothing if already loading or no more data.
+  Future<void> fetchMore() async {
+    if (_isLoading || !_hasMore) return;
+
     _isLoading = true;
     notifyListeners();
 
     try {
-      final fetchedDoctors = await _doctorService.fetchAllDoctors();
-      _doctors.clear();
-      _doctors.addAll(fetchedDoctors);
-      _hasPrimed = true;
+      final result = await _doctorService.fetchDoctorsPage(
+        startAfterDoc: _lastDocument,
+      );
+      _doctors.addAll(result.doctors);
+      _lastDocument = result.lastDoc;
+      _hasMore = result.doctors.length >= DoctorService.defaultPageSize;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -225,6 +256,8 @@ class DoctorsController extends ChangeNotifier {
     _doctors.clear();
     _isLoading = false;
     _hasPrimed = false;
+    _lastDocument = null;
+    _hasMore = true;
     _selectedSpecialties = {};
     _selectedExperienceRanges = {};
     _availableOnly = false;
