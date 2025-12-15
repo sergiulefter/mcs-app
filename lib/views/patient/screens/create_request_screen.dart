@@ -72,8 +72,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       });
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
       );
     }
   }
@@ -85,8 +85,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       });
       _pageController.animateToPage(
         _currentStep,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
       );
     }
   }
@@ -243,7 +243,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   Widget _buildProgressIndicator() {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing32,
+        horizontal: AppTheme.spacing24,
         vertical: AppTheme.spacing16,
       ),
       decoration: BoxDecoration(
@@ -254,35 +254,61 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
           ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(3, (index) {
+          final isCompleted = index < _currentStep;
+          final isCurrent = index == _currentStep;
+
+          return Row(
             children: [
-              Text(
-                'create_request.step_indicator'
-                    .tr(namedArgs: {'current': '${_currentStep + 1}', 'total': '3'}),
-                style: Theme.of(context).textTheme.titleSmall,
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isCompleted
+                      ? Theme.of(context).colorScheme.primary
+                      : isCurrent
+                          ? Theme.of(context).colorScheme.surface
+                          : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  border: Border.all(
+                    color: isCompleted || isCurrent
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outlineVariant,
+                    width: 2,
+                  ),
+                ),
+                child: Center(
+                  child: isCompleted
+                      ? Icon(
+                          Icons.check,
+                          size: 16,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        )
+                      : Text(
+                          '${index + 1}',
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: isCurrent
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                ),
               ),
-              Text(
-                '${((_currentStep + 1) / 3 * 100).toInt()}%',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
+              if (index < 2)
+                Container(
+                  width: 48,
+                  height: 2,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  color: index < _currentStep
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).dividerColor,
+                ),
             ],
-          ),
-          const SizedBox(height: AppTheme.spacing8),
-          LinearProgressIndicator(
-            value: (_currentStep + 1) / 3,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).colorScheme.primary,
-            ),
-          ),
-        ],
+          );
+        }),
       ),
     );
   }
@@ -449,10 +475,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               'create_request.step1.urgency_label'.tr(),
               style: Theme.of(context).textTheme.titleSmall,
             ),
-            const SizedBox(height: AppTheme.spacing12),
+            const SizedBox(height: AppTheme.spacing8),
             _buildUrgencySelector(),
 
-            const SizedBox(height: AppTheme.sectionSpacing),
+            const SizedBox(height: AppTheme.spacing32),
 
             // Continue button
             SizedBox(
@@ -512,26 +538,20 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         padding: AppTheme.cardPadding,
         decoration: BoxDecoration(
           color: isSelected
-              ? color.withValues(alpha: 0.1)
+              ? color.withValues(alpha: 0.08)
               : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
           border: Border.all(
-            color: isSelected
-                ? color
-                : Theme.of(context).dividerColor,
+            color: isSelected ? color : Theme.of(context).dividerColor,
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-              ),
-              child: Icon(icon, color: color, size: 24),
+            Icon(
+              icon,
+              color: isSelected ? color : Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 24,
             ),
             const SizedBox(width: AppTheme.spacing12),
             Expanded(
@@ -544,6 +564,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                         title,
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w600,
+                              color: isSelected ? color : null,
                             ),
                       ),
                       if (extraFee != null) ...[
@@ -554,40 +575,58 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                             vertical: AppTheme.spacing4,
                           ),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.15),
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusSmall),
+                            color: color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                            border: Border.all(
+                              color: color.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Text(
                             'create_request.urgency.priority_fee'.tr(
                               namedArgs: {'fee': extraFee.toInt().toString()},
                             ),
-                            style:
-                                Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: color,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: color,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ),
                       ],
                     ],
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                 ],
               ),
             ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: color,
-                size: 24,
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? color : Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
               ),
+              child: isSelected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: color,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
           ],
         ),
       ),
