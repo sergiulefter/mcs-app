@@ -495,7 +495,10 @@
     },
     "validation": {
       "title_too_short": "Titlul trebuie să aibă cel puțin {min} caractere",
+      "title_too_long": "Titlul trebuie să aibă mai puțin de {max} caractere",
       "description_too_short": "Descrierea trebuie să aibă cel puțin {min} de caractere",
+      "description_too_long": "Descrierea trebuie să aibă mai puțin de {max} caractere",
+      "invalid_urgency": "Nivel de urgență invalid",
       "accept_terms": "Trebuie să accepți termenii și condițiile"
     }
   },

@@ -56,6 +56,25 @@ service cloud.firestore {
 
     // Consultations collection - patients access their own; admins full access (seeding, management)
     match /consultations/{consultationId} {
+      // Validation constants (must match AppConstants in Dart)
+      function titleMinLength() { return 10; }
+      function titleMaxLength() { return 100; }
+      function descriptionMinLength() { return 50; }
+      function descriptionMaxLength() { return 1000; }
+
+      // Validate consultation fields on create
+      function isValidConsultation() {
+        let data = request.resource.data;
+        return data.title is string &&
+               data.title.size() >= titleMinLength() &&
+               data.title.size() <= titleMaxLength() &&
+               data.description is string &&
+               data.description.size() >= descriptionMinLength() &&
+               data.description.size() <= descriptionMaxLength() &&
+               data.urgency in ['normal', 'priority'] &&
+               data.status == 'pending';
+      }
+
       function isOwnerOfNew() {
         return isAuthenticated() &&
                request.resource.data.patientId == request.auth.uid;
@@ -88,7 +107,8 @@ service cloud.firestore {
                    .hasOnly(['status', 'updatedAt', 'completedAt', 'doctorResponse', 'infoRequests']);
       }
 
-      allow create: if isOwnerOfNew() || isAdmin();
+      // Patients must pass validation; admins can bypass (for seeding/management)
+      allow create: if (isOwnerOfNew() && isValidConsultation()) || isAdmin();
       allow read: if isOwnerExisting() || isAssignedDoctorExisting() || isAdmin();
       allow update: if isOwnerExisting() || isAdmin() || doctorUpdateAllowed();
       allow delete: if isOwnerExisting() || isAdmin();

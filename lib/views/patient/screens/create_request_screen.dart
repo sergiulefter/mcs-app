@@ -10,6 +10,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
+import 'package:mcs_app/utils/validation/consultation_validator.dart';
 import 'package:mcs_app/views/patient/screens/main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 
@@ -91,8 +92,6 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   bool _validateStep1() {
-    bool isValid = true;
-
     // Clear previous errors
     _scrollHelper.clearErrors();
     setState(() {
@@ -100,30 +99,38 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
       _descriptionError = null;
     });
 
-    if (_title.trim().length < AppConstants.titleMinLength) {
+    // Use centralized validator
+    final result = ConsultationValidator.validate(
+      title: _title,
+      description: _description,
+      urgency: _urgency,
+    );
+
+    if (result.isValid) {
+      return true;
+    }
+
+    // Map validation errors to UI
+    if (result.hasError('title')) {
       setState(() {
-        _titleError = 'create_request.validation.title_too_short'.tr(
+        _titleError = result.getError('title')!.tr(
           namedArgs: {'min': AppConstants.titleMinLength.toString()},
         );
       });
       _scrollHelper.setError('title');
-      isValid = false;
     }
-    if (_description.trim().length < AppConstants.descriptionMinLength) {
+
+    if (result.hasError('description')) {
       setState(() {
-        _descriptionError = 'create_request.validation.description_too_short'.tr(
+        _descriptionError = result.getError('description')!.tr(
           namedArgs: {'min': AppConstants.descriptionMinLength.toString()},
         );
       });
       _scrollHelper.setError('description');
-      isValid = false;
     }
 
-    if (!isValid) {
-      _scrollHelper.scrollToFirstError(context);
-    }
-
-    return isValid;
+    _scrollHelper.scrollToFirstError(context);
+    return false;
   }
 
 

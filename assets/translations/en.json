@@ -495,7 +495,10 @@
     },
     "validation": {
       "title_too_short": "Title must be at least {min} characters",
+      "title_too_long": "Title must be less than {max} characters",
       "description_too_short": "Description must be at least {min} characters",
+      "description_too_long": "Description must be less than {max} characters",
+      "invalid_urgency": "Invalid urgency level",
       "accept_terms": "You must accept the terms and conditions"
     }
   },
