@@ -171,7 +171,7 @@ class DoctorService {
   Future<void> updateAvailability(String uid, bool isAvailable) async {
     await _firestore.collection(AppConstants.collectionDoctors).doc(uid).update({
       'isAvailable': isAvailable,
-      'lastActive': DateTime.now().toIso8601String(),
+      'lastActive': FieldValue.serverTimestamp(),
     });
   }
 

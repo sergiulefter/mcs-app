@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mcs_app/models/user_model.dart';
 
@@ -9,8 +10,8 @@ void main() {
           'email': 'test@example.com',
           'displayName': 'Test User',
           'photoUrl': 'https://example.com/photo.jpg',
-          'createdAt': '2024-01-15T10:30:00.000Z',
-          'dateOfBirth': '1990-05-20T00:00:00.000Z',
+          'createdAt': Timestamp.fromDate(DateTime(2024, 1, 15, 10, 30)),
+          'dateOfBirth': Timestamp.fromDate(DateTime(1990, 5, 20)),
           'gender': 'male',
           'phone': '+40712345678',
           'preferredLanguage': 'ro',
@@ -94,8 +95,8 @@ void main() {
         expect(map['preferredLanguage'], 'ro');
         expect(map['userType'], 'doctor');
         expect(map['profileCompleted'], true);
-        expect(map['createdAt'], isNotNull);
-        expect(map['dateOfBirth'], isNotNull);
+        expect(map['createdAt'], isA<Timestamp>());
+        expect(map['dateOfBirth'], isA<Timestamp>());
       });
 
       test('does not include uid in map', () {

@@ -160,7 +160,7 @@ class AuthController extends ChangeNotifier {
       // Update Firestore with extended profile data
       final Map<String, dynamic> profileData = {
         'displayName': displayName,
-        'dateOfBirth': dateOfBirth.toIso8601String(),
+        'dateOfBirth': Timestamp.fromDate(dateOfBirth),
         'gender': gender,
         'phone': phone,
         'preferredLanguage': preferredLanguage,

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Medical specialties for doctor profiles
 enum MedicalSpecialty {
   cardiology,
@@ -65,16 +67,16 @@ class DateRange {
 
   factory DateRange.fromMap(Map<String, dynamic> map) {
     return DateRange(
-      startDate: DateTime.parse(map['startDate']),
-      endDate: DateTime.parse(map['endDate']),
+      startDate: _parseDate(map['startDate']),
+      endDate: _parseDate(map['endDate']),
       reason: map['reason'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
+      'startDate': Timestamp.fromDate(startDate),
+      'endDate': Timestamp.fromDate(endDate),
       if (reason != null) 'reason': reason,
     };
   }
@@ -83,4 +85,14 @@ class DateRange {
     final now = DateTime.now();
     return now.isAfter(startDate) && now.isBefore(endDate);
   }
+}
+
+DateTime _parseDate(dynamic value) {
+  if (value is Timestamp) return value.toDate();
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.parse(value);
+  if (value == null) {
+    throw const FormatException('Date value is null');
+  }
+  return DateTime.parse(value.toString());
 }

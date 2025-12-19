@@ -12,9 +12,8 @@ class AuthService {
     if (value == null) return null;
     if (value is DateTime) return value;
     if (value is String) return DateTime.tryParse(value);
-    // Handle Firestore Timestamp (has toDate() method)
-    if (value.runtimeType.toString().contains('Timestamp')) {
-      return (value as dynamic).toDate();
+    if (value is Timestamp) {
+      return value.toDate();
     }
     return null;
   }

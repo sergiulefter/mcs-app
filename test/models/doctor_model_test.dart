@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/models/medical_specialty.dart';
@@ -54,8 +55,8 @@ void main() {
           'languages': ['EN', 'RO', 'DE'],
           'isAvailable': true,
           'vacationPeriods': [],
-          'createdAt': '2024-01-15T10:30:00.000Z',
-          'lastActive': '2024-03-20T14:00:00.000Z',
+          'createdAt': Timestamp.fromDate(DateTime(2024, 1, 15, 10, 30)),
+          'lastActive': Timestamp.fromDate(DateTime(2024, 3, 20, 14, 0)),
         };
 
         final doctor = DoctorModel.fromMap(map, 'doc123');
@@ -137,6 +138,7 @@ void main() {
         expect(map['consultationPrice'], 300.0);
         expect(map['languages'], ['EN']);
         expect(map['education'], isNotEmpty);
+        expect(map['createdAt'], isA<Timestamp>());
       });
 
       test('serializes education entries correctly', () {
@@ -493,8 +495,8 @@ void main() {
   group('DateRange', () {
     test('fromMap parses correctly', () {
       final map = {
-        'startDate': '2024-07-01T00:00:00.000Z',
-        'endDate': '2024-07-15T00:00:00.000Z',
+        'startDate': Timestamp.fromDate(DateTime(2024, 7, 1)),
+        'endDate': Timestamp.fromDate(DateTime(2024, 7, 15)),
         'reason': 'Summer vacation',
       };
 
@@ -507,19 +509,19 @@ void main() {
       expect(range.reason, 'Summer vacation');
     });
 
-    test('toMap serializes correctly', () {
-      final range = DateRange(
-        startDate: DateTime(2024, 8, 1),
-        endDate: DateTime(2024, 8, 10),
-        reason: 'Conference',
-      );
+      test('toMap serializes correctly', () {
+        final range = DateRange(
+          startDate: DateTime(2024, 8, 1),
+          endDate: DateTime(2024, 8, 10),
+          reason: 'Conference',
+        );
 
-      final map = range.toMap();
+        final map = range.toMap();
 
-      expect(map['reason'], 'Conference');
-      expect(map['startDate'], contains('2024-08-01'));
-      expect(map['endDate'], contains('2024-08-10'));
-    });
+        expect(map['reason'], 'Conference');
+        expect(map['startDate'], isA<Timestamp>());
+        expect(map['endDate'], isA<Timestamp>());
+      });
 
     test('toMap excludes reason when null', () {
       final range = DateRange(

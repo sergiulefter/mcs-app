@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'medical_specialty.dart';
 
 /// Education entry for doctor's academic background
@@ -117,9 +118,8 @@ class DoctorModel {
     if (value == null) return null;
     if (value is DateTime) return value;
     if (value is String) return DateTime.tryParse(value);
-    // Handle Firestore Timestamp (has toDate() method)
-    if (value.runtimeType.toString().contains('Timestamp')) {
-      return (value as dynamic).toDate();
+    if (value is Timestamp) {
+      return value.toDate();
     }
     return null;
   }
@@ -166,8 +166,8 @@ class DoctorModel {
       'languages': languages,
       'isAvailable': isAvailable,
       'vacationPeriods': vacationPeriods.map((e) => e.toMap()).toList(),
-      'createdAt': createdAt.toIso8601String(),
-      'lastActive': lastActive?.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'lastActive': lastActive != null ? Timestamp.fromDate(lastActive!) : null,
     };
   }
 

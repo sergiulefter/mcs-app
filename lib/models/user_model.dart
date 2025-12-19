@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   final String uid;
   final String email;
@@ -65,9 +67,8 @@ class UserModel {
     if (value == null) return null;
     if (value is DateTime) return value;
     if (value is String) return DateTime.tryParse(value);
-    // Handle Firestore Timestamp (has toDate() method)
-    if (value.runtimeType.toString().contains('Timestamp')) {
-      return (value as dynamic).toDate();
+    if (value is Timestamp) {
+      return value.toDate();
     }
     return null;
   }
@@ -78,8 +79,8 @@ class UserModel {
       'email': email,
       'displayName': displayName,
       'photoUrl': photoUrl,
-      'createdAt': createdAt.toIso8601String(),
-      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'dateOfBirth': dateOfBirth != null ? Timestamp.fromDate(dateOfBirth!) : null,
       'gender': gender,
       'phone': phone,
       'preferredLanguage': preferredLanguage,
