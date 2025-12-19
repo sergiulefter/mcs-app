@@ -4,8 +4,16 @@ import '../models/user_model.dart';
 import '../utils/constants.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  AuthService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  })  : _auth = auth,
+        _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseAuth? _auth;
+  final FirebaseFirestore _firestore;
+
+  FirebaseAuth get _authInstance => _auth ?? FirebaseAuth.instance;
 
   /// Parse DateTime from various formats (String, Timestamp, or null)
   static DateTime? _parseDateTime(dynamic value) {
@@ -19,10 +27,10 @@ class AuthService {
   }
 
   // Get current user
-  User? get currentUser => _auth.currentUser;
+  User? get currentUser => _authInstance.currentUser;
 
   // Auth state changes stream
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<User?> get authStateChanges => _authInstance.authStateChanges();
 
   // Sign up with email and password
   Future<UserModel?> signUp({
@@ -32,7 +40,8 @@ class AuthService {
     String? preferredLanguage,
   }) async {
     // Create user in Firebase Auth
-    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+    UserCredential userCredential =
+        await _authInstance.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -44,7 +53,7 @@ class AuthService {
     if (displayName != null) {
       await user.updateDisplayName(displayName);
       await user.reload();
-      user = _auth.currentUser;
+      user = _authInstance.currentUser;
     }
 
     // Create user document in Firestore with preferred language
@@ -70,7 +79,7 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+    UserCredential userCredential = await _authInstance.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -118,12 +127,12 @@ class AuthService {
 
   // Sign out
   Future<void> signOut() async {
-    await _auth.signOut();
+    await _authInstance.signOut();
   }
 
   // Reset password
   Future<void> resetPassword(String email) async {
-    await _auth.sendPasswordResetEmail(email: email);
+    await _authInstance.sendPasswordResetEmail(email: email);
   }
 
   // Get user data from Firestore
@@ -163,7 +172,7 @@ class AuthService {
     String? displayName,
     String? photoUrl,
   }) async {
-    User? user = _auth.currentUser;
+    User? user = _authInstance.currentUser;
     if (user == null) throw Exception('No user logged in');
 
     Map<String, dynamic> updates = {};
@@ -182,7 +191,7 @@ class AuthService {
 
     // Reload Firebase Auth user to get updated info
     await user.reload();
-    user = _auth.currentUser;
+    user = _authInstance.currentUser;
 
     // Update Firestore document if there are changes
     if (updates.isNotEmpty) {
