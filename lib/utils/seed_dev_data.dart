@@ -151,7 +151,7 @@ class DevDataSeeder {
   }
 
   String _weightedRandomStatus(List<(String, int)> weights) {
-    final totalWeight = weights.fold(0, (sum, w) => sum + w.$2);
+    final totalWeight = weights.fold(0, (total, w) => total + w.$2);
     var random = _rand.nextInt(totalWeight);
     for (final (status, weight) in weights) {
       random -= weight;
