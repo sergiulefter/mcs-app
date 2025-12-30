@@ -50,7 +50,11 @@
     "password_hint": "Introdu parola",
     "create_password_hint": "Creează o parolă",
     "confirm_password_hint": "Confirmă parola",
-    "name_hint": "Introdu numele complet"
+    "name_hint": "Introdu numele complet",
+    "forgot_password_title": "Resetare Parolă",
+    "forgot_password_subtitle": "Introdu adresa de email și îți vom trimite un link pentru a-ți reseta parola.",
+    "send_reset_link": "Trimite Link Resetare",
+    "password_reset_sent": "Email de resetare parolă trimis"
   },
   "profile": {
     "complete_title": "Completează Profilul",

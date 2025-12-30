@@ -68,10 +68,7 @@ class AuthController extends ChangeNotifier {
 
   /// Sign in an existing user.
   /// Throws exceptions on failure - UI should catch and display.
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     _isLoading = true;
     notifyListeners();
 
@@ -103,7 +100,7 @@ class AuthController extends ChangeNotifier {
 
   /// Send password reset email.
   /// Throws exceptions on failure - UI should catch and display.
-  Future<void> resetPassword(String email) async {
+  Future<void> sendPasswordResetEmail(String email) async {
     _isLoading = true;
     notifyListeners();
 

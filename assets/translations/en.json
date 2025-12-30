@@ -50,7 +50,11 @@
     "password_hint": "Enter your password",
     "create_password_hint": "Create a password",
     "confirm_password_hint": "Confirm your password",
-    "name_hint": "Enter your full name"
+    "name_hint": "Enter your full name",
+    "forgot_password_title": "Reset Password",
+    "forgot_password_subtitle": "Enter your email address and we will send you a link to reset your password.",
+    "send_reset_link": "Send Reset Link",
+    "password_reset_sent": "Password reset email sent"
   },
   "profile": {
     "complete_title": "Complete Your Profile",

@@ -12,6 +12,7 @@ import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'signup_screen.dart';
 import 'main_shell.dart';
+import 'package:mcs_app/views/patient/widgets/auth/forgot_password_sheet.dart';
 import 'complete_profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -67,7 +68,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final userId = user?.uid;
 
       // Only prefetch consultations for patients (not doctors/admins)
-      if (userId != null && user?.isDoctor != true && user?.userType != 'admin') {
+      if (userId != null &&
+          user?.isDoctor != true &&
+          user?.userType != 'admin') {
         await consultationsController.primeForUser(userId, force: true);
       }
 
@@ -96,7 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
           // Give user time to see the home screen before prompting to complete profile
           Future.delayed(const Duration(milliseconds: 800), () {
             navigator.push(
-              MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+              MaterialPageRoute(
+                builder: (context) => const CompleteProfileScreen(),
+              ),
             );
           });
         }
@@ -132,15 +137,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: AppTheme.spacing48),
 
                   // Login Form
-                  KeyedSubtree(
-                    key: _emailKey,
-                    child: _buildEmailField(),
-                  ),
+                  KeyedSubtree(key: _emailKey, child: _buildEmailField()),
                   const SizedBox(height: AppTheme.spacing16),
-                  KeyedSubtree(
-                    key: _passwordKey,
-                    child: _buildPasswordField(),
-                  ),
+                  KeyedSubtree(key: _passwordKey, child: _buildPasswordField()),
                   const SizedBox(height: AppTheme.spacing8),
 
                   // Forgot Password
@@ -184,9 +183,9 @@ class _LoginScreenState extends State<LoginScreen> {
         // Title
         Text(
           'auth.sign_in'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppTheme.spacing8),
 
@@ -236,20 +235,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton(
-        onPressed: () {
-          // TODO: Implement forgot password
-        },
-        style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacing8,
-            vertical: AppTheme.spacing4,
-          ),
-        ),
+        onPressed: () => ForgotPasswordSheet.show(context),
         child: Text(
           'auth.forgot_password'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -259,8 +251,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Consumer<AuthController>(
       builder: (context, authController, child) {
         return ElevatedButton(
-          onPressed:
-              (authController.isLoading || _isPrefetching) ? null : _handleLogin,
+          onPressed: (authController.isLoading || _isPrefetching)
+              ? null
+              : _handleLogin,
           child: (authController.isLoading || _isPrefetching)
               ? SizedBox(
                   height: 20,
@@ -287,9 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
         TextButton(
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const SignupScreen(),
-              ),
+              MaterialPageRoute(builder: (context) => const SignupScreen()),
             );
           },
           child: Text('auth.sign_up'.tr()),
