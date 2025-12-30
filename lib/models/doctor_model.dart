@@ -22,11 +22,7 @@ class EducationEntry {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'institution': institution,
-      'degree': degree,
-      'year': year,
-    };
+    return {'institution': institution, 'degree': degree, 'year': year};
   }
 }
 
@@ -108,7 +104,8 @@ class DoctorModel {
   }
 
   /// Get formatted experience string
-  String get experienceLabel => '$experienceYears ${experienceYears == 1 ? 'year' : 'years'} experience';
+  String get experienceLabel =>
+      '$experienceYears ${experienceYears == 1 ? 'year' : 'years'} experience';
 
   /// Get formatted languages string
   String get languagesLabel => languages.join(' • ');
@@ -131,18 +128,22 @@ class DoctorModel {
       email: map['email'] ?? '',
       fullName: map['fullName'] ?? '',
       photoUrl: map['photoUrl'],
-      specialty: MedicalSpecialtyExtension.fromString(map['specialty'] ?? 'familyMedicine'),
+      specialty: MedicalSpecialtyExtension.fromString(
+        map['specialty'] ?? 'familyMedicine',
+      ),
       subspecialties: List<String>.from(map['subspecialties'] ?? []),
       experienceYears: map['experienceYears'] ?? 0,
       bio: map['bio'] ?? '',
-      education: (map['education'] as List?)
+      education:
+          (map['education'] as List?)
               ?.map((e) => EducationEntry.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
       consultationPrice: (map['consultationPrice'] ?? 0).toDouble(),
       languages: List<String>.from(map['languages'] ?? ['EN']),
       isAvailable: map['isAvailable'] ?? true,
-      vacationPeriods: (map['vacationPeriods'] as List?)
+      vacationPeriods:
+          (map['vacationPeriods'] as List?)
               ?.map((e) => DateRange.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -165,6 +166,7 @@ class DoctorModel {
       'consultationPrice': consultationPrice,
       'languages': languages,
       'isAvailable': isAvailable,
+      'isProfileComplete': isProfileComplete,
       'vacationPeriods': vacationPeriods.map((e) => e.toMap()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
       'lastActive': lastActive != null ? Timestamp.fromDate(lastActive!) : null,
