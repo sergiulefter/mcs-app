@@ -10,7 +10,10 @@ import 'mixins/consultation_filter_mixin.dart';
 /// Patient consultations controller
 class ConsultationsController extends ChangeNotifier
     with ConsultationFilterMixin {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+
+  ConsultationsController({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   /// Default page size for pagination
   static const int _pageSize = 20;
