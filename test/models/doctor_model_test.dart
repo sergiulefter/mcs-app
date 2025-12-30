@@ -49,7 +49,7 @@ void main() {
               'institution': 'Harvard Medical School',
               'degree': 'MD',
               'year': 2005,
-            }
+            },
           ],
           'consultationPrice': 250.0,
           'languages': ['EN', 'RO', 'DE'],
@@ -117,11 +117,7 @@ void main() {
           experienceYears: 20,
           bio: 'Experienced oncologist',
           education: [
-            EducationEntry(
-              institution: 'Oxford',
-              degree: 'MD',
-              year: 2000,
-            ),
+            EducationEntry(institution: 'Oxford', degree: 'MD', year: 2000),
           ],
           consultationPrice: 300.0,
           languages: ['EN'],
@@ -150,16 +146,8 @@ void main() {
           experienceYears: 10,
           bio: 'Test bio',
           education: [
-            EducationEntry(
-              institution: 'Harvard',
-              degree: 'MD',
-              year: 2010,
-            ),
-            EducationEntry(
-              institution: 'Stanford',
-              degree: 'PhD',
-              year: 2015,
-            ),
+            EducationEntry(institution: 'Harvard', degree: 'MD', year: 2010),
+            EducationEntry(institution: 'Stanford', degree: 'PhD', year: 2015),
           ],
           consultationPrice: 200.0,
           languages: ['EN'],
@@ -287,18 +275,12 @@ void main() {
         });
 
         test('returns false when education is empty', () {
-          final doctor = createTestDoctor(
-            bio: 'This is a bio',
-            education: [],
-          );
+          final doctor = createTestDoctor(bio: 'This is a bio', education: []);
           expect(doctor.isProfileComplete, false);
         });
 
         test('returns false when both bio and education are empty', () {
-          final doctor = createTestDoctor(
-            bio: '',
-            education: [],
-          );
+          final doctor = createTestDoctor(bio: '', education: []);
           expect(doctor.isProfileComplete, false);
         });
       });
@@ -338,11 +320,7 @@ void main() {
         test('returns first institution when education exists', () {
           final doctor = createTestDoctor(
             education: [
-              EducationEntry(
-                institution: 'Harvard',
-                degree: 'MD',
-                year: 2010,
-              ),
+              EducationEntry(institution: 'Harvard', degree: 'MD', year: 2010),
               EducationEntry(
                 institution: 'Stanford',
                 degree: 'PhD',
@@ -408,6 +386,43 @@ void main() {
         final doctor2 = createTestDoctor(uid: 'doc456');
 
         expect(doctor1 == doctor2, false);
+      });
+    });
+    group('toUserModel', () {
+      test('correctly maps fields to UserModel', () {
+        final doctor = createTestDoctor(
+          uid: 'doc123',
+          email: 'test@example.com',
+          fullName: 'Dr. Test',
+          education: [
+            EducationEntry(institution: 'Test', degree: 'MD', year: 2020),
+          ],
+          bio: 'Bio',
+        );
+
+        final user = doctor.toUserModel();
+
+        expect(user.uid, 'doc123');
+        expect(user.email, 'test@example.com');
+        expect(user.displayName, 'Dr. Test');
+        expect(user.createdAt, doctor.createdAt);
+        expect(user.isDoctor, true);
+        expect(user.profileCompleted, true);
+        expect(
+          user.userType,
+          'patient',
+        ); // Default in UserModel, should check logic if this matters
+      });
+
+      test('profileCompleted is false for incomplete doctor profile', () {
+        final doctor = createTestDoctor(
+          bio: '', // Incomplete
+          education: [], // Incomplete
+        );
+
+        final user = doctor.toUserModel();
+
+        expect(user.profileCompleted, false);
       });
     });
   });
@@ -509,19 +524,19 @@ void main() {
       expect(range.reason, 'Summer vacation');
     });
 
-      test('toMap serializes correctly', () {
-        final range = DateRange(
-          startDate: DateTime(2024, 8, 1),
-          endDate: DateTime(2024, 8, 10),
-          reason: 'Conference',
-        );
+    test('toMap serializes correctly', () {
+      final range = DateRange(
+        startDate: DateTime(2024, 8, 1),
+        endDate: DateTime(2024, 8, 10),
+        reason: 'Conference',
+      );
 
-        final map = range.toMap();
+      final map = range.toMap();
 
-        expect(map['reason'], 'Conference');
-        expect(map['startDate'], isA<Timestamp>());
-        expect(map['endDate'], isA<Timestamp>());
-      });
+      expect(map['reason'], 'Conference');
+      expect(map['startDate'], isA<Timestamp>());
+      expect(map['endDate'], isA<Timestamp>());
+    });
 
     test('toMap excludes reason when null', () {
       final range = DateRange(

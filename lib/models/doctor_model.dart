@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'medical_specialty.dart';
+import 'user_model.dart';
 
 /// Education entry for doctor's academic background
 class EducationEntry {
@@ -171,6 +172,21 @@ class DoctorModel {
       'createdAt': Timestamp.fromDate(createdAt),
       'lastActive': lastActive != null ? Timestamp.fromDate(lastActive!) : null,
     };
+  }
+
+  /// Convert to generic UserModel for session handling
+  UserModel toUserModel() {
+    return UserModel(
+      uid: uid,
+      email: email,
+      displayName: fullName,
+      photoUrl: photoUrl,
+      createdAt: createdAt,
+      isDoctor: true,
+      // Doctor profile is technically complete if we have a DoctorModel,
+      // but we use the specific getter check to be safe
+      profileCompleted: isProfileComplete,
+    );
   }
 
   /// Copy with method for immutability

@@ -1,30 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../models/doctor_model.dart';
 import '../utils/constants.dart';
 
 class AuthService {
-  AuthService({
-    FirebaseAuth? auth,
-    FirebaseFirestore? firestore,
-  })  : _auth = auth,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+  AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore})
+    : _auth = auth,
+      _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseAuth? _auth;
   final FirebaseFirestore _firestore;
 
   FirebaseAuth get _authInstance => _auth ?? FirebaseAuth.instance;
-
-  /// Parse DateTime from various formats (String, Timestamp, or null)
-  static DateTime? _parseDateTime(dynamic value) {
-    if (value == null) return null;
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value);
-    if (value is Timestamp) {
-      return value.toDate();
-    }
-    return null;
-  }
 
   // Get current user
   User? get currentUser => _authInstance.currentUser;
@@ -40,11 +28,8 @@ class AuthService {
     String? preferredLanguage,
   }) async {
     // Create user in Firebase Auth
-    UserCredential userCredential =
-        await _authInstance.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    UserCredential userCredential = await _authInstance
+        .createUserWithEmailAndPassword(email: email, password: password);
 
     User? user = userCredential.user;
     if (user == null) return null;
@@ -79,10 +64,8 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    UserCredential userCredential = await _authInstance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
+    UserCredential userCredential = await _authInstance
+        .signInWithEmailAndPassword(email: email, password: password);
 
     User? user = userCredential.user;
     if (user == null) return null;
@@ -94,7 +77,10 @@ class AuthService {
         .get();
 
     if (userDoc.exists) {
-      return UserModel.fromMap(userDoc.data() as Map<String, dynamic>, user.uid);
+      return UserModel.fromMap(
+        userDoc.data() as Map<String, dynamic>,
+        user.uid,
+      );
     }
 
     // Check if user exists in 'doctors' collection
@@ -104,16 +90,10 @@ class AuthService {
         .get();
 
     if (doctorDoc.exists) {
-      // Create a UserModel from doctor data with isDoctor flag
+      // Create a UserModel from doctor data using the conversion method
       final doctorData = doctorDoc.data() as Map<String, dynamic>;
-      return UserModel(
-        uid: user.uid,
-        email: doctorData['email'] ?? user.email ?? '',
-        displayName: doctorData['fullName'],
-        photoUrl: doctorData['photoUrl'],
-        createdAt: _parseDateTime(doctorData['createdAt']) ?? DateTime.now(),
-        isDoctor: true,
-      );
+      final doctorModel = DoctorModel.fromMap(doctorData, user.uid);
+      return doctorModel.toUserModel();
     }
 
     // If user document doesn't exist in either collection, create one in 'users'
@@ -153,14 +133,8 @@ class AuthService {
         .get();
     if (doctorDoc.exists) {
       final doctorData = doctorDoc.data() as Map<String, dynamic>;
-      return UserModel(
-        uid: uid,
-        email: doctorData['email'] ?? '',
-        displayName: doctorData['fullName'],
-        photoUrl: doctorData['photoUrl'],
-        createdAt: _parseDateTime(doctorData['createdAt']) ?? DateTime.now(),
-        isDoctor: true,
-      );
+      final doctorModel = DoctorModel.fromMap(doctorData, uid);
+      return doctorModel.toUserModel();
     }
 
     return null;

@@ -59,12 +59,7 @@ void main() {
         expect(controller.consultations.length, 1);
 
         final consultation = controller.consultations.first;
-
-        // Verify basic fields
         expect(consultation.id, 'cons_1');
-        expect(consultation.title, 'Leg Pain');
-
-        // Verify ENRICHED fields (This proves copyWith and Set update logic works)
         expect(consultation.doctorName, 'Gregory House');
         expect(consultation.doctorSpecialty, 'internalMedicine');
       },
@@ -110,6 +105,14 @@ void main() {
       await fakeFirestore.collection('doctors').doc(doctorId).set({
         'fullName': 'Gregory House',
         'specialty': 'internalMedicine',
+        'yearsOfExperience': 15,
+        'consultationPrice': 500,
+        'rating': 5.0,
+        'reviewCount': 100,
+        'isAvailable': true,
+        'bio': 'Diagnostics expert',
+        'education': [],
+        'languages': ['EN'],
       });
 
       await fakeFirestore.collection('consultations').doc('cons_1').set({

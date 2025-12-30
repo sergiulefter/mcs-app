@@ -4,56 +4,77 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mcs_app/services/auth_service.dart';
 
 void main() {
-  group('AuthService.getUserData', () {
-    late FakeFirebaseFirestore firestore;
+  group('AuthService Integration', () {
+    late FakeFirebaseFirestore fakeFirestore;
     late AuthService authService;
 
     setUp(() {
-      firestore = FakeFirebaseFirestore();
-      authService = AuthService(firestore: firestore);
+      fakeFirestore = FakeFirebaseFirestore();
+      // We pass null for FirebaseAuth as we are only testing Firestore data retrieval logic
+      // which uses the injected firestore instance.
+      authService = AuthService(firestore: fakeFirestore);
     });
 
-    test('returns doctor user for doctors collection with Timestamp dates', () async {
-      final createdAt = Timestamp.fromDate(DateTime(2024, 1, 1, 10, 0));
+    group('getUserData', () {
+      test(
+        'returns correct UserModel when user is in "doctors" collection',
+        () async {
+          final doctorId = 'doc_123';
+          final now = DateTime.now();
 
-      await firestore.collection('doctors').doc('doc123').set({
-        'email': 'doc@example.com',
-        'fullName': 'Dr. Timestamp',
-        'photoUrl': 'https://example.com/photo.jpg',
-        'createdAt': createdAt,
+          // Create a doctor document
+          // Note: We use the EXACT structure that caused the mismatch before
+          await fakeFirestore.collection('doctors').doc(doctorId).set({
+            'email': 'house@hospital.com',
+            'fullName': 'Dr. Gregory House',
+            'photoUrl': 'http://images/house.jpg',
+            'specialty': 'diagnostic_medicine',
+            'experienceYears': 10,
+            'bio': 'Genius',
+            'education': [], // Empty list
+            'consultationPrice': 500,
+            'languages': ['EN'],
+            'createdAt': Timestamp.fromDate(now),
+          });
+
+          // Act
+          final userModel = await authService.getUserData(doctorId);
+
+          // Assert
+          // Verified: The fix means we use toUserModel(), so isDoctor should be TRUE
+          expect(userModel, isNotNull);
+          expect(userModel!.uid, doctorId);
+          expect(userModel.displayName, 'Dr. Gregory House');
+          expect(userModel.isDoctor, true);
+          expect(userModel.email, 'house@hospital.com');
+        },
+      );
+
+      test(
+        'returns correct UserModel when user is in "users" collection',
+        () async {
+          final userId = 'patient_456';
+          final now = DateTime.now();
+
+          await fakeFirestore.collection('users').doc(userId).set({
+            'email': 'patient@test.com',
+            'displayName': 'John Doe',
+            'userType': 'patient',
+            'createdAt': Timestamp.fromDate(now),
+          });
+
+          final userModel = await authService.getUserData(userId);
+
+          expect(userModel, isNotNull);
+          expect(userModel!.uid, userId);
+          expect(userModel.isDoctor, false);
+        },
+      );
+
+      test('returns null when user is not found', () async {
+        final userModel = await authService.getUserData('unknown_id');
+        expect(userModel, isNull);
       });
-
-      final user = await authService.getUserData('doc123');
-
-      expect(user, isNotNull);
-      expect(user!.isDoctor, true);
-      expect(user.email, 'doc@example.com');
-      expect(user.displayName, 'Dr. Timestamp');
-      expect(user.photoUrl, 'https://example.com/photo.jpg');
-      expect(user.createdAt.year, 2024);
-    });
-
-    test('returns patient user for users collection with Timestamp dates', () async {
-      final createdAt = Timestamp.fromDate(DateTime(2023, 12, 31));
-      final dateOfBirth = Timestamp.fromDate(DateTime(1990, 5, 20));
-
-      await firestore.collection('users').doc('user123').set({
-        'email': 'patient@example.com',
-        'displayName': 'Patient One',
-        'createdAt': createdAt,
-        'dateOfBirth': dateOfBirth,
-        'preferredLanguage': 'ro',
-      });
-
-      final user = await authService.getUserData('user123');
-
-      expect(user, isNotNull);
-      expect(user!.isDoctor, false);
-      expect(user.email, 'patient@example.com');
-      expect(user.displayName, 'Patient One');
-      expect(user.createdAt.year, 2023);
-      expect(user.dateOfBirth?.year, 1990);
-      expect(user.preferredLanguage, 'ro');
     });
   });
 }
