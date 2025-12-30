@@ -13,7 +13,8 @@ class ConsultationModel {
   final String id;
   final String patientId;
   final String? doctorId; // Optional - can be null if not yet assigned
-  final String status; // "pending" | "in_review" | "info_requested" | "completed" | "cancelled"
+  final String
+  status; // "pending" | "in_review" | "info_requested" | "completed" | "cancelled"
   final String urgency; // "normal" | "priority"
   final String title;
   final String description;
@@ -25,11 +26,11 @@ class ConsultationModel {
   final DateTime? completedAt;
   final DateTime termsAcceptedAt;
 
-  // Cached doctor info (not from Firestore, fetched separately)
-  String? doctorName;
-  String? doctorSpecialty;
-  String? patientName;
-  String? patientEmail;
+  // Cached info (fetched separately)
+  final String? doctorName;
+  final String? doctorSpecialty;
+  final String? patientName;
+  final String? patientEmail;
 
   ConsultationModel({
     required this.id,
@@ -64,15 +65,18 @@ class ConsultationModel {
       urgency: data['urgency'] ?? 'normal',
       title: data['title'] ?? '',
       description: data['description'] ?? '',
-      attachments: (data['attachments'] as List<dynamic>?)
+      attachments:
+          (data['attachments'] as List<dynamic>?)
               ?.map((e) => AttachmentModel.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
       doctorResponse: data['doctorResponse'] != null
           ? DoctorResponseModel.fromMap(
-              data['doctorResponse'] as Map<String, dynamic>)
+              data['doctorResponse'] as Map<String, dynamic>,
+            )
           : null,
-      infoRequests: (data['infoRequests'] as List<dynamic>?)
+      infoRequests:
+          (data['infoRequests'] as List<dynamic>?)
               ?.map((e) => InfoRequestModel.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -99,8 +103,9 @@ class ConsultationModel {
       'infoRequests': infoRequests.map((info) => info.toMap()).toList(),
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
-      'completedAt':
-          completedAt != null ? Timestamp.fromDate(completedAt!) : null,
+      'completedAt': completedAt != null
+          ? Timestamp.fromDate(completedAt!)
+          : null,
       'termsAcceptedAt': Timestamp.fromDate(termsAcceptedAt),
     };
   }
@@ -150,7 +155,8 @@ class ConsultationModel {
 
   /// Value-based equality for Set deduplication
   @override
-  bool operator ==(Object other) => other is ConsultationModel && other.id == id;
+  bool operator ==(Object other) =>
+      other is ConsultationModel && other.id == id;
 
   @override
   int get hashCode => id.hashCode;
@@ -211,7 +217,8 @@ class DoctorResponseModel {
       respondedAt: _parseDate(map['respondedAt']),
       followUpNeeded: map['followUpNeeded'] ?? false,
       recommendations: map['recommendations'],
-      responseAttachments: (map['responseAttachments'] as List<dynamic>?)
+      responseAttachments:
+          (map['responseAttachments'] as List<dynamic>?)
               ?.map((e) => AttachmentModel.fromMap(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -224,8 +231,9 @@ class DoctorResponseModel {
       'recommendations': recommendations,
       'respondedAt': Timestamp.fromDate(respondedAt),
       'followUpNeeded': followUpNeeded,
-      'responseAttachments':
-          responseAttachments.map((attachment) => attachment.toMap()).toList(),
+      'responseAttachments': responseAttachments
+          .map((attachment) => attachment.toMap())
+          .toList(),
     };
   }
 }
@@ -258,15 +266,16 @@ class InfoRequestModel {
     return InfoRequestModel(
       id: map['id'] ?? '',
       message: map['message'] ?? '',
-      questions: (map['questions'] as List<dynamic>?)
+      questions:
+          (map['questions'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
       doctorId: map['doctorId'] ?? '',
       requestedAt: _parseDate(map['requestedAt']),
       answers: (map['answers'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList(),
+          ?.map((e) => e.toString())
+          .toList(),
       additionalInfo: map['additionalInfo'],
       respondedAt: map['respondedAt'] != null
           ? _parseDate(map['respondedAt'])

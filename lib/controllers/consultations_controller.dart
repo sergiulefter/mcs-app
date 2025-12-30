@@ -8,7 +8,8 @@ import '../utils/constants.dart';
 import 'mixins/consultation_filter_mixin.dart';
 
 /// Patient consultations controller
-class ConsultationsController extends ChangeNotifier with ConsultationFilterMixin {
+class ConsultationsController extends ChangeNotifier
+    with ConsultationFilterMixin {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Default page size for pagination
@@ -94,7 +95,9 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
         querySnapshot.docs.map((doc) => ConsultationModel.fromFirestore(doc)),
       );
 
-      _lastDocument = querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      _lastDocument = querySnapshot.docs.isNotEmpty
+          ? querySnapshot.docs.last
+          : null;
       _hasMore = querySnapshot.docs.length >= _pageSize;
 
       // Fetch doctor info for each consultation
@@ -134,7 +137,9 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
           .toList();
 
       _consultations.addAll(newConsultations);
-      _lastDocument = querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      _lastDocument = querySnapshot.docs.isNotEmpty
+          ? querySnapshot.docs.last
+          : null;
       _hasMore = querySnapshot.docs.length >= _pageSize;
 
       // Fetch doctor info for new consultations
@@ -160,29 +165,68 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
   }
 
   /// Fetch doctor information for a specific list of consultations.
-  Future<void> _fetchDoctorInfoForList(List<ConsultationModel> consultations) async {
+  /// Updates local state with enriched data.
+  Future<void> _fetchDoctorInfoForList(
+    List<ConsultationModel> targetConsultations,
+  ) async {
+    // 1. Identify unique doctor IDs needed
+    final doctorIds = targetConsultations
+        .map((c) => c.doctorId)
+        .where((id) => id != null)
+        .toSet();
+
+    if (doctorIds.isEmpty) return;
+
+    // 2. Fetch doctor data
+    // optimization: could cache these lookups if needed, but keeping it simple for now
+    final Map<String, DoctorModel> doctorMap = {};
+
     await Future.wait(
-      consultations.where((c) => c.doctorId != null).map((consultation) async {
+      doctorIds.map((id) async {
         try {
-          final doctorDoc = await _firestore
+          final doc = await _firestore
               .collection(AppConstants.collectionDoctors)
-              .doc(consultation.doctorId)
+              .doc(id)
               .get();
 
-          if (doctorDoc.exists) {
-            final doctor = DoctorModel.fromMap(
-              doctorDoc.data() as Map<String, dynamic>,
-              doctorDoc.id,
+          if (doc.exists) {
+            doctorMap[id!] = DoctorModel.fromMap(
+              doc.data() as Map<String, dynamic>,
+              doc.id,
             );
-            consultation.doctorName = doctor.fullName;
-            consultation.doctorSpecialty = doctor.specialty.name;
           }
         } catch (e) {
-          // If doctor fetch fails, just continue with null values
-          debugPrint('Error fetching doctor info: $e');
+          debugPrint('Error fetching doctor $id: $e');
         }
       }),
     );
+
+    // 3. Update consultations in the list AND the main set
+    // We must remove the old instance and add the new one to preserve Set integrity
+    // if the comparator logic or hashcode relied on these fields (it matches by ID/Created).
+
+    // We iterate over the *targets* but update the *main state*
+    for (final consultation in targetConsultations) {
+      if (consultation.doctorId != null &&
+          doctorMap.containsKey(consultation.doctorId)) {
+        final doctor = doctorMap[consultation.doctorId];
+
+        // Create immutable copy
+        final updatedConsultation = consultation.copyWith(
+          doctorName: doctor?.fullName,
+          doctorSpecialty: doctor?.specialty.name,
+        );
+
+        // Update main state
+        if (_consultations.contains(consultation)) {
+          _consultations.remove(consultation);
+          _consultations.add(updatedConsultation);
+        }
+      }
+    }
+
+    // Notify once after batch update
+    notifyListeners();
   }
 
   // Set filter status
@@ -239,9 +283,9 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
         .collection(AppConstants.collectionConsultations)
         .doc(consultationId)
         .update({
-      'status': AppConstants.statusCancelled,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+          'status': AppConstants.statusCancelled,
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
 
     // Update local state - find, remove, update, re-add (Set pattern)
     final consultation = _consultations.firstWhere(
@@ -249,10 +293,12 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
       orElse: () => throw Exception('Consultation not found'),
     );
     _consultations.remove(consultation);
-    _consultations.add(consultation.copyWith(
-      status: AppConstants.statusCancelled,
-      updatedAt: DateTime.now(),
-    ));
+    _consultations.add(
+      consultation.copyWith(
+        status: AppConstants.statusCancelled,
+        updatedAt: DateTime.now(),
+      ),
+    );
     notifyListeners();
   }
 
@@ -287,18 +333,20 @@ class ConsultationsController extends ChangeNotifier with ConsultationFilterMixi
         .collection(AppConstants.collectionConsultations)
         .doc(consultationId)
         .update({
-      'status': AppConstants.statusInReview,
-      'updatedAt': FieldValue.serverTimestamp(),
-      'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
-    });
+          'status': AppConstants.statusInReview,
+          'updatedAt': FieldValue.serverTimestamp(),
+          'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
+        });
 
     // Update local state - remove old, add updated (Set pattern)
     _consultations.remove(consultation);
-    _consultations.add(consultation.copyWith(
-      status: AppConstants.statusInReview,
-      updatedAt: DateTime.now(),
-      infoRequests: updatedInfoRequests,
-    ));
+    _consultations.add(
+      consultation.copyWith(
+        status: AppConstants.statusInReview,
+        updatedAt: DateTime.now(),
+        infoRequests: updatedInfoRequests,
+      ),
+    );
     notifyListeners();
   }
 }
