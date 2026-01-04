@@ -10,9 +10,9 @@ class AppTheme {
   // ============================================================================
 
   // Primary Colors
-  static const Color primaryBlue = Color(0xFF0066CC);
-  static const Color primaryBlueDark = Color(0xFF004C99);
-  static const Color primaryBlueLight = Color(0xFF3385D6);
+  static const Color primaryBlue = Color(0xFF1152D4); // Stitch Primary
+  static const Color primaryBlueDark = Color(0xFF0D3FA0);
+  static const Color primaryBlueLight = Color(0xFF4C82E8);
 
   // Secondary Colors
   static const Color secondaryGreen = Color(0xFF00A878);
@@ -26,14 +26,16 @@ class AppTheme {
   static const Color infoBlue = Color(0xFF17A2B8);
 
   // Neutral Colors
-  static const Color backgroundLight = Color(0xFFF8F9FA);
+  static const Color backgroundLight = Color(0xFFF6F6F8); // Stitch Light BG
   static const Color backgroundWhite = Color(0xFFFFFFFF);
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color dividerColor = Color(0xFFE9ECEF);
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF212529);
-  static const Color textSecondary = Color(0xFF6C757D);
+  static const Color textPrimary = Color(
+    0xFF101622,
+  ); // Stitch Dark BG (used as text in light)
+  static const Color textSecondary = Color(0xFF4C669A); // Stitch Slate Blue
   static const Color textTertiary = Color(0xFFADB5BD);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
   static const Color textOnSecondary = Color(0xFFFFFFFF);
@@ -50,12 +52,12 @@ class AppTheme {
   // ============================================================================
 
   // Dark Backgrounds
-  static const Color backgroundDark = Color(0xFF121212); // Material Design dark
-  static const Color backgroundDarkElevated = Color(0xFF1E1E1E); // Slightly elevated
-  static const Color surfaceDark = Color(0xFF1E1E1E);
-  static const Color surfaceDarkElevated = Color(0xFF2C2C2C);
-  static const Color dividerDark = Color(0xFF3A3A3A); // More visible than 0xFF2C2C2C
-  static const Color borderDark = Color(0xFF3A3A3A); // Subtle borders for dark mode
+  static const Color backgroundDark = Color(0xFF101622); // Stitch Dark BG
+  static const Color backgroundDarkElevated = Color(0xFF1A2130);
+  static const Color surfaceDark = Color(0xFF1A2130);
+  static const Color surfaceDarkElevated = Color(0xFF252D3F);
+  static const Color dividerDark = Color(0xFF252D3F);
+  static const Color borderDark = Color(0xFF252D3F);
 
   // Dark Text Colors
   static const Color textPrimaryDark = Color(0xFFE0E0E0);
@@ -65,7 +67,9 @@ class AppTheme {
 
   // Adjusted semantic colors for dark mode (slightly lighter for visibility)
   static const Color primaryBlueDarkMode = Color(0xFF4D94FF); // Lighter blue
-  static const Color secondaryGreenDarkMode = Color(0xFF33C699); // Lighter green
+  static const Color secondaryGreenDarkMode = Color(
+    0xFF33C699,
+  ); // Lighter green
   static const Color errorRedDark = Color(0xFFFF6B6B); // Lighter red
   static const Color successGreenDark = Color(0xFF51CF66); // Lighter green
   static const Color warningOrangeDark = Color(0xFFFFB84D); // Lighter orange
@@ -202,10 +206,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           letterSpacing: -0.5,
         ),
-        iconTheme: IconThemeData(
-          color: textPrimary,
-          size: iconMedium,
-        ),
+        iconTheme: IconThemeData(color: textPrimary, size: iconMedium),
       ),
 
       // Card Theme
@@ -303,10 +304,7 @@ class AppTheme {
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        hintStyle: const TextStyle(
-          color: textTertiary,
-          fontSize: 14,
-        ),
+        hintStyle: const TextStyle(color: textTertiary, fontSize: 14),
         errorStyle: const TextStyle(
           color: errorRed,
           fontSize: 12,
@@ -357,15 +355,9 @@ class AppTheme {
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(
-              size: iconMedium,
-              color: primaryBlue,
-            );
+            return const IconThemeData(size: iconMedium, color: primaryBlue);
           }
-          return const IconThemeData(
-            size: iconMedium,
-            color: textSecondary,
-          );
+          return const IconThemeData(size: iconMedium, color: textSecondary);
         }),
       ),
 
@@ -422,16 +414,10 @@ class AppTheme {
           EdgeInsets.symmetric(horizontal: spacing16),
         ),
         textStyle: const WidgetStatePropertyAll(
-          TextStyle(
-            fontSize: 16,
-            color: textPrimary,
-          ),
+          TextStyle(fontSize: 16, color: textPrimary),
         ),
         hintStyle: const WidgetStatePropertyAll(
-          TextStyle(
-            fontSize: 16,
-            color: textSecondary,
-          ),
+          TextStyle(fontSize: 16, color: textSecondary),
         ),
       ),
 
@@ -702,10 +688,7 @@ class AppTheme {
           fontWeight: FontWeight.w600,
           letterSpacing: -0.5,
         ),
-        iconTheme: IconThemeData(
-          color: textPrimaryDark,
-          size: iconMedium,
-        ),
+        iconTheme: IconThemeData(color: textPrimaryDark, size: iconMedium),
       ),
 
       // Card Theme - No shadows in dark mode, use borders for separation
@@ -807,10 +790,7 @@ class AppTheme {
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        hintStyle: const TextStyle(
-          color: textTertiaryDark,
-          fontSize: 14,
-        ),
+        hintStyle: const TextStyle(color: textTertiaryDark, fontSize: 14),
         errorStyle: const TextStyle(
           color: errorRedDark,
           fontSize: 12,
@@ -926,16 +906,10 @@ class AppTheme {
           EdgeInsets.symmetric(horizontal: spacing16),
         ),
         textStyle: const WidgetStatePropertyAll(
-          TextStyle(
-            fontSize: 16,
-            color: textPrimaryDark,
-          ),
+          TextStyle(fontSize: 16, color: textPrimaryDark),
         ),
         hintStyle: const WidgetStatePropertyAll(
-          TextStyle(
-            fontSize: 16,
-            color: textSecondaryDark,
-          ),
+          TextStyle(fontSize: 16, color: textSecondaryDark),
         ),
       ),
 

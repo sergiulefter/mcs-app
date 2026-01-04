@@ -23,13 +23,29 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   bool _showLoadingUi = false;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
     _initializeApp();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeApp() async {
@@ -57,7 +73,8 @@ class _SplashScreenState extends State<SplashScreen> {
       // Check preferences for language selection and onboarding
       final prefs = await SharedPreferences.getInstance();
       final languageSelected = prefs.getBool('language_selected') ?? false;
-      final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+      final onboardingCompleted =
+          prefs.getBool('onboarding_completed') ?? false;
 
       if (!mounted) return;
 
@@ -88,7 +105,9 @@ class _SplashScreenState extends State<SplashScreen> {
             // Give user time to see the home screen before prompting to complete profile
             Future.delayed(const Duration(milliseconds: 800), () {
               navigator.push(
-                MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const CompleteProfileScreen(),
+                ),
               );
             });
           }
@@ -101,7 +120,8 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
       final prefs = await SharedPreferences.getInstance();
       final languageSelected = prefs.getBool('language_selected') ?? false;
-      final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+      final onboardingCompleted =
+          prefs.getBool('onboarding_completed') ?? false;
       if (!mounted) return;
       _navigateToAuthFlow(languageSelected, onboardingCompleted);
     }
@@ -124,16 +144,14 @@ class _SplashScreenState extends State<SplashScreen> {
   void _navigateToMainShell() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const MainShell(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainShell(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curvedAnimation = CurvedAnimation(
             parent: animation,
             curve: Curves.easeOutCubic,
           );
-          return FadeTransition(
-            opacity: curvedAnimation,
-            child: child,
-          );
+          return FadeTransition(opacity: curvedAnimation, child: child);
         },
         transitionDuration: AppConstants.longDuration,
       ),
@@ -150,10 +168,7 @@ class _SplashScreenState extends State<SplashScreen> {
             parent: animation,
             curve: Curves.easeOutCubic,
           );
-          return FadeTransition(
-            opacity: curvedAnimation,
-            child: child,
-          );
+          return FadeTransition(opacity: curvedAnimation, child: child);
         },
         transitionDuration: AppConstants.longDuration,
       ),
@@ -170,10 +185,7 @@ class _SplashScreenState extends State<SplashScreen> {
             parent: animation,
             curve: Curves.easeOutCubic,
           );
-          return FadeTransition(
-            opacity: curvedAnimation,
-            child: child,
-          );
+          return FadeTransition(opacity: curvedAnimation, child: child);
         },
         transitionDuration: AppConstants.longDuration,
       ),
@@ -202,10 +214,7 @@ class _SplashScreenState extends State<SplashScreen> {
             parent: animation,
             curve: Curves.easeOutCubic,
           );
-          return FadeTransition(
-            opacity: curvedAnimation,
-            child: child,
-          );
+          return FadeTransition(opacity: curvedAnimation, child: child);
         },
         transitionDuration: AppConstants.longDuration,
       ),
@@ -217,93 +226,195 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!_showLoadingUi) {
       // For unauthenticated users we skip the dynamic splash; show a blank canvas while routing.
       return Scaffold(
-        body: Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-        ),
+        body: Container(color: Theme.of(context).scaffoldBackgroundColor),
       );
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Main content - centered
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildAppIcon(),
-                    const SizedBox(height: AppTheme.spacing24),
-                    _buildAppName(),
-                    const SizedBox(height: AppTheme.spacing8),
-                    _buildAppDescription(),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Stack(
+        children: [
+          // Decorative Background Pattern (Subtle Gradient Blobs)
+          Positioned(
+            top: -150,
+            right: -150,
+            child: Container(
+              width: 500,
+              height: 500,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    primaryColor.withValues(alpha: 0.05),
+                    Colors.transparent,
                   ],
                 ),
               ),
             ),
-
-            // Loading indicator at bottom
-            _buildLoadingIndicator(),
-            const SizedBox(height: AppTheme.spacing48),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppIcon() {
-    return Container(
-      width: 96,
-      height: 96,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
-      ),
-      child: Icon(
-        Icons.medical_services_outlined,
-        size: 56,
-        color: Theme.of(context).colorScheme.primary,
-      ),
-    );
-  }
-
-  Widget _buildAppName() {
-    return Text(
-      AppConstants.appName,
-      style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            letterSpacing: -1.0,
           ),
-    );
-  }
-
-  Widget _buildAppDescription() {
-    return Text(
-      AppConstants.appDescription,
-      style: Theme.of(context).textTheme.bodyLarge,
-      textAlign: TextAlign.center,
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Column(
-      children: [
-        SizedBox(
-          width: 200,
-          child: LinearProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).colorScheme.primary,
+          Positioned(
+            top: 300,
+            left: -100,
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    primaryColor.withValues(alpha: 0.05),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
             ),
-            minHeight: 3,
           ),
-        ),
-        const SizedBox(height: AppTheme.spacing16),
-        Text(
-          'Loading...',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
+
+          // Main Content
+          SafeArea(
+            child: Column(
+              children: [
+                const Spacer(),
+
+                // Center Brand Section
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Pulse Rings and Icon
+                      SizedBox(
+                        width: 160,
+                        height: 160,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Outer Pulse Ring 2
+                            ScaleTransition(
+                              scale: _pulseAnimation,
+                              child: Container(
+                                width: 144,
+                                height: 144,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(48),
+                                  border: Border.all(
+                                    color: primaryColor.withValues(alpha: 0.05),
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Outer Pulse Ring 1
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(36),
+                                border: Border.all(
+                                  color: primaryColor.withValues(alpha: 0.1),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            // Main Icon Container
+                            Container(
+                              width: 96,
+                              height: 96,
+                              decoration: BoxDecoration(
+                                color: primaryColor,
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: primaryColor.withValues(alpha: 0.3),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.monitor_heart_outlined,
+                                size: 48,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Brand Wordmark
+                      Text(
+                        'MCS',
+                        style: Theme.of(context).textTheme.displayLarge
+                            ?.copyWith(
+                              fontSize: 40,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -1.0,
+                              height: 1.1,
+                              color: isDark ? Colors.white : primaryColor,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Spacer(),
+
+                // Bottom Section: Loading & Meta
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 48,
+                  ),
+                  child: Column(
+                    children: [
+                      // Minimal Loading Indicator
+                      SizedBox(
+                        width: 160,
+                        height: 6,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            backgroundColor: isDark
+                                ? const Color(0xFF1E293B) // Slate 800
+                                : const Color(0xFFF1F5F9), // Slate 100
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Meta Information
+                      Text(
+                        'Professional Medical Care',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: isDark
+                              ? const Color(0xFF94A3B8) // Slate 400
+                              : const Color(0xFF4C669A), // Stitch Slate Blue
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'v1.0',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: isDark
+                              ? const Color(0xFF475569) // Slate 600
+                              : const Color(0xFFCBD5E1), // Slate 300
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
