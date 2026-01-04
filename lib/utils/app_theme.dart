@@ -102,7 +102,7 @@ class AppTheme {
   static const double buttonHeight = 56.0;
   static const EdgeInsets buttonPadding = EdgeInsets.symmetric(
     horizontal: spacing32,
-    vertical: spacing20,
+    vertical: spacing16,
   );
 
   /// Standard padding for modal bottom sheet headers (title area).

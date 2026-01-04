@@ -25,7 +25,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 /// ```
 class AppTextField extends StatelessWidget {
   /// The label text displayed above the field.
-  final String label;
+  final String? label;
 
   /// The hint text displayed inside the field.
   final String hintText;
@@ -86,7 +86,7 @@ class AppTextField extends StatelessWidget {
 
   const AppTextField({
     super.key,
-    required this.label,
+    this.label,
     required this.hintText,
     required this.controller,
     this.prefixIcon,
@@ -114,24 +114,26 @@ class AppTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Label Row
-        Row(
-          children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            if (isOptional) ...[
-              const SizedBox(width: AppTheme.spacing8),
+        if (label != null) ...[
+          Row(
+            children: [
               Text(
-                optionalText ?? '(Optional)',
-                style: Theme.of(context).textTheme.bodySmall,
+                label!,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
               ),
+              if (isOptional) ...[
+                const SizedBox(width: AppTheme.spacing8),
+                Text(
+                  optionalText ?? '(Optional)',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ],
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacing8),
+          ),
+          const SizedBox(height: AppTheme.spacing8),
+        ],
         // Text Field
         TextFormField(
           controller: controller,
@@ -148,18 +150,9 @@ class AppTextField extends StatelessWidget {
           onFieldSubmitted: onFieldSubmitted,
           decoration: InputDecoration(
             hintText: hintText,
-            prefixIcon: prefixIcon != null
-                ? Icon(
-                    prefixIcon,
-                  )
-                : null,
+            prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
             suffixIcon: suffixIcon != null
-                ? IconButton(
-                    icon: Icon(
-                      suffixIcon,
-                    ),
-                    onPressed: onSuffixIconTap,
-                  )
+                ? IconButton(icon: Icon(suffixIcon), onPressed: onSuffixIconTap)
                 : null,
           ),
           validator: validator,

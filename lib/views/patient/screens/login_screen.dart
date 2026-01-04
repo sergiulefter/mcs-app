@@ -29,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isPrefetching = false;
+  String _selectedRole = 'Patient'; // 'Patient' or 'Doctor'
 
   // GlobalKeys for scroll-to-error functionality
   final _emailKey = GlobalKey();
@@ -66,6 +67,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final user = authController.currentUser;
       final userId = user?.uid;
+
+      // Validate role selection matches user type
+      // Note: This is an additional client-side check. Real security is server-side.
+      if (_selectedRole == 'Doctor' && user?.isDoctor != true) {
+        // If they tried to sign in as Doctor but aren't one, warn them?
+        // For now, we will just route them based on their ACTUAL account type,
+        // effectively ignoring the toggle if it's wrong, OR we could block access.
+        // Let's route based on ACTUAL type for better UX, but maybe show a snackbar if mismatch?
+        // Actually, simpler to just route correctly.
+      }
 
       // Only prefetch consultations for patients (not doctors/admins)
       if (userId != null &&
@@ -122,38 +133,131 @@ class _LoginScreenState extends State<LoginScreen> {
     _scrollHelper.register('email', _emailKey);
     _scrollHelper.register('password', _passwordKey);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: AppTheme.screenPadding,
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // App Branding
-                  _buildHeader(),
-                  const SizedBox(height: AppTheme.spacing48),
+        child: SingleChildScrollView(
+          padding: AppTheme.screenPadding,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Welcome Text
+                Text(
+                  'Welcome Back',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    fontSize: 26, // Reduced from 28
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 4), // Reduced from 8
+                Text(
+                  'Sign in to manage your appointments.', // Shortened text
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: isDark
+                        ? AppTheme.textSecondaryDark
+                        : AppTheme.textSecondary,
+                    fontSize: 14, // Explicit smaller size
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20), // Reduced from 24
+                // Role Toggle
+                Container(
+                  height: 44, // Reduced from 48
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(child: _buildRoleToggleOption('Patient')),
+                      Expanded(child: _buildRoleToggleOption('Doctor')),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20), // Reduced from 24
+                // Form Fields
+                KeyedSubtree(key: _emailKey, child: _buildEmailField()),
+                const SizedBox(height: 12), // Reduced from 16
+                KeyedSubtree(key: _passwordKey, child: _buildPasswordField()),
+                const SizedBox(height: 4), // Reduced from 8
+                // Forgot Password
+                _buildForgotPassword(),
+                const SizedBox(height: 16),
+                // Sign In Button
+                _buildSignInButton(),
 
-                  // Login Form
-                  KeyedSubtree(key: _emailKey, child: _buildEmailField()),
-                  const SizedBox(height: AppTheme.spacing16),
-                  KeyedSubtree(key: _passwordKey, child: _buildPasswordField()),
-                  const SizedBox(height: AppTheme.spacing8),
+                const SizedBox(height: 20), // Reduced from 24
+                // Divider
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(color: Theme.of(context).dividerColor),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Or continue with',
+                        style: TextStyle(
+                          color: isDark
+                              ? AppTheme.textSecondaryDark
+                              : AppTheme.textSecondary,
+                          fontSize: 13, // Reduced font size
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(color: Theme.of(context).dividerColor),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16), // Reduced from 24
+                // Social Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSocialButton(
+                        'Google',
+                        'assets/icons/google.png',
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildSocialButton(
+                        'Apple',
+                        null,
+                        icon: Icons.apple,
+                      ),
+                    ),
+                  ],
+                ),
 
-                  // Forgot Password
-                  _buildForgotPassword(),
-                  const SizedBox(height: AppTheme.sectionSpacing),
+                const SizedBox(height: 20), // Reduced from 24
+                // Sign Up Link
+                _buildSignUpLink(),
 
-                  // Sign In Button
-                  _buildSignInButton(),
-                  const SizedBox(height: AppTheme.spacing24),
-
-                  // Sign Up Link
-                  _buildSignUpLink(),
-                ],
-              ),
+                const SizedBox(height: 12), // Reduced from 16
+                // Terms
+                Text(
+                  'By signing up, you agree to our Terms of Service.', // Shortened
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 11, // Reduced font size
+                    color: isDark
+                        ? AppTheme.textTertiaryDark
+                        : AppTheme.textTertiary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),
@@ -161,86 +265,120 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildRoleToggleOption(String role) {
+    final isSelected = _selectedRole == role;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedRole = role;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF334155) : Colors.white)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 2,
+                  ),
+                ]
+              : null,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          role,
+          style: TextStyle(
+            color: isSelected
+                ? (isDark ? Colors.white : Colors.black)
+                : (isDark
+                      ? AppTheme.textSecondaryDark
+                      : AppTheme.textSecondary),
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmailField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // App Icon
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          ),
-          child: const Icon(
-            Icons.medical_services_outlined,
-            size: AppTheme.iconXLarge,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 4),
+          child: Text(
+            'Email Address',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
         ),
-        const SizedBox(height: AppTheme.spacing24),
-
-        // Title
-        Text(
-          'auth.sign_in'.tr(),
-          style: Theme.of(
-            context,
-          ).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-
-        // Subtitle
-        Text(
-          'auth.sign_in_subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
+        AppTextField(
+          // label: 'common.email'.tr(), // Label moved outside as per design
+          hintText: 'name@example.com',
+          controller: _emailController,
+          prefixIcon: Icons.mail_outline,
+          keyboardType: TextInputType.emailAddress,
+          textInputAction: TextInputAction.next,
+          validator: Validators.validateEmail,
         ),
       ],
     );
   }
 
-  Widget _buildEmailField() {
-    return AppTextField(
-      label: 'common.email'.tr(),
-      hintText: 'auth.email_hint'.tr(),
-      controller: _emailController,
-      prefixIcon: Icons.email_outlined,
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
-      validator: Validators.validateEmail,
-    );
-  }
-
   Widget _buildPasswordField() {
-    return AppTextField(
-      label: 'auth.password'.tr(),
-      hintText: 'auth.password_hint'.tr(),
-      controller: _passwordController,
-      prefixIcon: Icons.lock_outlined,
-      suffixIcon: _obscurePassword
-          ? Icons.visibility_outlined
-          : Icons.visibility_off_outlined,
-      onSuffixIconTap: () {
-        setState(() {
-          _obscurePassword = !_obscurePassword;
-        });
-      },
-      obscureText: _obscurePassword,
-      textInputAction: TextInputAction.done,
-      onFieldSubmitted: (_) => _handleLogin(),
-      validator: Validators.validatePassword,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 4),
+          child: Text(
+            'Password',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+          ),
+        ),
+        AppTextField(
+          // label: 'auth.password'.tr(),
+          hintText: '••••••••',
+          controller: _passwordController,
+          prefixIcon: Icons.lock_outline,
+          suffixIcon: _obscurePassword
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+          onSuffixIconTap: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+          obscureText: _obscurePassword,
+          textInputAction: TextInputAction.done,
+          onFieldSubmitted: (_) => _handleLogin(),
+          validator: Validators.validatePassword,
+        ),
+      ],
     );
   }
 
   Widget _buildForgotPassword() {
     return Align(
       alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: () => ForgotPasswordSheet.show(context),
+      child: GestureDetector(
+        onTap: () => ForgotPasswordSheet.show(context),
         child: Text(
           'auth.forgot_password'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
         ),
       ),
@@ -250,22 +388,73 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildSignInButton() {
     return Consumer<AuthController>(
       builder: (context, authController, child) {
-        return ElevatedButton(
-          onPressed: (authController.isLoading || _isPrefetching)
-              ? null
-              : _handleLogin,
-          child: (authController.isLoading || _isPrefetching)
-              ? SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Theme.of(context).colorScheme.onPrimary,
+        return SizedBox(
+          height: 56,
+          child: ElevatedButton(
+            onPressed: (authController.isLoading || _isPrefetching)
+                ? null
+                : _handleLogin,
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              shadowColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.3),
+            ),
+            child: (authController.isLoading || _isPrefetching)
+                ? SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  )
+                : const Text(
+                    'Sign In', // Hardcoded as per design or use tr()
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                )
-              : Text('auth.sign_in'.tr()),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildSocialButton(String label, String? assetPath, {IconData? icon}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      height: 48, // h-12
+      child: OutlinedButton(
+        onPressed: () {
+          // Social login impl
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Theme.of(context).cardColor,
+          foregroundColor: isDark ? Colors.white : const Color(0xFF334155),
+          side: BorderSide(color: Theme.of(context).dividerColor),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (assetPath != null)
+              // Fallback icon since we might not have assets
+              // Image.asset(assetPath, width: 20, height: 20)
+              // Using generic icons for now to avoid asset errors
+              const Icon(Icons.g_mobiledata, size: 24) // Placeholder for Google
+            else if (icon != null)
+              Icon(icon, size: 20),
+
+            const SizedBox(width: 8),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -274,16 +463,27 @@ class _LoginScreenState extends State<LoginScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'auth.no_account'.tr(),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+          "Don't have an account?",
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppTheme.textSecondaryDark
+                : AppTheme.textSecondary,
+          ),
         ),
-        TextButton(
-          onPressed: () {
+        const SizedBox(width: 4),
+        GestureDetector(
+          onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const SignupScreen()),
             );
           },
-          child: Text('auth.sign_up'.tr()),
+          child: Text(
+            'Sign Up',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );

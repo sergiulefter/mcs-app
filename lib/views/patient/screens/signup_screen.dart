@@ -53,8 +53,6 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     final authController = context.read<AuthController>();
-
-    // Get the current language from EasyLocalization (set in LanguageSelectionScreen)
     final currentLanguage = context.locale.languageCode;
 
     try {
@@ -67,17 +65,16 @@ class _SignupScreenState extends State<SignupScreen> {
 
       if (!mounted) return;
 
-      // Navigate to MainShell first, then push CompleteProfileScreen on top
       final navigator = Navigator.of(context);
-
       navigator.pushReplacement(
         MaterialPageRoute(builder: (context) => const MainShell()),
       );
 
-      // Give user time to see the home screen before prompting to complete profile
       Future.delayed(const Duration(milliseconds: 800), () {
         navigator.push(
-          MaterialPageRoute(builder: (context) => const CompleteProfileScreen()),
+          MaterialPageRoute(
+            builder: (context) => const CompleteProfileScreen(),
+          ),
         );
       });
     } catch (e) {
@@ -88,77 +85,194 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Register fields in order for scroll-to-error
     _scrollHelper.register('name', _nameKey);
     _scrollHelper.register('email', _emailKey);
     _scrollHelper.register('password', _passwordKey);
     _scrollHelper.register('confirmPassword', _confirmPasswordKey);
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-            padding: AppTheme.screenPadding,
+          padding: AppTheme.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Back Button
-                _buildBackButton(),
-                const SizedBox(height: AppTheme.spacing16),
-
-                // App Branding
-                _buildHeader(),
-                const SizedBox(height: AppTheme.sectionSpacing),
-
-                // Signup Form
+                // Welcome Text
+                Text(
+                  'Create Account',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    fontSize: 28, // Reduced font size
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Sign up to get started with your medical consultations.',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: isDark
+                        ? AppTheme.textSecondaryDark
+                        : AppTheme.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24), // Reduced from 32
+                // Form Fields
                 KeyedSubtree(
                   key: _nameKey,
-                  child: AppTextField(
-                    label: 'common.full_name'.tr(),
-                    hintText: 'auth.name_hint'.tr(),
-                    controller: _nameController,
-                    prefixIcon: Icons.person_outlined,
-                    keyboardType: TextInputType.name,
-                    textInputAction: TextInputAction.next,
-                    textCapitalization: TextCapitalization.words,
-                    validator: Validators.validateName,
+                  child: _buildLabelledField(
+                    'Full Name',
+                    AppTextField(
+                      hintText: 'John Doe',
+                      controller: _nameController,
+                      prefixIcon: Icons.person_outline,
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      textCapitalization: TextCapitalization.words,
+                      validator: Validators.validateName,
+                    ),
                   ),
                 ),
-                const SizedBox(height: AppTheme.spacing16),
+                const SizedBox(height: 16),
 
                 KeyedSubtree(
                   key: _emailKey,
-                  child: AppTextField(
-                    label: 'common.email'.tr(),
-                    hintText: 'auth.email_hint'.tr(),
-                    controller: _emailController,
-                    prefixIcon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
-                    validator: Validators.validateEmail,
+                  child: _buildLabelledField(
+                    'Email Address',
+                    AppTextField(
+                      hintText: 'name@example.com',
+                      controller: _emailController,
+                      prefixIcon: Icons.mail_outline,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      validator: Validators.validateEmail,
+                    ),
                   ),
                 ),
-                const SizedBox(height: AppTheme.spacing16),
+                const SizedBox(height: 16),
 
                 KeyedSubtree(
                   key: _passwordKey,
-                  child: _buildPasswordField(),
+                  child: _buildLabelledField(
+                    'Password',
+                    AppTextField(
+                      hintText: '••••••••',
+                      controller: _passwordController,
+                      prefixIcon: Icons.lock_outline,
+                      suffixIcon: _obscurePassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      onSuffixIconTap: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      obscureText: _obscurePassword,
+                      textInputAction: TextInputAction.next,
+                      validator: Validators.validatePassword,
+                    ),
+                  ),
                 ),
-                const SizedBox(height: AppTheme.spacing16),
+                const SizedBox(height: 16),
 
                 KeyedSubtree(
                   key: _confirmPasswordKey,
-                  child: _buildConfirmPasswordField(),
+                  child: _buildLabelledField(
+                    'Confirm Password',
+                    AppTextField(
+                      hintText: '••••••••',
+                      controller: _confirmPasswordController,
+                      prefixIcon: Icons.lock_outline,
+                      suffixIcon: _obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      onSuffixIconTap: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                      obscureText: _obscureConfirmPassword,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _handleSignup(),
+                      validator: (value) => Validators.validateConfirmPassword(
+                        value,
+                        _passwordController.text,
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: AppTheme.sectionSpacing),
 
+                const SizedBox(height: 24), // Reduced from 32
                 // Sign Up Button
                 _buildSignUpButton(),
-                const SizedBox(height: AppTheme.spacing24),
 
+                const SizedBox(height: 24), // Reduced from 32
+                // Divider
+                Row(
+                  children: [
+                    Expanded(
+                      child: Divider(color: Theme.of(context).dividerColor),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        'Or continue with',
+                        style: TextStyle(
+                          color: isDark
+                              ? AppTheme.textSecondaryDark
+                              : AppTheme.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(color: Theme.of(context).dividerColor),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16), // Reduced from 24
+                // Social Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSocialButton(
+                        'Google',
+                        'assets/icons/google.png',
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildSocialButton(
+                        'Apple',
+                        null,
+                        icon: Icons.apple,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24), // Reduced from 32
                 // Sign In Link
                 _buildSignInLink(),
+
+                const SizedBox(height: 16), // Reduced from 24
+                // Terms
+                Text(
+                  'By signing up, you agree to our Terms of Service and Privacy Policy.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    color: isDark
+                        ? AppTheme.textTertiaryDark
+                        : AppTheme.textTertiary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
@@ -167,139 +281,20 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildBackButton() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: IconButton(
-        onPressed: () => Navigator.of(context).pop(),
-        icon: const Icon(
-          Icons.arrow_back,
-        ),
-        style: IconButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          minimumSize: const Size(48, 48),
-          padding: const EdgeInsets.all(AppTheme.spacing12),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
+  Widget _buildLabelledField(String label, Widget child) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // App Icon
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          ),
-          child: Icon(
-            Icons.medical_services_outlined,
-            size: AppTheme.iconXLarge,
-            color: Theme.of(context).colorScheme.primary,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 4),
+          child: Text(
+            label, // We use hardcoded English here as per design request for now, or match keys if strict
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
         ),
-        const SizedBox(height: AppTheme.spacing24),
-
-        // Title
-        Text(
-          'auth.sign_up'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-
-        // Subtitle
-        Text(
-          'auth.sign_up_subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.password'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _passwordController,
-          obscureText: _obscurePassword,
-          textInputAction: TextInputAction.next,
-          decoration: InputDecoration(
-            hintText: 'auth.create_password_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.lock_outlined,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
-            ),
-          ),
-          validator: Validators.validatePassword,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildConfirmPasswordField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'auth.confirm_password'.tr(),
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        TextFormField(
-          controller: _confirmPasswordController,
-          obscureText: _obscureConfirmPassword,
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (_) => _handleSignup(),
-          decoration: InputDecoration(
-            hintText: 'auth.confirm_password_hint'.tr(),
-            prefixIcon: const Icon(
-              Icons.lock_outlined,
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _obscureConfirmPassword
-                    ? Icons.visibility_outlined
-                    : Icons.visibility_off_outlined,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
-            ),
-          ),
-          validator: (value) => Validators.validateConfirmPassword(
-            value,
-            _passwordController.text,
-          ),
-        ),
+        child,
       ],
     );
   }
@@ -307,20 +302,68 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget _buildSignUpButton() {
     return Consumer<AuthController>(
       builder: (context, authController, child) {
-        return ElevatedButton(
-          onPressed: authController.isLoading ? null : _handleSignup,
-          child: authController.isLoading
-              ? SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Theme.of(context).colorScheme.onPrimary,
+        return SizedBox(
+          height: 56,
+          child: ElevatedButton(
+            onPressed: authController.isLoading ? null : _handleSignup,
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              shadowColor: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.3),
+            ),
+            child: authController.isLoading
+                ? SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  )
+                : const Text(
+                    'Sign Up',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                )
-              : Text('auth.sign_up'.tr()),
+          ),
         );
       },
+    );
+  }
+
+  Widget _buildSocialButton(String label, String? assetPath, {IconData? icon}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      height: 48,
+      child: OutlinedButton(
+        onPressed: () {
+          // Social login impl
+        },
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Theme.of(context).cardColor,
+          foregroundColor: isDark ? Colors.white : const Color(0xFF334155),
+          side: BorderSide(color: Theme.of(context).dividerColor),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (assetPath != null)
+              const Icon(Icons.g_mobiledata, size: 24)
+            else if (icon != null)
+              Icon(icon, size: 20),
+
+            const SizedBox(width: 8),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -329,12 +372,23 @@ class _SignupScreenState extends State<SignupScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'auth.have_account'.tr(),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+          'Already have an account?',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppTheme.textSecondaryDark
+                : AppTheme.textSecondary,
+          ),
         ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('auth.sign_in'.tr()),
+        const SizedBox(width: 4),
+        GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Text(
+            'Sign In',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );
