@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 
+/// Horizontal scrollable pill-style segment filter for doctor requests.
 class DoctorRequestSegmentFilter extends StatelessWidget {
   final String selectedSegment;
   final ValueChanged<String> onSegmentChanged;
@@ -22,77 +23,41 @@ class DoctorRequestSegmentFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing16,
-        vertical: AppTheme.spacing12,
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.spacing16,
+        AppTheme.spacing8,
+        AppTheme.spacing16,
+        AppTheme.spacing16,
       ),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(color: Theme.of(context).dividerColor),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Segmented control
-          Expanded(
-            child: Container(
-              height: 40,
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-              ),
-              child: Row(
-                children: [
-                  _buildSegment(
-                    context,
-                    key: 'in_progress',
-                    label: 'common.status.in_review'.tr(),
-                  ),
-                  const SizedBox(width: 6),
-                  _buildSegment(
-                    context,
-                    key: 'new',
-                    label: 'doctor.requests.segments.new'.tr(),
-                  ),
-                  const SizedBox(width: 6),
-                  _buildSegment(
-                    context,
-                    key: 'completed',
-                    label: 'common.status.completed'.tr(),
-                  ),
-                ],
-              ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildPillButton(
+              context,
+              key: 'new',
+              label: 'doctor.requests.segments.new'.tr(),
             ),
-          ),
-
-          // Filter icon button
-          if (onFilterTap != null) ...[
             const SizedBox(width: AppTheme.spacing12),
-            IconButton(
-              onPressed: onFilterTap,
-              icon: Icon(
-                Icons.tune,
-                color: colorScheme.onSurfaceVariant,
-              ),
-              style: IconButton.styleFrom(
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                ),
-              ),
+            _buildPillButton(
+              context,
+              key: 'in_progress',
+              label: 'doctor.requests.segments.in_progress'.tr(),
+            ),
+            const SizedBox(width: AppTheme.spacing12),
+            _buildPillButton(
+              context,
+              key: 'completed',
+              label: 'doctor.requests.segments.completed'.tr(),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildSegment(
+  Widget _buildPillButton(
     BuildContext context, {
     required String key,
     required String label,
@@ -100,52 +65,38 @@ class DoctorRequestSegmentFilter extends StatelessWidget {
     final isSelected = selectedSegment == key;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Expanded(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => onSegmentChanged(key),
-          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              color: isSelected ? colorScheme.primary : Colors.transparent,
-              borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-              border: Border.all(
-                color: isSelected
-                    ? colorScheme.primary
-                    : Theme.of(context).dividerColor,
-                width: 1,
-              ),
-              boxShadow: isSelected
-                  ? [
-                      BoxShadow(
-                        color: colorScheme.primary.withValues(alpha: 0.3),
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                child: Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: isSelected
-                            ? colorScheme.onPrimary
-                            : colorScheme.onSurfaceVariant,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
-                        fontSize: 12,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
+    return GestureDetector(
+      onTap: () => onSegmentChanged(key),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.spacing16,
+          vertical: AppTheme.spacing8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? colorScheme.primary : colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+          border: isSelected
+              ? null
+              : Border.all(color: Theme.of(context).dividerColor),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: isSelected
+                ? colorScheme.onPrimary
+                : colorScheme.onSurfaceVariant,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ),

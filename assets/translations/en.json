@@ -676,7 +676,10 @@
     "away_until": "Away until {date}",
     "urgency": {
       "standard": "Standard",
-      "priority": "Priority"
+      "priority": "Priority",
+      "high": "High",
+      "moderate": "Moderate",
+      "low": "Low"
     },
     "availability": {
       "available": "Available",
@@ -884,12 +887,17 @@
     },
     "requests": {
       "title": "Consultation Requests",
+      "incoming_title": "Incoming Requests",
       "coming_soon_desc": "The consultation requests feature is being developed and will be available soon.",
       "empty_title": "No requests yet",
       "empty_subtitle": "New consultation requests will appear here once patients submit them.",
       "patient_unknown": "Patient",
+      "end_of_requests": "End of requests",
+      "review_button": "Review",
       "segments": {
-        "new": "New"
+        "new": "New",
+        "in_progress": "In Progress",
+        "completed": "Completed"
       },
       "empty": {
         "new_title": "No new requests",

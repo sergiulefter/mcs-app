@@ -676,7 +676,10 @@
     "away_until": "Plecat până la {date}",
     "urgency": {
       "standard": "Standard",
-      "priority": "Prioritate"
+      "priority": "Prioritate",
+      "high": "Ridicat",
+      "moderate": "Moderat",
+      "low": "Scăzut"
     },
     "availability": {
       "available": "Disponibil",
@@ -884,12 +887,17 @@
     },
     "requests": {
       "title": "Cereri de Consultație",
+      "incoming_title": "Cereri Primite",
       "coming_soon_desc": "Funcția de cereri de consultație este în dezvoltare și va fi disponibilă în curând.",
       "empty_title": "Nicio cerere încă",
       "empty_subtitle": "Cererile noi de consultație vor apărea aici când pacienții le trimit.",
       "patient_unknown": "Pacient",
+      "end_of_requests": "Sfârșitul cererilor",
+      "review_button": "Revizuiește",
       "segments": {
-        "new": "Noi"
+        "new": "Noi",
+        "in_progress": "În Curs",
+        "completed": "Finalizate"
       },
       "empty": {
         "new_title": "Nicio cerere nouă",
