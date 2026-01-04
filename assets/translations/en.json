@@ -67,7 +67,7 @@
     "system_default": "System Default",
     "support": "Support",
     "privacy_security": "Privacy & Security",
-    "app_version": "MediConnect App v{version} (Build {build})",
+    "app_version": "Medical Correct Solution App v{version} (Build {build})",
     "date_of_birth": "Date of Birth",
     "date_of_birth_hint": "Select your date of birth",
     "sex": "Sex",
