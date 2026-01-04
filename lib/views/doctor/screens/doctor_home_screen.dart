@@ -9,13 +9,16 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
 import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_notifications_screen.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 import 'package:mcs_app/views/patient/widgets/home/home_sections.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 
 /// Doctor home screen - Dashboard with stats, availability, and recent requests
 class DoctorHomeScreen extends StatefulWidget {
-  const DoctorHomeScreen({super.key});
+  const DoctorHomeScreen({super.key, this.onNavigateToRequests});
+
+  final VoidCallback? onNavigateToRequests;
 
   @override
   State<DoctorHomeScreen> createState() => _DoctorHomeScreenState();
@@ -264,7 +267,12 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               iconSize: 20,
               color: colorScheme.onSurfaceVariant,
               onPressed: () {
-                // TODO: Navigate to notifications
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DoctorNotificationsScreen(),
+                  ),
+                );
               },
             ),
           ),
@@ -513,9 +521,10 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               color: labelColor ?? colorScheme.onSurfaceVariant,
               fontWeight: isHighlighted ? FontWeight.w700 : FontWeight.w500,
-              fontSize: 10,
+              fontSize: 12,
+              height: 1.1,
             ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -572,9 +581,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
               const Spacer(),
               // View All button
               TextButton(
-                onPressed: () {
-                  // TODO: Navigate to all requests
-                },
+                onPressed: widget.onNavigateToRequests,
                 child: Text(
                   'doctor.home.view_all'.tr(),
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(

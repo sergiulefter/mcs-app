@@ -27,7 +27,6 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
   late final DoctorProfileController _doctorProfileController;
 
   // List of screens - using IndexedStack to preserve state
-  late final List<Widget> _screens;
 
   void _onTabTapped(int index) {
     setState(() {
@@ -47,17 +46,21 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
         _doctorProfileController.prime(doctorId);
       }
     });
-    _screens = [
+    _currentIndex = widget.initialIndex;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Depend on locale so nav labels update immediately when language changes
+    final locale = context.locale;
+
+    final screens = [
       MultiProvider(
         providers: [
-          ChangeNotifierProvider.value(
-            value: _doctorProfileController,
-          ),
-          ChangeNotifierProvider.value(
-            value: _doctorConsultationsController,
-          ),
+          ChangeNotifierProvider.value(value: _doctorProfileController),
+          ChangeNotifierProvider.value(value: _doctorConsultationsController),
         ],
-        child: const DoctorHomeScreen(),
+        child: DoctorHomeScreen(onNavigateToRequests: () => _onTabTapped(1)),
       ),
       ChangeNotifierProvider.value(
         value: _doctorConsultationsController,
@@ -72,23 +75,13 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
         child: const DoctorAccountScreen(),
       ),
     ];
-    _currentIndex = widget.initialIndex.clamp(0, _screens.length - 1);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Depend on locale so nav labels update immediately when language changes
-    final locale = context.locale;
 
     return Scaffold(
       body: Column(
         children: [
           const ConnectivityBanner(),
           Expanded(
-            child: IndexedStack(
-              index: _currentIndex,
-              children: _screens,
-            ),
+            child: IndexedStack(index: _currentIndex, children: screens),
           ),
         ],
       ),
