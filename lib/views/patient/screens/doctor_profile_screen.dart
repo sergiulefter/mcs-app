@@ -629,11 +629,11 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
-                disabledBackgroundColor: colorScheme.onSurface.withOpacity(
-                  0.12,
+                disabledBackgroundColor: colorScheme.onSurface.withValues(
+                  alpha: 0.12,
                 ),
-                disabledForegroundColor: colorScheme.onSurface.withOpacity(
-                  0.38,
+                disabledForegroundColor: colorScheme.onSurface.withValues(
+                  alpha: 0.38,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
