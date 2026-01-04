@@ -1,22 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
-import 'package:mcs_app/controllers/consultations_controller.dart';
-import 'package:mcs_app/controllers/theme_controller.dart';
-import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/utils/seed_dev_data.dart';
-import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
-import 'package:mcs_app/views/patient/widgets/cards/action_tile.dart';
-import 'package:mcs_app/views/patient/widgets/cards/language_selection_card.dart';
-import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
-import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
-import 'package:mcs_app/views/patient/widgets/cards/user_header_card.dart';
-import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
-import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
-import 'login_screen.dart';
-import 'patient_profile_edit_screen.dart';
+import 'package:mcs_app/models/user_model.dart';
+import 'package:mcs_app/views/patient/screens/settings_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -25,6 +12,7 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authController = context.watch<AuthController>();
     final user = authController.currentUser;
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (user == null) {
       return Scaffold(
@@ -38,415 +26,450 @@ class AccountScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-            padding: AppTheme.screenPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User Header Section
-              UserHeaderCard(
-                displayName: user.displayName ?? '',
-                email: user.email,
-                photoUrl: user.photoUrl,
-                userType: user.userType,
-                isDoctor: user.isDoctor,
-                fallbackName: 'account.not_set'.tr(),
+        child: Column(
+          children: [
+            // Header
+            _buildHeader(context, user),
+
+            // Scrollable Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(
+                  24,
+                  8,
+                  24,
+                  100,
+                ), // Extra bottom padding for nav
+                child: Column(
+                  children: [
+                    // Profile Overview (Avatar + Name)
+                    _buildProfileOverview(context, user),
+                    const SizedBox(height: 32),
+
+                    // Cards
+                    _buildInfoCard(
+                      context,
+                      title: 'profile.contact_info'.tr(),
+                      icon: Icons.contact_mail_outlined,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          label: 'common.email'.tr(),
+                          value: user.email,
+                          isFirst: true,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          label: 'common.phone'.tr(),
+                          value: user.phone ?? 'account.not_provided'.tr(),
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildInfoCard(
+                      context,
+                      title: 'profile.personal_details'.tr(),
+                      icon: Icons.badge_outlined,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          label: 'account.date_of_birth'.tr(),
+                          value: user.dateOfBirth != null
+                              ? DateFormat(
+                                  'MMM d, yyyy',
+                                  context.locale.toString(),
+                                ).format(user.dateOfBirth!)
+                              : 'account.not_provided'.tr(),
+                          isFirst: true,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          label: 'account.sex'.tr(),
+                          value: user.gender != null
+                              ? 'profile.${user.gender}'.tr()
+                              : 'account.not_provided'.tr(),
+                        ),
+                        _buildInfoRow(
+                          context,
+                          label: 'common.languages'.tr(),
+                          value: _getLanguageName(user.preferredLanguage),
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    _buildMedicalBasicsCard(context, user),
+
+                    const SizedBox(height: 16),
+                    Text(
+                      'profile.medical_records_updated'.tr(
+                        namedArgs: {
+                          'date': DateFormat(
+                            'MMM d, h:mm a',
+                          ).format(DateTime.now()), // Placeholder logic for now
+                        },
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: AppTheme.sectionSpacing),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              // Profile Details Section
-              SectionHeader(title: 'common.profile_details'.tr()),
-              const SizedBox(height: AppTheme.spacing16),
-              _buildProfileDetailsCard(context, user),
-              const SizedBox(height: AppTheme.sectionSpacing),
-
-              // Quick Actions Section
-              SectionHeader(title: 'common.quick_actions'.tr()),
-              const SizedBox(height: AppTheme.spacing16),
-              _buildQuickActionsCard(context),
-              const SizedBox(height: AppTheme.sectionSpacing),
-
-              // Admin Panel Section (only for admin users)
-              if (user.userType == 'admin') ...[
-                SectionHeader(title: 'admin.admin_panel_section'.tr()),
-                const SizedBox(height: AppTheme.spacing16),
-                _buildAdminPanelCard(context),
-                const SizedBox(height: AppTheme.sectionSpacing),
-              ],
-
-              // Account Section
-              SectionHeader(title: 'account.account_section'.tr()),
-              const SizedBox(height: AppTheme.spacing16),
-              _buildAccountCard(context, user),
-              const SizedBox(height: AppTheme.sectionSpacing),
-
-              // Debug Section (only in debug mode)
-              if (kDebugMode) ...[
-                _buildDebugSection(context),
-                const SizedBox(height: AppTheme.sectionSpacing),
-              ],
-
-              // Sign Out Button
-              _buildSignOutButton(context),
-              const SizedBox(height: AppTheme.spacing16),
-            ],
+  Widget _buildHeader(BuildContext context, UserModel user) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(width: 40), // Spacer for centering title
+          Text(
+            'profile.profile_setup'.tr(), // "My Profile" equivalent title
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileDetailsCard(BuildContext context, dynamic user) {
-    final notProvidedText = 'account.not_provided'.tr();
-    final localeName = context.locale.toLanguageTag();
-
-    return ListCard(
-      padding: EdgeInsets.zero,
-      children: [
-        ProfileDetailRow(
-          icon: Icons.cake_outlined,
-          label: 'account.date_of_birth'.tr(),
-          value: user.dateOfBirth != null
-              ? DateFormat('dd MMMM yyyy', localeName).format(user.dateOfBirth!)
-              : notProvidedText,
-          notProvidedText: notProvidedText,
-        ),
-        ProfileDetailRow(
-          icon: Icons.wc_outlined,
-          label: 'account.sex'.tr(),
-          value: user.gender != null ? 'profile.${user.gender}'.tr() : notProvidedText,
-          notProvidedText: notProvidedText,
-        ),
-        ProfileDetailRow(
-          icon: Icons.phone_outlined,
-          label: 'common.phone'.tr(),
-          value: user.phone ?? notProvidedText,
-          notProvidedText: notProvidedText,
-        ),
-        ProfileDetailRow(
-          icon: Icons.language_outlined,
-          label: 'account.preferred_language'.tr(),
-          value: _getLanguageName(user.preferredLanguage),
-        ),
-        ProfileDetailRow(
-          icon: Icons.calendar_today_outlined,
-          label: 'account.member_since'.tr(),
-          value: DateFormat('dd MMMM yyyy', localeName).format(user.createdAt),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActionsCard(BuildContext context) {
-    return ListCard(
-      padding: EdgeInsets.zero,
-      children: [
-        ActionTile(
-          icon: Icons.edit_outlined,
-          title: 'account.edit_profile'.tr(),
-          subtitle: 'account.edit_profile_desc'.tr(),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const PatientProfileEditScreen(),
+          SizedBox(
+            width: 40,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsScreen(),
+                    ),
+                  );
+                },
+                style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  shape: const CircleBorder(),
+                ),
               ),
-            );
-          },
-        ),
-        ActionTile(
-          icon: Icons.language_outlined,
-          title: 'account.change_language'.tr(),
-          subtitle: 'account.change_language_desc'.tr(),
-          onTap: () => _showLanguageDialog(context),
-        ),
-        Consumer<ThemeController>(
-          builder: (context, themeController, _) {
-            return ActionTile(
-              icon: Icons.palette_outlined,
-              title: 'account.appearance'.tr(),
-              subtitle: themeController.getThemeModeName(context),
-              onTap: () => _showThemeDialog(context, themeController),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAccountCard(BuildContext context, dynamic user) {
-    return SurfaceCard(
-      padding: EdgeInsets.zero,
-      child: ActionTile(
-        icon: Icons.lock_outline,
-        title: 'account.change_password'.tr(),
-        subtitle: 'account.change_password_desc'.tr(),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('account.change_password_coming_soon'.tr()),
-              backgroundColor: Theme.of(context).colorScheme.primary,
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildAdminPanelCard(BuildContext context) {
-    return SurfaceCard(
-      padding: EdgeInsets.zero,
-      child: ActionTile(
-        icon: Icons.admin_panel_settings_outlined,
-        title: 'admin.go_to_admin_panel'.tr(),
-        subtitle: 'admin.go_to_admin_panel_desc'.tr(),
-        onTap: () {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const AdminDashboardScreen(),
-            ),
-            (route) => false,
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildDebugSection(BuildContext context) {
+  Widget _buildProfileOverview(BuildContext context, UserModel user) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SurfaceCard(
-      padding: EdgeInsets.zero,
-      borderColor: colorScheme.error,
-      borderWidth: 2,
+    return Column(
+      children: [
+        // Avatar
+        Container(
+          width: 128,
+          height: 128,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: user.photoUrl == null ? colorScheme.primaryContainer : null,
+            border: Border.all(color: colorScheme.surface, width: 4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
+            image: user.photoUrl != null
+                ? DecorationImage(
+                    image: NetworkImage(user.photoUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          child: user.photoUrl == null
+              ? Icon(
+                  Icons.person,
+                  size: 64,
+                  color: colorScheme.onPrimaryContainer,
+                )
+              : null,
+        ),
+        const SizedBox(height: 16),
+
+        // Name
+        Text(
+          user.displayName ?? 'User',
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+
+        // ID Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: colorScheme.primary.withValues(alpha: 0.1),
+            ),
+          ),
+          child: Text(
+            'Patient ID: #${user.uid.substring(0, 5).toUpperCase()}',
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            spreadRadius: 1,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(AppTheme.spacing16),
-            decoration: BoxDecoration(
-              color: colorScheme.errorContainer,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(AppTheme.radiusSmall),
-                topRight: Radius.circular(AppTheme.radiusSmall),
-              ),
+          // Card Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Icon(icon, color: colorScheme.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
             ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1F2937) // gray-800
+                : const Color(0xFFF9FAFB), // gray-50
+          ),
+          // Content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Column(children: children),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: !isLast
+            ? Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1F2937) // gray-800
+                      : const Color(0xFFF9FAFB), // gray-50
+                ),
+              )
+            : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w500,
+              color: colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMedicalBasicsCard(BuildContext context, UserModel user) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            spreadRadius: 1,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
                 Icon(
-                  Icons.bug_report,
-                  color: colorScheme.onErrorContainer,
+                  Icons.monitor_heart_outlined,
+                  color: colorScheme.primary,
+                  size: 20,
                 ),
-                const SizedBox(width: AppTheme.spacing12),
+                const SizedBox(width: 8),
                 Text(
-                  'Debug Tools',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onErrorContainer,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  'profile.medical_basics'.tr().toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
                 ),
               ],
             ),
           ),
-          ActionTile(
-            icon: Icons.cloud_download_outlined,
-            title: 'Seed Dev Data (Doctors + Consultations)',
-            subtitle: 'Bulk seed hundreds of doctors & consultations (dev only)',
-            onTap: () => _handleSeedDevData(context),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1F2937) // gray-800
+                : const Color(0xFFF9FAFB), // gray-50
+          ),
+          // Grid Content
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              children: [
+                _buildMedicalItem(
+                  context,
+                  label: 'profile.height'.tr(),
+                  value: user.height ?? '-',
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFF9FAFB),
+                ),
+                _buildMedicalItem(
+                  context,
+                  label: 'profile.weight'.tr(),
+                  value: user.weight ?? '-',
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFF9FAFB),
+                ),
+                _buildMedicalItem(
+                  context,
+                  label: 'profile.blood_type'.tr(),
+                  value: user.bloodType ?? '-',
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSignOutButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () => _handleSignOut(context),
-        icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-        label: Text(
-          'auth.sign_out'.tr(),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Theme.of(context).colorScheme.error),
-          padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
-        ),
-      ),
-    );
-  }
+  Widget _buildMedicalItem(
+    BuildContext context, {
+    required String label,
+    required String value,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-  void _showLanguageDialog(BuildContext context) {
-    String selectedLocale = context.locale.languageCode;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('account.select_language'.tr()),
-        content: StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LanguageSelectionCard(
-                languageName: 'English',
-                languageCode: 'en',
-                isSelected: selectedLocale == 'en',
-                onTap: () async {
-                  setState(() => selectedLocale = 'en'); // instant UI feedback
-                  await dialogContext.setLocale(const Locale('en'));
-                  if (!dialogContext.mounted) return;
-                  final authController = context.read<AuthController>();
-                  await authController.updatePreferredLanguage('en');
-                },
-              ),
-              const SizedBox(height: AppTheme.spacing12),
-              LanguageSelectionCard(
-                languageName: 'Română',
-                languageCode: 'ro',
-                isSelected: selectedLocale == 'ro',
-                onTap: () async {
-                  setState(() => selectedLocale = 'ro'); // instant UI feedback
-                  await dialogContext.setLocale(const Locale('ro'));
-                  if (!dialogContext.mounted) return;
-                  final authController = context.read<AuthController>();
-                  await authController.updatePreferredLanguage('ro');
-                },
-              ),
-            ],
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('common.close'.tr()),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _handleSeedDevData(BuildContext context) async {
-    final authController = context.read<AuthController>();
-    final currentUser = authController.currentUser;
-    if (currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('auth.no_user_logged_in'.tr()),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Seeding dev data...'),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-      ),
-    );
-
-    try {
-      // Run the seeder script (requires Firebase initialized)
-      // Using specific patient UUID for dev testing
-      const devPatientId = 'cX0vbVAD3CYbdy4mX2uIB6ABCWm1';
-      await Future.sync(() => runDevSeeder(patientId: devPatientId));
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Dev data seeded successfully'),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Seeding failed: $e'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
-  }
-
-  void _showThemeDialog(BuildContext context, ThemeController themeController) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('account.select_theme'.tr()),
-        content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioMenuButton<ThemeMode>(
-                value: ThemeMode.light,
-                groupValue: themeController.themeMode,
-                onChanged: (value) {
-                  if (value != null) {
-                    themeController.setThemeMode(value);
-                  }
-                },
-                child: Text('account.light_mode'.tr()),
-              ),
-              RadioMenuButton<ThemeMode>(
-                value: ThemeMode.dark,
-                groupValue: themeController.themeMode,
-                onChanged: (value) {
-                  if (value != null) {
-                    themeController.setThemeMode(value);
-                  }
-                },
-                child: Text('account.dark_mode'.tr()),
-              ),
-              RadioMenuButton<ThemeMode>(
-                value: ThemeMode.system,
-                groupValue: themeController.themeMode,
-                onChanged: (value) {
-                  if (value != null) {
-                    themeController.setThemeMode(value);
-                  }
-                },
-                child: Text('account.system_mode'.tr()),
-              ),
-            ],
-          ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('common.cancel'.tr()),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _handleSignOut(BuildContext context) async {
-    final authController = context.read<AuthController>();
-    final consultationsController = context.read<ConsultationsController>();
-
-    // Clear cached data before signing out
-    consultationsController.clear();
-    await authController.signOut();
-
-    if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
-  }
-
-  String _getLanguageName(String languageCode) {
-    switch (languageCode) {
-      case 'ro':
-        return 'Română';
-      case 'en':
-      default:
-        return 'English';
-    }
+  String _getLanguageName(String code) {
+    if (code == 'ro') return 'Română';
+    return 'English';
   }
 }
-

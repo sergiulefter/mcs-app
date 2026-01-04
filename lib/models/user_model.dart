@@ -15,6 +15,11 @@ class UserModel {
   final String userType;
   final bool profileCompleted;
 
+  // Medical Basics
+  final String? height;
+  final String? weight;
+  final String? bloodType;
+
   // Runtime flag - set when user is loaded from doctors collection
   // This is NOT stored in Firestore
   final bool isDoctor;
@@ -31,6 +36,9 @@ class UserModel {
     this.preferredLanguage = 'en',
     this.userType = 'patient',
     this.profileCompleted = false,
+    this.height,
+    this.weight,
+    this.bloodType,
     this.isDoctor = false,
   });
 
@@ -59,6 +67,9 @@ class UserModel {
       preferredLanguage: map['preferredLanguage'] ?? 'en',
       userType: map['userType'] ?? 'patient',
       profileCompleted: map['profileCompleted'] ?? false,
+      height: map['height'],
+      weight: map['weight'],
+      bloodType: map['bloodType'],
     );
   }
 
@@ -80,12 +91,17 @@ class UserModel {
       'displayName': displayName,
       'photoUrl': photoUrl,
       'createdAt': Timestamp.fromDate(createdAt),
-      'dateOfBirth': dateOfBirth != null ? Timestamp.fromDate(dateOfBirth!) : null,
+      'dateOfBirth': dateOfBirth != null
+          ? Timestamp.fromDate(dateOfBirth!)
+          : null,
       'gender': gender,
       'phone': phone,
       'preferredLanguage': preferredLanguage,
       'userType': userType,
       'profileCompleted': profileCompleted,
+      'height': height,
+      'weight': weight,
+      'bloodType': bloodType,
     };
   }
 
@@ -102,6 +118,9 @@ class UserModel {
     String? preferredLanguage,
     String? userType,
     bool? profileCompleted,
+    String? height,
+    String? weight,
+    String? bloodType,
     bool? isDoctor,
   }) {
     return UserModel(
@@ -116,6 +135,9 @@ class UserModel {
       preferredLanguage: preferredLanguage ?? this.preferredLanguage,
       userType: userType ?? this.userType,
       profileCompleted: profileCompleted ?? this.profileCompleted,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      bloodType: bloodType ?? this.bloodType,
       isDoctor: isDoctor ?? this.isDoctor,
     );
   }
