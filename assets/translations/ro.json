@@ -990,13 +990,22 @@
     "calendar": {
       "title": "Calendar",
       "coming_soon_desc": "Funcția de calendar și programare este în dezvoltare și va fi disponibilă în curând.",
+      "today_button": "Azi",
       "view_label": "Vizualizare",
       "view_month": "Lună",
       "view_week": "Săptămână",
       "day_overview": "Rezumatul zilei",
       "no_consultations_title": "Nicio consultație în această zi",
       "no_consultations_subtitle": "Selectează altă dată pentru a vedea programul.",
-      "vacation_badge": "Concediu"
+      "vacation_badge": "Concediu",
+      "filters": {
+        "all": "Toate",
+        "pending": "În Așteptare",
+        "completed": "Finalizate"
+      },
+      "requested_for": "Solicitat pentru {time}",
+      "resolved_at": "Rezolvat la {time}",
+      "details_button": "Detalii"
     },
     "account": {
       "price": "Preț consultație",

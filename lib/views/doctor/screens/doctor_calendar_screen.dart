@@ -7,14 +7,12 @@ import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
-import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
-import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
-import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 /// Doctor-facing calendar view for consultations and availability.
+/// Modern design matching the HTML/CSS stitch.
 class DoctorCalendarScreen extends StatefulWidget {
   const DoctorCalendarScreen({super.key});
 
@@ -29,7 +27,6 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
   bool _isDoctorLoading = true;
   bool _initialized = false;
 
-  CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay = DateTime.now();
 
@@ -75,13 +72,16 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     await _primeData(force: true);
   }
 
+  void _goToToday() {
+    setState(() {
+      _selectedDay = DateTime.now();
+      _focusedDay = DateTime.now();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('doctor.calendar.title'.tr()),
-        automaticallyImplyLeading: false,
-      ),
       body: SafeArea(
         child: Consumer<DoctorConsultationsController>(
           builder: (context, controller, _) {
@@ -89,8 +89,9 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            final filteredConsultations =
-                _applyStatusFilter(controller.consultations);
+            final filteredConsultations = _applyStatusFilter(
+              controller.consultations,
+            );
             final eventsByDay = _groupByDay(filteredConsultations);
             final selectedEvents = _selectedDay != null
                 ? eventsByDay[_dayKey(_selectedDay!)] ?? const []
@@ -98,17 +99,28 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
 
             return RefreshIndicator(
               onRefresh: _refresh,
-              child: ListView(
+              child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: AppTheme.screenPadding,
-                children: [
-                  _buildViewToggle(context),
-                  const SizedBox(height: AppTheme.spacing16),
-                  _buildStatusFilters(context),
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildCalendar(context, eventsByDay),
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildDaySummary(context, selectedEvents),
+                slivers: [
+                  // Header with month/year and Today button
+                  SliverToBoxAdapter(child: _buildHeader(context)),
+
+                  // Calendar grid
+                  SliverToBoxAdapter(
+                    child: _buildCalendar(context, eventsByDay),
+                  ),
+
+                  // Status filter pills
+                  SliverToBoxAdapter(child: _buildStatusFilters(context)),
+
+                  // Selected day header and consultations
+                  SliverToBoxAdapter(
+                    child: _buildDaySummary(
+                      context,
+                      selectedEvents,
+                      controller,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -118,245 +130,167 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     );
   }
 
-  Widget _buildViewToggle(BuildContext context) {
+  /// Header with month/year title and "Today" button
+  Widget _buildHeader(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        Text(
-          'doctor.calendar.view_label'.tr(),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-        const Spacer(),
-        Wrap(
-          spacing: AppTheme.spacing8,
-          children: [
-            ChoiceChip(
-              label: Text('doctor.calendar.view_month'.tr()),
-              selected: _calendarFormat == CalendarFormat.month,
-              onSelected: (_) =>
-                  setState(() => _calendarFormat = CalendarFormat.month),
-              labelStyle: Theme.of(context).textTheme.labelLarge,
-              selectedColor: colorScheme.primary.withValues(alpha: 0.12),
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                side: BorderSide(color: Theme.of(context).dividerColor),
-              ),
-            ),
-            ChoiceChip(
-              label: Text('doctor.calendar.view_week'.tr()),
-              selected: _calendarFormat == CalendarFormat.week,
-              onSelected: (_) =>
-                  setState(() => _calendarFormat = CalendarFormat.week),
-              labelStyle: Theme.of(context).textTheme.labelLarge,
-              selectedColor: colorScheme.primary.withValues(alpha: 0.12),
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                side: BorderSide(color: Theme.of(context).dividerColor),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+    final monthYear = DateFormat.yMMMM(
+      context.locale.toLanguageTag(),
+    ).format(_focusedDay);
 
-  Widget _buildStatusFilters(BuildContext context) {
-    final filters = <String, String>{
-      'all': 'common.all'.tr(),
-      'pending': 'common.status.pending'.tr(),
-      'in_review': 'common.status.in_review'.tr(),
-      'info_requested': 'common.status.info_requested'.tr(),
-      'completed': 'common.status.completed'.tr(),
-    };
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.spacing16,
+        AppTheme.spacing24,
+        AppTheme.spacing16,
+        AppTheme.spacing16,
+      ),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor),
+        ),
+      ),
       child: Row(
         children: [
-          for (final entry in filters.entries)
-            Padding(
-              padding: const EdgeInsets.only(right: AppTheme.spacing8),
-              child: ThemedFilterChip(
-                label: entry.value,
-                selected: _statusFilter == entry.key,
-                onSelected: (_) => setState(() => _statusFilter = entry.key),
+          Text(
+            monthYear,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const Spacer(),
+          TextButton(
+            onPressed: _goToToday,
+            child: Text(
+              'doctor.calendar.today_button'.tr(),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w700,
               ),
             ),
+          ),
         ],
       ),
     );
   }
 
+  /// Calendar grid with custom day cells
   Widget _buildCalendar(
     BuildContext context,
     Map<DateTime, List<ConsultationModel>> eventsByDay,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
 
-    return TableCalendar<ConsultationModel>(
-      firstDay: DateTime.utc(2020),
-      lastDay: DateTime.utc(2035),
-      focusedDay: _focusedDay,
-      locale: context.locale.languageCode,
-      calendarFormat: _calendarFormat,
-      availableGestures: AvailableGestures.horizontalSwipe,
-      availableCalendarFormats: const {
-        CalendarFormat.month: 'Month',
-        CalendarFormat.week: 'Week',
-      },
-      rowHeight: 64,
-      startingDayOfWeek: StartingDayOfWeek.monday,
-      selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-      eventLoader: (day) => eventsByDay[_dayKey(day)] ?? const [],
-      holidayPredicate: _isVacationDay,
-      onDaySelected: (selectedDay, focusedDay) {
-        setState(() {
-          _selectedDay = selectedDay;
-          _focusedDay = focusedDay;
-        });
-      },
-      onPageChanged: (focusedDay) => _focusedDay = focusedDay,
-      headerStyle: HeaderStyle(
-        titleCentered: false,
-        formatButtonVisible: false,
-        titleTextStyle: (textTheme.titleLarge ?? const TextStyle()).copyWith(
-          fontWeight: FontWeight.w700,
-        ),
-        leftChevronIcon: const Icon(Icons.chevron_left),
-        rightChevronIcon: const Icon(Icons.chevron_right),
+    return Container(
+      color: colorScheme.surface,
+      padding: const EdgeInsets.only(
+        left: AppTheme.spacing16,
+        right: AppTheme.spacing16,
+        bottom: AppTheme.spacing16,
       ),
-      daysOfWeekStyle: DaysOfWeekStyle(
-        weekdayStyle: textTheme.labelLarge!,
-        weekendStyle: textTheme.labelLarge!,
-      ),
-      calendarStyle: CalendarStyle(
-        outsideDaysVisible: false,
-        cellMargin: EdgeInsets.zero,
-        cellPadding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.spacing16,
-          vertical: AppTheme.spacing12,
+      child: TableCalendar<ConsultationModel>(
+        firstDay: DateTime.utc(2020),
+        lastDay: DateTime.utc(2035),
+        focusedDay: _focusedDay,
+        locale: context.locale.languageCode,
+        calendarFormat: CalendarFormat.month,
+        availableGestures: AvailableGestures.horizontalSwipe,
+        headerVisible: false, // We use custom header
+        daysOfWeekHeight: 32,
+        rowHeight: 44,
+        startingDayOfWeek: StartingDayOfWeek.monday,
+        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+        eventLoader: (day) => eventsByDay[_dayKey(day)] ?? const [],
+        holidayPredicate: _isVacationDay,
+        onDaySelected: (selectedDay, focusedDay) {
+          setState(() {
+            _selectedDay = selectedDay;
+            _focusedDay = focusedDay;
+          });
+        },
+        onPageChanged: (focusedDay) => setState(() => _focusedDay = focusedDay),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: Theme.of(context).textTheme.labelSmall!.copyWith(
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            fontWeight: FontWeight.w500,
+          ),
+          weekendStyle: Theme.of(context).textTheme.labelSmall!.copyWith(
+            color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        todayDecoration: BoxDecoration(
-          color: colorScheme.primary.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          border: Border.all(color: colorScheme.primary),
+        calendarStyle: const CalendarStyle(
+          outsideDaysVisible: true,
+          cellMargin: EdgeInsets.zero,
+          cellPadding: EdgeInsets.zero,
         ),
-        selectedDecoration: BoxDecoration(
-          color: colorScheme.primary,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        ),
-        selectedTextStyle:
-            (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-          color: colorScheme.onPrimary,
-          fontWeight: FontWeight.w700,
-        ),
-        holidayDecoration: BoxDecoration(
-          color: colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        ),
-        holidayTextStyle:
-            (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-          color: colorScheme.onSurface.withValues(alpha: 0.5),
-          fontWeight: FontWeight.w500,
-        ),
-        weekendTextStyle: textTheme.bodyMedium!,
-        defaultTextStyle: textTheme.bodyMedium!,
-        markerDecoration: BoxDecoration(
-          color: colorScheme.primary,
-          shape: BoxShape.circle,
-        ),
-      ),
-      calendarBuilders: CalendarBuilders(
-        markerBuilder: (context, day, events) {
-          if (events.isEmpty) return null;
-          final colors = events
-              .map((event) => _urgencyColor(context, event.urgency))
-              .toSet()
-              .take(3)
-              .toList();
-          return Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: AppTheme.spacing4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: colors
-                    .map(
-                      (color) => Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: AppTheme.spacing2),
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    )
-                    .toList(),
+        calendarBuilders: CalendarBuilders(
+          dowBuilder: (context, day) {
+            final text = DateFormat.E(
+              context.locale.languageCode,
+            ).format(day).substring(0, 1).toUpperCase();
+            return Center(
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          );
-        },
-        disabledBuilder: (context, day, focusedDay) {
-          final isVacation = _isVacationDay(day);
-          return _buildDayCell(
-            context,
-            day,
-            eventsByDay[_dayKey(day)] ?? const [],
-            isDisabled: true,
-            isVacation: isVacation,
-          );
-        },
-        defaultBuilder: (context, day, focusedDay) {
-          final isVacation = _isVacationDay(day);
-          return _buildDayCell(
-            context,
-            day,
-            eventsByDay[_dayKey(day)] ?? const [],
-            isSelected: isSameDay(day, _selectedDay),
-            isToday: isSameDay(day, DateTime.now()),
-            isVacation: isVacation,
-          );
-        },
-        todayBuilder: (context, day, focusedDay) {
-          final isVacation = _isVacationDay(day);
-          return _buildDayCell(
-            context,
-            day,
-            eventsByDay[_dayKey(day)] ?? const [],
-            isToday: true,
-            isVacation: isVacation,
-          );
-        },
-        selectedBuilder: (context, day, focusedDay) {
-          final isVacation = _isVacationDay(day);
-          return _buildDayCell(
-            context,
-            day,
-            eventsByDay[_dayKey(day)] ?? const [],
-            isSelected: true,
-            isVacation: isVacation,
-          );
-        },
-        holidayBuilder: (context, day, focusedDay) {
-          return _buildDayCell(
-            context,
-            day,
-            eventsByDay[_dayKey(day)] ?? const [],
-            isVacation: true,
-          );
-        },
+            );
+          },
+          outsideBuilder: (context, day, focusedDay) {
+            return _buildDayCell(
+              context,
+              day,
+              eventsByDay[_dayKey(day)] ?? const [],
+              isOutside: true,
+            );
+          },
+          defaultBuilder: (context, day, focusedDay) {
+            final isVacation = _isVacationDay(day);
+            return _buildDayCell(
+              context,
+              day,
+              eventsByDay[_dayKey(day)] ?? const [],
+              isVacation: isVacation,
+            );
+          },
+          todayBuilder: (context, day, focusedDay) {
+            final isVacation = _isVacationDay(day);
+            return _buildDayCell(
+              context,
+              day,
+              eventsByDay[_dayKey(day)] ?? const [],
+              isToday: true,
+              isVacation: isVacation,
+            );
+          },
+          selectedBuilder: (context, day, focusedDay) {
+            final isVacation = _isVacationDay(day);
+            return _buildDayCell(
+              context,
+              day,
+              eventsByDay[_dayKey(day)] ?? const [],
+              isSelected: true,
+              isVacation: isVacation,
+            );
+          },
+          holidayBuilder: (context, day, focusedDay) {
+            return _buildDayCell(
+              context,
+              day,
+              eventsByDay[_dayKey(day)] ?? const [],
+              isVacation: true,
+            );
+          },
+        ),
       ),
     );
   }
 
+  /// Modern day cell with filled circle for selected, dot for events
   Widget _buildDayCell(
     BuildContext context,
     DateTime day,
@@ -364,148 +298,408 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     bool isSelected = false,
     bool isToday = false,
     bool isVacation = false,
-    bool isDisabled = false,
+    bool isOutside = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Background - use subtle opacity for vacation days
-    final background = isSelected
-        ? colorScheme.primary
-        : isToday
-            ? colorScheme.primary.withValues(alpha: 0.12)
-            : isVacation
-                ? colorScheme.onSurface.withValues(alpha: 0.05)
-                : colorScheme.surface;
-
-    // Text color - slightly muted for vacation days
+    // Text color
     final textColor = isSelected
         ? colorScheme.onPrimary
-        : isDisabled
-            ? Theme.of(context).hintColor
-            : isVacation
-                ? colorScheme.onSurface.withValues(alpha: 0.5)
-                : colorScheme.onSurface;
+        : isOutside
+        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.3)
+        : isVacation
+        ? colorScheme.onSurfaceVariant.withValues(alpha: 0.5)
+        : colorScheme.onSurface;
 
-    // Border - only for today indicator, none for other cells
-    final border = isToday && !isSelected
-        ? Border.all(color: colorScheme.primary, width: 1)
-        : null;
-
-    return Padding(
-      padding: const EdgeInsets.all(AppTheme.spacing4),
-      child: SizedBox.expand(
-        child: Container(
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            border: border,
-          ),
-          child: Stack(
-            children: [
-              // Vacation icon indicator in top-right corner (subtle)
-              if (isVacation)
-                Positioned(
-                  top: 2,
-                  right: 2,
-                  child: Icon(
-                    Icons.beach_access,
-                    size: 10,
-                    color: colorScheme.onSurface.withValues(alpha: 0.3),
+    return SizedBox(
+      height: 44,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Day number (with filled circle if selected)
+          if (isSelected)
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.primary.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  '${day.day}',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onPrimary,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              // Day number and event indicator
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${day.day}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: textColor,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w600,
-                          ),
-                    ),
-                    if (events.isNotEmpty && !isVacation)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                  ],
+              ),
+            )
+          else
+            Text(
+              '${day.day}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+
+          // Event indicator dot
+          if (events.isNotEmpty && !isOutside)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Container(
+                width: 4,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  shape: BoxShape.circle,
                 ),
               ),
-            ],
-          ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Status filter pills (All, Pending, Completed)
+  Widget _buildStatusFilters(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final filters = <String, String>{
+      'all': 'doctor.calendar.filters.all'.tr(),
+      'pending': 'doctor.calendar.filters.pending'.tr(),
+      'completed': 'doctor.calendar.filters.completed'.tr(),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacing16,
+        vertical: AppTheme.spacing12,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor),
+        ),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: filters.entries.map((entry) {
+            final isSelected = _statusFilter == entry.key;
+            return Padding(
+              padding: const EdgeInsets.only(right: AppTheme.spacing8),
+              child: GestureDetector(
+                onTap: () => setState(() => _statusFilter = entry.key),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacing16,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? colorScheme.primary
+                        : colorScheme.surface,
+                    borderRadius: BorderRadius.circular(
+                      AppTheme.radiusCircular,
+                    ),
+                    border: isSelected
+                        ? null
+                        : Border.all(color: Theme.of(context).dividerColor),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: colorScheme.primary.withValues(alpha: 0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Text(
+                    entry.value,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: isSelected
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurfaceVariant,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
   }
 
+  /// Selected day summary with consultation cards
   Widget _buildDaySummary(
     BuildContext context,
     List<ConsultationModel> events,
+    DoctorConsultationsController controller,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
     final dateLabel = _selectedDay != null
-        ? DateFormat.yMMMMd(context.locale.toLanguageTag()).format(_selectedDay!)
+        ? DateFormat(
+            'MMM d, yyyy',
+            context.locale.toLanguageTag(),
+          ).format(_selectedDay!)
         : '';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'doctor.calendar.day_overview'.tr()),
-        const SizedBox(height: AppTheme.spacing8),
-        Text(
-          dateLabel,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).hintColor,
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Date header
+          Text(
+            dateLabel.toUpperCase(),
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacing16),
+
+          // Consultations or empty state
+          if (events.isEmpty)
+            AppEmptyState(
+              icon: Icons.calendar_today_outlined,
+              title: 'doctor.calendar.no_consultations_title'.tr(),
+              subtitle: 'doctor.calendar.no_consultations_subtitle'.tr(),
+            )
+          else
+            Column(
+              children: events
+                  .map(
+                    (event) => Padding(
+                      padding: const EdgeInsets.only(
+                        bottom: AppTheme.spacing16,
+                      ),
+                      child: _buildConsultationCard(context, event, controller),
+                    ),
+                  )
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Modern consultation card matching HTML design
+  Widget _buildConsultationCard(
+    BuildContext context,
+    ConsultationModel consultation,
+    DoctorConsultationsController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
+    final patient = controller.patientProfile(consultation.patientId);
+    final patientName =
+        patient?.displayName ?? 'doctor.requests.patient_unknown'.tr();
+    final initials = _getInitials(patientName);
+
+    final isCompleted = consultation.status == 'completed';
+    final statusColor = isCompleted ? semantic.success : semantic.warning;
+    final statusLabel = isCompleted
+        ? 'common.status.completed'.tr()
+        : 'common.status.pending'.tr();
+
+    // Avatar colors based on name hash
+    final avatarColors = _getAvatarColors(patientName, colorScheme);
+
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
         ),
-        const SizedBox(height: AppTheme.spacing16),
-        if (events.isEmpty)
-          AppEmptyState(
-            icon: Icons.calendar_today_outlined,
-            title: 'doctor.calendar.no_consultations_title'.tr(),
-            subtitle: 'doctor.calendar.no_consultations_subtitle'.tr(),
-          )
-        else
-          Column(
-            children: events
-                .map(
-                  (event) => Padding(
-                    padding:
-                        const EdgeInsets.only(bottom: AppTheme.spacing12),
-                    child: DoctorRequestCard(
-                      consultation: event,
-                      onTap: () {
-                        final controller =
-                            context.read<DoctorConsultationsController>();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ChangeNotifierProvider.value(
-                              value: controller,
-                              child: RequestReviewScreen(
-                                consultationId: event.id,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.onSurface.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header row: avatar, name, status
+          Row(
+            children: [
+              // Avatar
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: avatarColors.background,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    initials,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: avatarColors.foreground,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                )
-                .toList(),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing12),
+
+              // Name and type
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      patientName,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      consultation.title,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Status badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacing8,
+                  vertical: AppTheme.spacing4,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                ),
+                child: Text(
+                  statusLabel.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
           ),
-      ],
+
+          // Divider
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing12),
+            child: Divider(
+              height: 1,
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+            ),
+          ),
+
+          // Footer: time and action button
+          Row(
+            children: [
+              // Time info
+              Icon(
+                isCompleted ? Icons.check_circle : Icons.schedule,
+                size: 16,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: AppTheme.spacing4),
+              Text(
+                _formatTimeInfo(consultation, isCompleted),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const Spacer(),
+
+              // Action button
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChangeNotifierProvider.value(
+                        value: controller,
+                        child: RequestReviewScreen(
+                          consultationId: consultation.id,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  isCompleted
+                      ? 'doctor.calendar.details_button'.tr()
+                      : 'doctor.requests.review_button'.tr(),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: isCompleted
+                        ? colorScheme.onSurfaceVariant
+                        : colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
+  }
+
+  String _formatTimeInfo(ConsultationModel consultation, bool isCompleted) {
+    final time = DateFormat('hh:mm a').format(consultation.createdAt);
+    if (isCompleted) {
+      return 'doctor.calendar.resolved_at'.tr(namedArgs: {'time': time});
+    }
+    return 'doctor.calendar.requested_for'.tr(namedArgs: {'time': time});
+  }
+
+  String _getInitials(String name) {
+    final parts = name.trim().split(' ');
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+  }
+
+  ({Color background, Color foreground}) _getAvatarColors(
+    String name,
+    ColorScheme colorScheme,
+  ) {
+    final colors = [
+      (colorScheme.primary.withValues(alpha: 0.15), colorScheme.primary),
+      (Colors.purple.withValues(alpha: 0.15), Colors.purple),
+      (Colors.teal.withValues(alpha: 0.15), Colors.teal),
+      (Colors.amber.withValues(alpha: 0.15), Colors.amber.shade700),
+      (Colors.pink.withValues(alpha: 0.15), Colors.pink),
+    ];
+    final index = name.hashCode.abs() % colors.length;
+    return (background: colors[index].$1, foreground: colors[index].$2);
   }
 
   Map<DateTime, List<ConsultationModel>> _groupByDay(
@@ -523,6 +717,11 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     List<ConsultationModel> consultations,
   ) {
     if (_statusFilter == 'all') return consultations;
+    if (_statusFilter == 'pending') {
+      return consultations
+          .where((c) => c.status != 'completed' && c.status != 'cancelled')
+          .toList();
+    }
     return consultations.where((c) => c.status == _statusFilter).toList();
   }
 
@@ -539,16 +738,5 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
       }
     }
     return false;
-  }
-
-  Color _urgencyColor(BuildContext context, String urgency) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
-    switch (urgency) {
-      case 'priority':
-        return semantic.warning;
-      default:
-        return colorScheme.primary;
-    }
   }
 }
