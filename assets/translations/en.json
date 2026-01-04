@@ -115,7 +115,30 @@
     "profile_incomplete": "Complete Your Profile",
     "profile_incomplete_desc": "Add your personal information to get personalized recommendations.",
     "complete_profile_button": "Complete Profile",
-    "medical_disclaimer": "This service provides second opinions only and does not replace direct medical consultation. Always consult with your primary healthcare provider for medical decisions."
+    "medical_disclaimer": "This service provides second opinions only and does not replace direct medical consultation. Always consult with your primary healthcare provider for medical decisions.",
+    "active_request_status": "Active Request Status",
+    "find_specialist": "Find a Specialist",
+    "recent_activity": "Recent Activity",
+    "no_recent_activity": "No recent activity",
+    "consult_specialist_prompt": "Consult a specialist below to get started.",
+    "status": {
+      "doctor_reviewing": "Doctor is reviewing your file",
+      "doctor_reviewing_desc": "Estimated response: within 24h",
+      "pending": "Waiting for assignment",
+      "pending_desc": "We are matching you with a specialist",
+      "info_requested": "Additional information needed",
+      "info_requested_desc": "Please reply to doctor's questions",
+      "completed": "Consultation completed",
+      "completed_desc": "View your diagnosis and prescription",
+      "cancelled": "Request cancelled",
+      "update_available": "Update available",
+      "view_details": "Tap to view details",
+      "request_approved": "Request Approved",
+      "doctor_reviewing_title": "Doctor Reviewing",
+      "info_requested_title": "Info Requested",
+      "request_pending": "Request Pending",
+      "request_update": "Request Update"
+    }
   },
   "doctors": {
     "title": "Browse Doctors",
@@ -189,7 +212,12 @@
     "pathology": "Pathology",
     "familyMedicine": "Family Medicine",
     "internalMedicine": "Internal Medicine",
-    "emergency": "Emergency Medicine"
+    "emergency": "Emergency Medicine",
+    "general": "General",
+    "dentist": "Dentist",
+    "vision": "Vision",
+    "heart": "Heart",
+    "lungs": "Lungs"
   },
   "subspecialties": {
     "interventional": "Interventional Cardiology",
@@ -632,7 +660,10 @@
       "info_requested": "Info Requested",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "view_details": "View Details",
+    "new": "New",
+    "waiting_for_doctor": "Waiting for Doctor"
   },
   "validation": {
     "required_field": "This field is required",

@@ -115,7 +115,30 @@
     "profile_incomplete": "Completează Profilul",
     "profile_incomplete_desc": "Adaugă informațiile personale pentru recomandări personalizate.",
     "complete_profile_button": "Completează Profilul",
-    "medical_disclaimer": "Acest serviciu oferă doar a doua opinie și nu înlocuiește consultația medicală directă. Consultă întotdeauna medicul tău de familie pentru decizii medicale."
+    "medical_disclaimer": "Acest serviciu oferă doar a doua opinie și nu înlocuiește consultația medicală directă. Consultă întotdeauna medicul tău de familie pentru decizii medicale.",
+    "active_request_status": "Status Solicitare Activă",
+    "find_specialist": "Găsește un Specialist",
+    "recent_activity": "Activitate Recentă",
+    "no_recent_activity": "Nicio activitate recentă",
+    "consult_specialist_prompt": "Consultă un specialist mai jos pentru a începe.",
+    "status": {
+      "doctor_reviewing": "Medicul vă revizuiește dosarul",
+      "doctor_reviewing_desc": "Răspuns estimat: în 24h",
+      "pending": "În așteptarea atribuirii",
+      "pending_desc": "Vă potrivim cu un specialist",
+      "info_requested": "Informații suplimentare necesare",
+      "info_requested_desc": "Vă rugăm să răspundeți întrebărilor medicului",
+      "completed": "Consultație finalizată",
+      "completed_desc": "Vizualizați diagnosticul și rețeta",
+      "cancelled": "Solicitare anulată",
+      "update_available": "Actualizare disponibilă",
+      "view_details": "Apăsați pentru detalii",
+      "request_approved": "Solicitare Aprobată",
+      "doctor_reviewing_title": "Medic Revizuiește",
+      "info_requested_title": "Info Solicitate",
+      "request_pending": "Solicitare În Așteptare",
+      "request_update": "Actualizare Solicitare"
+    }
   },
   "doctors": {
     "title": "Explorează Medicii",
@@ -189,7 +212,12 @@
     "pathology": "Patologie",
     "familyMedicine": "Medicină de Familie",
     "internalMedicine": "Medicină Internă",
-    "emergency": "Medicină de Urgență"
+    "emergency": "Medicină de Urgență",
+    "general": "General",
+    "dentist": "Stomatolog",
+    "vision": "Oftalmologie",
+    "heart": "Cardiologie",
+    "lungs": "Pneumologie"
   },
   "subspecialties": {
     "interventional": "Cardiologie Intervențională",
@@ -632,7 +660,10 @@
       "info_requested": "Informații Solicitate",
       "completed": "Finalizată",
       "cancelled": "Anulată"
-    }
+    },
+    "view_details": "Vezi Detalii",
+    "new": "Nou",
+    "waiting_for_doctor": "În așteptarea medicului"
   },
   "validation": {
     "required_field": "Acest câmp este obligatoriu",

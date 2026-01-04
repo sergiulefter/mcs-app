@@ -92,8 +92,8 @@ class _MainShellState extends State<MainShell> {
               label: 'navigation.doctors'.tr(),
             ),
             NavigationDestination(
-              icon: const Icon(Icons.assignment_outlined),
-              selectedIcon: const Icon(Icons.assignment),
+              icon: const Icon(Icons.description_outlined),
+              selectedIcon: const Icon(Icons.description),
               label: 'navigation.consultations'.tr(),
             ),
             NavigationDestination(
