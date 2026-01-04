@@ -1008,7 +1008,10 @@
       "details_button": "Details"
     },
     "account": {
-      "price": "Consultation Price",
+      "price": "Price",
+      "professional_info": "Professional Details",
+      "practice_info": "Practice Info",
+      "patients": "Patients",
       "edit_profile_desc": "Update your professional information",
       "manage_availability": "Manage Availability",
       "manage_availability_desc": "Set vacation periods and availability"

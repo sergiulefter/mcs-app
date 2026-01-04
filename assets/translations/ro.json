@@ -1008,7 +1008,10 @@
       "details_button": "Detalii"
     },
     "account": {
-      "price": "Preț consultație",
+      "price": "Preț",
+      "professional_info": "Detalii Profesionale",
+      "practice_info": "Info Practică",
+      "patients": "Pacienți",
       "edit_profile_desc": "Actualizează informațiile profesionale",
       "manage_availability": "Gestionează disponibilitatea",
       "manage_availability_desc": "Setează perioade de concediu și disponibilitate"

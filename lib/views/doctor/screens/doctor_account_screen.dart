@@ -3,378 +3,494 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/doctor_profile_controller.dart';
-import 'package:mcs_app/controllers/consultations_controller.dart';
-import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/models/doctor_model.dart';
-import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/patient/screens/login_screen.dart';
-import 'package:mcs_app/views/patient/widgets/cards/action_tile.dart';
-import 'package:mcs_app/views/patient/widgets/cards/language_selection_card.dart';
-import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
-import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
-import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
-import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
-import 'package:mcs_app/views/doctor/screens/availability_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_settings_screen.dart';
 
-/// Doctor account screen - Profile display, settings, and sign out
-class DoctorAccountScreen extends StatefulWidget {
+/// Doctor account screen matching the patient account screen design.
+/// Shows profile overview, professional details, and info cards.
+class DoctorAccountScreen extends StatelessWidget {
   const DoctorAccountScreen({super.key});
 
-  @override
-  State<DoctorAccountScreen> createState() => _DoctorAccountScreenState();
-}
-
-class _DoctorAccountScreenState extends State<DoctorAccountScreen> {
   @override
   Widget build(BuildContext context) {
     final authController = context.watch<AuthController>();
     final profile = context.watch<DoctorProfileController>();
     final user = authController.currentUser;
     final doctor = profile.doctor;
+    final colorScheme = Theme.of(context).colorScheme;
 
     if (user == null || doctor == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'account.no_user_logged_in'.tr(),
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ),
       );
     }
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: AppTheme.screenPadding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Doctor Header
-              _buildDoctorHeader(context, doctor),
-              const SizedBox(height: AppTheme.sectionSpacing),
+        child: Column(
+          children: [
+            // Header
+            _buildHeader(context),
 
-              // Profile Details Section
-              SectionHeader(title: 'common.profile_details'.tr()),
-              const SizedBox(height: AppTheme.spacing16),
-              _buildProfileDetailsCard(context, doctor),
-              const SizedBox(height: AppTheme.sectionSpacing),
+            // Scrollable Content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
+                child: Column(
+                  children: [
+                    // Profile Overview (Avatar + Name + Specialty)
+                    _buildProfileOverview(context, doctor),
+                    const SizedBox(height: 32),
 
-              // Quick Actions Section
-              SectionHeader(title: 'common.quick_actions'.tr()),
-              const SizedBox(height: AppTheme.spacing16),
-              _buildQuickActionsCard(context),
-              const SizedBox(height: AppTheme.sectionSpacing),
+                    // Contact Information Card
+                    _buildInfoCard(
+                      context,
+                      title: 'profile.contact_info'.tr(),
+                      icon: Icons.contact_mail_outlined,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          label: 'common.email'.tr(),
+                          value: user.email,
+                          isFirst: true,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          label: 'common.phone'.tr(),
+                          value: user.phone ?? 'account.not_provided'.tr(),
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
 
-              // Sign Out Button
-              _buildSignOutButton(context),
-              const SizedBox(height: AppTheme.spacing16),
-            ],
-          ),
+                    // Professional Details Card
+                    _buildInfoCard(
+                      context,
+                      title: 'doctor.account.professional_info'.tr(),
+                      icon: Icons.medical_services_outlined,
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          label: 'common.specialty'.tr(),
+                          value: 'specialties.${doctor.specialty.name}'.tr(),
+                          isFirst: true,
+                        ),
+                        _buildInfoRow(
+                          context,
+                          label: 'common.experience'.tr(),
+                          value: 'common.years_format'.tr(
+                            namedArgs: {
+                              'years': doctor.experienceYears.toString(),
+                            },
+                          ),
+                        ),
+                        _buildInfoRow(
+                          context,
+                          label: 'common.languages'.tr(),
+                          value: doctor.languages.isNotEmpty
+                              ? doctor.languages.join(', ')
+                              : 'account.not_provided'.tr(),
+                          isLast: true,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Practice Info Card (like Medical Basics for patients)
+                    _buildPracticeInfoCard(context, doctor),
+
+                    const SizedBox(height: 16),
+                    Text(
+                      'profile.medical_records_updated'.tr(
+                        namedArgs: {
+                          'date': DateFormat(
+                            'MMM d, h:mm a',
+                          ).format(doctor.lastActive ?? doctor.createdAt),
+                        },
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDoctorHeader(BuildContext context, DoctorModel doctor) {
-    final doctorName = doctor.fullName;
-    final specialty = 'specialties.${doctor.specialty.name}'.tr();
-    final initials = _getInitials(doctorName);
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const SizedBox(width: 40), // Spacer for centering title
+          Text(
+            'profile.profile_setup'.tr(),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            width: 40,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () {
+                  final profileController = context
+                      .read<DoctorProfileController>();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChangeNotifierProvider.value(
+                        value: profileController,
+                        child: const DoctorSettingsScreen(),
+                      ),
+                    ),
+                  );
+                },
+                style: IconButton.styleFrom(
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  shape: const CircleBorder(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    return Row(
+  Widget _buildProfileOverview(BuildContext context, DoctorModel doctor) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final specialty = 'specialties.${doctor.specialty.name}'.tr();
+    final initials = _getInitials(doctor.fullName);
+
+    return Column(
       children: [
         // Avatar
         Container(
-          width: 72,
-          height: 72,
+          width: 128,
+          height: 128,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            shape: BoxShape.circle,
+            color: colorScheme.primaryContainer,
+            border: Border.all(color: colorScheme.surface, width: 4),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Center(
             child: Text(
               initials,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: Theme.of(context).colorScheme.primary,
+              style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Name
+        Text(
+          doctor.fullName,
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 4),
+
+        // Specialty
+        Text(
+          specialty,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 12),
+
+        // Availability Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: doctor.isCurrentlyAvailable
+                ? colorScheme.secondary.withValues(alpha: 0.1)
+                : colorScheme.error.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: doctor.isCurrentlyAvailable
+                  ? colorScheme.secondary.withValues(alpha: 0.2)
+                  : colorScheme.error.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Text(
+            doctor.isCurrentlyAvailable
+                ? 'common.availability.available'.tr()
+                : 'common.availability.unavailable'.tr(),
+            style: TextStyle(
+              color: doctor.isCurrentlyAvailable
+                  ? colorScheme.secondary
+                  : colorScheme.error,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoCard(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            spreadRadius: 1,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Card Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Icon(icon, color: colorScheme.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  title.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
                   ),
+                ),
+              ],
             ),
           ),
-        ),
-        const SizedBox(width: AppTheme.spacing16),
-        // Name and Specialty
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                doctorName,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              const SizedBox(height: AppTheme.spacing4),
-              Text(
-                specialty,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).hintColor,
-                    ),
-              ),
-              const SizedBox(height: AppTheme.spacing8),
-              // Availability badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppTheme.spacing12,
-                  vertical: AppTheme.spacing4,
-                ),
-                decoration: BoxDecoration(
-                  color: doctor.isCurrentlyAvailable
-                      ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1)
-                      : Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                ),
-                child: Text(
-                  doctor.isCurrentlyAvailable
-                      ? 'common.availability.available'.tr()
-                      : 'common.availability.unavailable'.tr(),
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: doctor.isCurrentlyAvailable
-                            ? Theme.of(context).colorScheme.secondary
-                            : Theme.of(context).colorScheme.error,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ),
-            ],
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1F2937)
+                : const Color(0xFFF9FAFB),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProfileDetailsCard(BuildContext context, DoctorModel doctor) {
-    final notProvidedText = 'account.not_provided'.tr();
-
-    return ListCard(
-      padding: EdgeInsets.zero,
-      children: [
-        ProfileDetailRow(
-          icon: Icons.medical_services_outlined,
-          label: 'common.specialty'.tr(),
-          value: 'specialties.${doctor.specialty.name}'.tr(),
-          notProvidedText: notProvidedText,
-        ),
-        ProfileDetailRow(
-          icon: Icons.work_history_outlined,
-          label: 'common.experience'.tr(),
-          value: 'common.years_format'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
-          notProvidedText: notProvidedText,
-        ),
-        ProfileDetailRow(
-          icon: Icons.language_outlined,
-          label: 'common.languages'.tr(),
-          value: doctor.languages.isNotEmpty ? doctor.languages.join(', ') : notProvidedText,
-          notProvidedText: notProvidedText,
-        ),
-        ProfileDetailRow(
-          icon: Icons.payments_outlined,
-          label: 'doctor.account.price'.tr(),
-          value: doctor.consultationPrice > 0
-              ? '${doctor.consultationPrice.toStringAsFixed(0)} RON'
-              : notProvidedText,
-          notProvidedText: notProvidedText,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActionsCard(BuildContext context) {
-    return ListCard(
-      padding: EdgeInsets.zero,
-      children: [
-        ActionTile(
-          icon: Icons.edit_outlined,
-          title: 'common.edit_profile'.tr(),
-          subtitle: 'doctor.account.edit_profile_desc'.tr(),
-          onTap: () async {
-            final profileController = context.read<DoctorProfileController>();
-            final result = await Navigator.push<bool>(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const DoctorProfileEditScreen(),
-              ),
-            );
-            // Reload doctor data if profile was updated
-            if (result == true) {
-              await profileController.refresh();
-            }
-          },
-        ),
-        ActionTile(
-          icon: Icons.event_busy_outlined,
-          title: 'doctor.account.manage_availability'.tr(),
-          subtitle: 'doctor.account.manage_availability_desc'.tr(),
-          onTap: () async {
-            final profileController = context.read<DoctorProfileController>();
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const AvailabilityScreen(),
-              ),
-            );
-            // Reload doctor data after returning
-            await profileController.refresh();
-          },
-        ),
-        ActionTile(
-          icon: Icons.language_outlined,
-          title: 'account.change_language'.tr(),
-          subtitle: 'account.change_language_desc'.tr(),
-          onTap: () => _showLanguageDialog(context),
-        ),
-        Consumer<ThemeController>(
-          builder: (context, themeController, _) {
-            return ActionTile(
-              icon: Icons.palette_outlined,
-              title: 'account.appearance'.tr(),
-              subtitle: themeController.getThemeModeName(context),
-              onTap: () => _showThemeDialog(context, themeController),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSignOutButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: () => _handleSignOut(context),
-        icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-        label: Text(
-          'auth.sign_out'.tr(),
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Theme.of(context).colorScheme.error),
-          padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
-        ),
-      ),
-    );
-  }
-
-  void _showLanguageDialog(BuildContext context) {
-    String selectedLocale = context.locale.languageCode;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('account.select_language'.tr()),
-        content: StatefulBuilder(
-          builder: (context, setState) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LanguageSelectionCard(
-                languageName: 'English',
-                languageCode: 'en',
-                isSelected: selectedLocale == 'en',
-                onTap: () async {
-                  setState(() => selectedLocale = 'en');
-                  await dialogContext.setLocale(const Locale('en'));
-                  if (!dialogContext.mounted) return;
-                  final authController = context.read<AuthController>();
-                  await authController.updatePreferredLanguage('en');
-                },
-              ),
-              const SizedBox(height: AppTheme.spacing12),
-              LanguageSelectionCard(
-                languageName: 'Română',
-                languageCode: 'ro',
-                isSelected: selectedLocale == 'ro',
-                onTap: () async {
-                  setState(() => selectedLocale = 'ro');
-                  await dialogContext.setLocale(const Locale('ro'));
-                  if (!dialogContext.mounted) return;
-                  final authController = context.read<AuthController>();
-                  await authController.updatePreferredLanguage('ro');
-                },
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('common.close'.tr()),
+          // Content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Column(children: children),
           ),
         ],
       ),
     );
   }
 
-  void _showThemeDialog(BuildContext context, ThemeController themeController) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('account.select_theme'.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioMenuButton<ThemeMode>(
-              value: ThemeMode.light,
-              groupValue: themeController.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  themeController.setThemeMode(value);
-                }
-              },
-              child: Text('account.light_mode'.tr()),
+  Widget _buildInfoRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    bool isFirst = false,
+    bool isLast = false,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        border: !isLast
+            ? Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFF9FAFB),
+                ),
+              )
+            : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
-            RadioMenuButton<ThemeMode>(
-              value: ThemeMode.dark,
-              groupValue: themeController.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  themeController.setThemeMode(value);
-                }
-              },
-              child: Text('account.dark_mode'.tr()),
+          ),
+          Flexible(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
             ),
-            RadioMenuButton<ThemeMode>(
-              value: ThemeMode.system,
-              groupValue: themeController.themeMode,
-              onChanged: (value) {
-                if (value != null) {
-                  themeController.setThemeMode(value);
-                }
-              },
-              child: Text('account.system_mode'.tr()),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text('common.cancel'.tr()),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _handleSignOut(BuildContext context) async {
-    final authController = context.read<AuthController>();
-    final consultationsController = context.read<ConsultationsController>();
+  Widget _buildPracticeInfoCard(BuildContext context, DoctorModel doctor) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-    // Clear cached data before signing out
-    consultationsController.clear();
-    await authController.signOut();
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            spreadRadius: 1,
+            offset: const Offset(0, 0),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Icon(Icons.work_outline, color: colorScheme.primary, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  'doctor.account.practice_info'.tr().toUpperCase(),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF1F2937)
+                : const Color(0xFFF9FAFB),
+          ),
+          // Grid Content
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              children: [
+                _buildPracticeItem(
+                  context,
+                  label: 'doctor.account.price'.tr(),
+                  value: doctor.consultationPrice > 0
+                      ? '${doctor.consultationPrice.toStringAsFixed(0)} RON'
+                      : '-',
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFF9FAFB),
+                ),
+                _buildPracticeItem(
+                  context,
+                  label: 'common.experience'.tr(),
+                  value: '${doctor.experienceYears} yrs',
+                ),
+                Container(
+                  width: 1,
+                  height: 40,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1F2937)
+                      : const Color(0xFFF9FAFB),
+                ),
+                _buildPracticeItem(
+                  context,
+                  label: 'common.languages'.tr(),
+                  value: doctor.languages.isNotEmpty
+                      ? doctor.languages.length.toString()
+                      : '-',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false,
-      );
-    }
+  Widget _buildPracticeItem(
+    BuildContext context, {
+    required String label,
+    required String value,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _getInitials(String name) {
