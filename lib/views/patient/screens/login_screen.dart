@@ -133,8 +133,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _scrollHelper.register('email', _emailKey);
     _scrollHelper.register('password', _passwordKey);
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -159,9 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'Sign in to manage your appointments.', // Shortened text
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: isDark
-                        ? AppTheme.textSecondaryDark
-                        : AppTheme.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 14, // Explicit smaller size
                   ),
                   textAlign: TextAlign.center,
@@ -172,9 +168,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 44, // Reduced from 48
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1E293B)
-                        : const Color(0xFFE2E8F0),
+                    color: Theme.of(
+                      context,
+                    ).dividerColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -208,9 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         'Or continue with',
                         style: TextStyle(
-                          color: isDark
-                              ? AppTheme.textSecondaryDark
-                              : AppTheme.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 13, // Reduced font size
                         ),
                       ),
@@ -251,9 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   'By signing up, you agree to our Terms of Service.', // Shortened
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 11, // Reduced font size
-                    color: isDark
-                        ? AppTheme.textTertiaryDark
-                        : AppTheme.textTertiary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -267,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildRoleToggleOption(String role) {
     final isSelected = _selectedRole == role;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final isDark = Theme.of(context).brightness == Brightness.dark; // Removed
 
     return GestureDetector(
       onTap: () {
@@ -277,14 +269,14 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark ? const Color(0xFF334155) : Colors.white)
-              : Colors.transparent,
+          color: isSelected ? Theme.of(context).cardColor : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
+                    color: Theme.of(
+                      context,
+                    ).shadowColor.withValues(alpha: 0.05),
                     blurRadius: 2,
                   ),
                 ]
@@ -295,10 +287,8 @@ class _LoginScreenState extends State<LoginScreen> {
           role,
           style: TextStyle(
             color: isSelected
-                ? (isDark ? Colors.white : Colors.black)
-                : (isDark
-                      ? AppTheme.textSecondaryDark
-                      : AppTheme.textSecondary),
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
             fontSize: 14,
           ),
@@ -423,7 +413,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildSocialButton(String label, String? assetPath, {IconData? icon}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 48, // h-12
       child: OutlinedButton(
@@ -432,7 +421,7 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         style: OutlinedButton.styleFrom(
           backgroundColor: Theme.of(context).cardColor,
-          foregroundColor: isDark ? Colors.white : const Color(0xFF334155),
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
           side: BorderSide(color: Theme.of(context).dividerColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -465,9 +454,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           "Don't have an account?",
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? AppTheme.textSecondaryDark
-                : AppTheme.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(width: 4),

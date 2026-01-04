@@ -544,8 +544,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
                       onChanged: (value) {
                         setState(() {
                           _description = value;
-                          if (_descriptionError != null)
+                          if (_descriptionError != null) {
                             _descriptionError = null;
+                          }
                         });
                       },
                       decoration: _getInputDecoration(
@@ -613,10 +614,8 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   Widget _buildUrgencySelector() {
-    // Using semantic colors if available or hardcoded fallbacks matching the HTML guidelines safely
-    // HTML: Medical Blue (#0ea5e9) and Warning Orange (#f97316)
-    final blueColor = const Color(0xFF0ea5e9);
-    final orangeColor = const Color(0xFFf97316);
+    final blueColor = Theme.of(context).colorScheme.primary;
+    final orangeColor = Theme.of(context).extension<AppSemanticColors>()!.warning;
 
     return Column(
       children: [

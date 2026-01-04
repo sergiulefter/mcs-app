@@ -51,17 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final authController = context.watch<AuthController>();
     final consultationsController = context.watch<ConsultationsController>();
     final user = authController.currentUser;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Direct HTML Color mappings for precise fidelity
-    final bgLight = const Color(0xFFF6F6F8);
-    final bgDark = const Color(0xFF101622);
-    final surfaceLight = const Color(0xFFFFFFFF);
-    final surfaceDark = const Color(0xFF1A2130);
-    final textSlate900 = isDark ? Colors.white : const Color(0xFF0F172A);
-    final textSlate500 = isDark
-        ? const Color(0xFF94A3B8)
-        : const Color(0xFF64748B);
 
     // Dynamic Profile Data
     final profileImage = user?.photoUrl;
@@ -75,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final recentActivity = allConsultations.take(3).toList();
 
     return Scaffold(
-      backgroundColor: isDark ? bgDark : bgLight,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -96,22 +85,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: AppTheme.primaryBlue.withValues(alpha: 0.2),
+                            color: Theme.of(context).dividerColor,
                             width: 2,
                           ),
                         ),
                         child: CircleAvatar(
-                          backgroundColor: AppTheme.primaryBlue.withValues(
-                            alpha: 0.1,
-                          ),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
                           backgroundImage:
                               profileImage != null && profileImage.isNotEmpty
                               ? NetworkImage(profileImage)
                               : null,
                           child: (profileImage == null || profileImage.isEmpty)
-                              ? const Icon(
+                              ? Icon(
                                   Icons.person,
-                                  color: AppTheme.primaryBlue,
+                                  color: Theme.of(context).colorScheme.primary,
                                 )
                               : null,
                         ),
@@ -124,7 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             _getGreeting(),
                             style: TextStyle(
                               fontSize: 12,
-                              color: textSlate500,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.5,
                             ),
@@ -134,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: textSlate900,
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.2,
                             ),
                           ),
@@ -148,19 +139,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
-                          color: isDark ? surfaceDark : Colors.white,
+                          color: Theme.of(context).cardColor,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Theme.of(
+                                context,
+                              ).shadowColor.withValues(alpha: 0.03),
                               blurRadius: 20,
                               offset: const Offset(0, 4),
                             ),
                           ],
                           border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF1E293B)
-                                : const Color(0xFFF1F5F9),
+                            color: Theme.of(context).dividerColor,
                           ),
                         ),
                         child: IconButton(
@@ -168,9 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: Icon(
                             Icons.notifications_outlined,
                             size: 22,
-                            color: isDark
-                                ? const Color(0xFFCBD5E1)
-                                : const Color(0xFF475569),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             Navigator.of(context).push(
@@ -190,10 +181,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444),
+                            color: Theme.of(context).colorScheme.error,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark ? surfaceDark : Colors.white,
+                              color: Theme.of(context).cardColor,
                               width: 1,
                             ),
                           ),
@@ -210,39 +201,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildSectionHeader(
                   context,
                   'home.active_request_status'.tr(),
-                  textSlate900,
+                  Theme.of(context).colorScheme.onSurface,
                 ),
                 const SizedBox(height: 16),
-                _buildActiveRequestCard(
-                  context,
-                  activeConsultations.first,
-                  isDark,
-                  textSlate900,
-                  textSlate500,
-                  bgLight,
-                  bgDark,
-                  surfaceLight,
-                  surfaceDark,
-                ),
+                _buildActiveRequestCard(context, activeConsultations.first),
               ] else ...[
                 // Placeholder or empty state for active requests?
                 // Design suggests we should prompt to find a specialist if empty.
                 _buildSectionHeader(
                   context,
                   'home.active_request_status'.tr(),
-                  textSlate900,
+                  Theme.of(context).colorScheme.onSurface,
                 ),
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: isDark ? surfaceDark : surfaceLight,
+                    color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF334155).withValues(alpha: 0.3)
-                          : const Color(0xFFF1F5F9).withValues(alpha: 0.5),
-                    ),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                   ),
                   child: Center(
                     child: Column(
@@ -250,13 +227,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icon(
                           Icons.assignment_turned_in_outlined,
                           size: 48,
-                          color: textSlate500.withValues(alpha: 0.5),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'home.no_active_consultations'.tr(),
                           style: TextStyle(
-                            color: textSlate900,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -264,7 +243,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'home.consult_specialist_prompt'.tr(),
-                          style: TextStyle(color: textSlate500, fontSize: 14),
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                            fontSize: 14,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -278,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildSectionHeader(
                 context,
                 'home.find_specialist'.tr(),
-                textSlate900,
+                Theme.of(context).colorScheme.onSurface,
               ),
               const SizedBox(height: 16),
               SingleChildScrollView(
@@ -325,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildSectionHeader(
                 context,
                 'home.recent_activity'.tr(),
-                textSlate900,
+                Theme.of(context).colorScheme.onSurface,
               ),
               const SizedBox(height: 16),
               if (recentActivity.isNotEmpty)
@@ -346,7 +330,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Center(
                     child: Text(
                       'home.no_recent_activity'.tr(),
-                      style: TextStyle(color: textSlate500),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -359,15 +345,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildActiveRequestCard(
     BuildContext context,
-    ConsultationModel consultation, // Using ConsultationModel
-    bool isDark,
-    Color textSlate900,
-    Color textSlate500,
-    Color bgLight,
-    Color bgDark,
-    Color surfaceLight,
-    Color surfaceDark,
+    ConsultationModel consultation,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textSlate900 = colorScheme.onSurface;
+    final textSlate500 = colorScheme.onSurfaceVariant;
+    final surfaceColor = Theme.of(context).cardColor;
+    final dividerColor = Theme.of(context).dividerColor;
     // Map status to display
     final status = consultation.status;
     final doctorName =
@@ -387,19 +372,15 @@ class _HomeScreenState extends State<HomeScreen> {
     } else if (status == 'in_review') {
       statusColor = const Color(0xFFF59E0B);
     } else if (status == 'pending') {
-      statusColor = AppTheme.primaryBlue;
+      statusColor = Theme.of(context).colorScheme.primary;
     }
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? surfaceDark : surfaceLight,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isDark
-              ? const Color(0xFF334155).withValues(alpha: 0.3)
-              : const Color(0xFFF1F5F9).withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: dividerColor),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF1152D4).withValues(alpha: 0.1),
@@ -418,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 64,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: AppTheme.primaryBlue.withValues(
+                  color: Theme.of(context).colorScheme.primary.withValues(
                     alpha: 0.1,
                   ), // Use a themed color
                 ),
@@ -428,7 +409,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.primaryBlue.withValues(alpha: 0.8),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -520,13 +503,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? bgDark.withValues(alpha: 0.5) : bgLight,
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFF1F5F9),
-              ),
+              border: Border.all(color: dividerColor),
             ),
             child: Row(
               children: [
@@ -534,14 +513,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withValues(
-                      alpha: isDark ? 0.2 : 0.1,
-                    ),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.assignment_ind_outlined,
-                    color: AppTheme.primaryBlue,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 20,
                   ),
                 ),
@@ -581,12 +560,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               style: OutlinedButton.styleFrom(
-                backgroundColor: isDark ? surfaceDark : Colors.white,
-                side: BorderSide(
-                  color: isDark
-                      ? const Color(0xFF334155)
-                      : const Color(0xFFE2E8F0),
-                ),
+                backgroundColor: surfaceColor,
+                side: BorderSide(color: dividerColor),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -670,16 +645,12 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData icon,
     bool isActive,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isActive
-        ? AppTheme.primaryBlue
-        : (isDark ? const Color(0xFF1A2130) : Colors.white);
+    final theme = Theme.of(context);
+    final bgColor = isActive ? theme.colorScheme.primary : theme.cardColor;
     final iconColor = isActive
-        ? Colors.white
-        : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B));
-    final borderColor = isDark
-        ? const Color(0xFF1E293B)
-        : const Color(0xFFF1F5F9);
+        ? theme.colorScheme.onPrimary
+        : theme.colorScheme.onSurfaceVariant;
+    final borderColor = theme.dividerColor;
 
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
@@ -698,7 +669,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 boxShadow: isActive
                     ? [
                         BoxShadow(
-                          color: AppTheme.primaryBlue.withValues(alpha: 0.25),
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withValues(alpha: 0.25),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -719,9 +692,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                color: isDark
-                    ? const Color(0xFFCBD5E1)
-                    : const Color(0xFF334155),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -745,25 +716,25 @@ class _HomeScreenState extends State<HomeScreen> {
     if (status == 'completed') {
       title = 'home.status.request_approved'.tr();
       icon = Icons.verified;
-      color = Colors.green;
+      color = Theme.of(context).extension<AppSemanticColors>()!.success;
     } else if (status == 'in_review') {
       title = 'home.status.doctor_reviewing_title'.tr();
       icon = Icons.assignment_ind;
-      color = AppTheme.primaryBlue;
+      color = Theme.of(context).colorScheme.primary;
       isNew = true;
     } else if (status == 'info_requested') {
       title = 'home.status.info_requested_title'.tr();
       icon = Icons.contact_support;
-      color = Colors.orange;
+      color = Theme.of(context).extension<AppSemanticColors>()!.warning;
       isNew = true;
     } else if (status == 'pending') {
       title = 'home.status.request_pending'.tr();
       icon = Icons.hourglass_empty;
-      color = Colors.grey;
+      color = Theme.of(context).colorScheme.outline;
     } else {
       title = 'home.status.request_update'.tr();
       icon = Icons.notifications;
-      color = Colors.purple;
+      color = Theme.of(context).colorScheme.tertiary;
     }
 
     final dateStr = DateFormat('MMM d • h:mm a').format(consultation.updatedAt);
@@ -789,10 +760,8 @@ class _HomeScreenState extends State<HomeScreen> {
     bool isNew = false,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surface = isDark ? const Color(0xFF1A2130) : const Color(0xFFFFFFFF);
-    final borderColor = isDark
-        ? const Color(0xFF1E293B)
-        : const Color(0xFFF1F5F9);
+    final surface = Theme.of(context).cardColor;
+    final borderColor = Theme.of(context).dividerColor;
 
     return InkWell(
       onTap: () => _navigateToTab(context, 2),

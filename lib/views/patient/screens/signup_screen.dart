@@ -90,8 +90,6 @@ class _SignupScreenState extends State<SignupScreen> {
     _scrollHelper.register('password', _passwordKey);
     _scrollHelper.register('confirmPassword', _confirmPasswordKey);
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -116,9 +114,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 Text(
                   'Sign up to get started with your medical consultations.',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: isDark
-                        ? AppTheme.textSecondaryDark
-                        : AppTheme.textSecondary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -224,9 +220,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Text(
                         'Or continue with',
                         style: TextStyle(
-                          color: isDark
-                              ? AppTheme.textSecondaryDark
-                              : AppTheme.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
                         ),
                       ),
@@ -267,9 +261,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   'By signing up, you agree to our Terms of Service and Privacy Policy.',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 12,
-                    color: isDark
-                        ? AppTheme.textTertiaryDark
-                        : AppTheme.textTertiary,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -335,7 +327,6 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _buildSocialButton(String label, String? assetPath, {IconData? icon}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SizedBox(
       height: 48,
       child: OutlinedButton(
@@ -344,7 +335,7 @@ class _SignupScreenState extends State<SignupScreen> {
         },
         style: OutlinedButton.styleFrom(
           backgroundColor: Theme.of(context).cardColor,
-          foregroundColor: isDark ? Colors.white : const Color(0xFF334155),
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
           side: BorderSide(color: Theme.of(context).dividerColor),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -374,9 +365,7 @@ class _SignupScreenState extends State<SignupScreen> {
         Text(
           'Already have an account?',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? AppTheme.textSecondaryDark
-                : AppTheme.textSecondary,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(width: 4),

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/models/doctor_model.dart';
+import 'package:mcs_app/utils/app_theme.dart';
 
 class DoctorCard extends StatefulWidget {
   const DoctorCard({super.key, required this.doctor, this.onTap});
@@ -34,7 +35,7 @@ class _DoctorCardState extends State<DoctorCard> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 4),
               ),
@@ -146,15 +147,17 @@ class _DoctorCardState extends State<DoctorCard> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: const Color(0xFFDCFCE7), // green-100
+          color: Theme.of(
+            context,
+          ).extension<AppSemanticColors>()!.success.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
           'common.availability.available_now'.tr(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF166534), // green-800
+            color: Theme.of(context).extension<AppSemanticColors>()!.success,
           ),
         ),
       );
@@ -162,16 +165,16 @@ class _DoctorCardState extends State<DoctorCard> {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: const Color(0xFFF1F5F9), // slate-100
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Text(
           // Assuming we can pass a date here later, generic 'Away' for now or from translation
           'common.availability.unavailable'.tr(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF475569), // slate-600
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       );
