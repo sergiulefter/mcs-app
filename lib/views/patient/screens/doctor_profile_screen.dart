@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/views/patient/screens/create_request_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:mcs_app/controllers/auth_controller.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
   const DoctorProfileScreen({super.key, required this.doctor});
@@ -18,7 +20,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   @override
   Widget build(BuildContext context) {
     // Determine bottom padding based on footer height + safe area
-    final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
+    // Increased to 120 to ensure footer (especially with warning text) doesn't cover content
+    final bottomPadding = 120.0 + MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
       body: Stack(
@@ -442,7 +445,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   ],
                 ),
                 child: Text(
-                  sub, // Assuming subspecialties are either translated keys or raw strings. Using raw for now.
+                  'subspecialties.$sub'.tr(),
                   style: TextStyle(
                     color: Theme.of(context).textTheme.bodyMedium?.color,
                     fontSize: 13,
@@ -580,6 +583,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   Widget _buildFooter(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final authController = Provider.of<AuthController>(context);
+    final isProfileComplete =
+        authController.currentUser?.profileCompleted ?? false;
 
     return Container(
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding),
@@ -601,15 +607,17 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             width: double.infinity,
             height: 48,
             child: FilledButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        CreateRequestScreen(doctor: widget.doctor),
-                  ),
-                );
-              },
+              onPressed: isProfileComplete
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              CreateRequestScreen(doctor: widget.doctor),
+                        ),
+                      );
+                    }
+                  : null,
               icon: const Icon(Icons.calendar_month, size: 20),
               label: Text(
                 'doctor_profile.request_consultation'.tr(),
@@ -621,23 +629,32 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
               style: FilledButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
+                disabledBackgroundColor: colorScheme.onSurface.withOpacity(
+                  0.12,
+                ),
+                disabledForegroundColor: colorScheme.onSurface.withOpacity(
+                  0.38,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                elevation: 4,
+                elevation: isProfileComplete ? 4 : 0,
                 shadowColor: colorScheme.primary.withValues(alpha: 0.4),
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'doctor_profile.requires_profile'.tr(),
-            style: TextStyle(
-              color: Theme.of(context).disabledColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+          if (!isProfileComplete) ...[
+            const SizedBox(height: 8),
+            Text(
+              'doctor_profile.requires_profile'.tr(),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
+          ],
         ],
       ),
     );
