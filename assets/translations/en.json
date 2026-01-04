@@ -507,6 +507,8 @@
     "success_message": "Consultation request submitted successfully",
     "error_message": "Error submitting request. Please try again.",
     "step1": {
+      "main_title": "Request Details",
+      "main_subtitle": "Please describe your symptoms and concerns in detail",
       "title": "Request Details",
       "subtitle": "Describe your condition and concerns in detail",
       "title_label": "Brief Title",

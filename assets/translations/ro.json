@@ -507,6 +507,8 @@
     "success_message": "Cererea de consultație a fost trimisă cu succes",
     "error_message": "Eroare la trimiterea cererii. Te rog încearcă din nou.",
     "step1": {
+      "main_title": "Detalii Cerere",
+      "main_subtitle": "Te rugăm să descrii simptomele și îngrijorările tale în detaliu",
       "title": "Detalii Cerere",
       "subtitle": "Descrie condiția și preocupările tale în detaliu",
       "title_label": "Titlu Scurt",

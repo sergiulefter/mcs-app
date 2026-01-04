@@ -273,9 +273,9 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
           // Icon mapping (simplified)
           IconData? icon;
-          if (specialty == 'general')
+          if (specialty == 'general') {
             icon = Icons.medical_services;
-          else if (specialty == 'dentist')
+          } else if (specialty == 'dentist')
             icon = Icons.masks; // Approximation
           else if (specialty == 'cardiology')
             icon = Icons.favorite;
