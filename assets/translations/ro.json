@@ -149,7 +149,7 @@
     "results_count": "{count} medici",
     "view_profile": "Vezi profilul",
     "verified": "Profil verificat",
-    "price_format": "{price} RON / consultație",
+    "price_format": "{price} RON",
     "availability_description": {
       "available": "Acceptă cereri pentru a doua opinie",
       "unavailable": "Evaluează consultațiile existente"
@@ -160,7 +160,8 @@
       "experience": "Experiență",
       "price_asc": "Preț (crescător)",
       "price_desc": "Preț (descrescător)",
-      "name": "Nume"
+      "name": "Nume",
+      "rating": "Cel mai bine cotat"
     },
     "experience": {
       "new": "Nou în practică",
@@ -372,6 +373,11 @@
     "criticalCareEM": "Terapie Intensivă"
   },
   "doctor_profile": {
+    "title": "Profil Medic",
+    "verified": "Verificat",
+    "experience_label": "Experiență",
+    "price_label": "Preț",
+    "languages_label": "Limbi",
     "about": "Despre",
     "education": "Educație & Credențiale",
     "subspecialties": "Subspecialități",
@@ -384,8 +390,9 @@
     "on_vacation_prefix": "Indisponibil din",
     "on_vacation_to": "până în",
     "read_more": "Citește mai mult",
-    "read_less": "Citește mai puțin",
+    "read_less": "Restrânge",
     "request_consultation": "Solicită Consultație",
+    "requires_profile": "Necesită completarea profilului",
     "complete_profile_required": "Te rugăm să îți completezi profilul înainte de a solicita o consultație"
   },
   "consultations": {
@@ -643,7 +650,12 @@
     "full_name": "Nume Complet",
     "coming_soon": "În Curând",
     "years": "ani",
-    "years_format": "{years} ani",
+    "years_short": "Ani",
+    "years_format": "{years} ani experiență",
+    "speaks": "Vorbește {language}",
+    "book_appointment": "Fă o programare",
+    "consultation_fee": "Cost Consultație",
+    "away_until": "Plecat până la {date}",
     "urgency": {
       "standard": "Standard",
       "priority": "Prioritate"

@@ -1,19 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:provider/provider.dart';
-import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:mcs_app/models/doctor_model.dart';
-import 'package:mcs_app/models/specialty_registry.dart';
-import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
-import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
-import 'create_request_screen.dart';
+import 'package:mcs_app/views/patient/screens/create_request_screen.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
-  const DoctorProfileScreen({
-    super.key,
-    required this.doctor,
-  });
+  const DoctorProfileScreen({super.key, required this.doctor});
 
   final DoctorModel doctor;
 
@@ -22,187 +13,306 @@ class DoctorProfileScreen extends StatefulWidget {
 }
 
 class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
-  bool _isBioExpanded = false;
+  bool _isAboutExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    final doctor = widget.doctor;
+    // Determine bottom padding based on footer height + safe area
+    final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ListView(
-              padding: AppTheme.screenPadding.copyWith(
-                bottom: AppTheme.screenPadding.bottom + 100,
-              ),
+      body: Stack(
+        children: [
+          // Scrollable Content
+          SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: 70 + MediaQuery.of(context).padding.top, // Header height
+              bottom: bottomPadding,
+            ),
+            child: Column(
               children: [
-                _buildHeader(context, doctor),
-                const SizedBox(height: AppTheme.sectionSpacing),
-                _buildQuickInfo(context, doctor),
-                if (doctor.bio.isNotEmpty) ...[
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildBioSection(context, doctor),
-                ],
-                if (doctor.education.isNotEmpty) ...[
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildEducationSection(context, doctor),
-                ],
-                if (doctor.subspecialties.isNotEmpty) ...[
-                  const SizedBox(height: AppTheme.sectionSpacing),
-                  _buildSubspecialtiesSection(context, doctor),
-                ],
-                const SizedBox(height: AppTheme.sectionSpacing),
-                _buildAvailabilitySection(context, doctor),
+                _buildHero(context),
+                _buildStats(context),
+                _buildAbout(context),
+                _buildSubspecialties(context),
+                _buildEducation(context),
               ],
             ),
-            // Gradient scrim - fades content behind the floating area
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: IgnorePointer(
-                child: Container(
-                  height: 90,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0),
-                        Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.7),
-                      ],
-                      stops: const [0.0, 1.0],
+          ),
+
+          // Sticky Header
+          Positioned(top: 0, left: 0, right: 0, child: _buildHeader(context)),
+
+          // Fixed Footer
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: _buildFooter(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: topPadding,
+        left: 16,
+        right: 16,
+        bottom: 16,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(
+          context,
+        ).scaffoldBackgroundColor.withValues(alpha: 0.95),
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildCircleButton(
+            context,
+            icon: Icons.arrow_back,
+            onTap: () => Navigator.pop(context),
+          ),
+          Text(
+            'doctor_profile.title'.tr(),
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCircleButton(
+    BuildContext context, {
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.transparent, // HTML hover bg handled by InkWell ripple
+        ),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface),
+      ),
+    );
+  }
+
+  Widget _buildHero(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final doctor = widget.doctor;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: Column(
+        children: [
+          // Avatar Ring
+          Stack(
+            children: [
+              Container(
+                width: 128,
+                height: 128,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Theme.of(context).cardColor,
+                    width: 4,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  image: doctor.photoUrl != null
+                      ? DecorationImage(
+                          image: NetworkImage(doctor.photoUrl!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  color: colorScheme.surfaceContainerHighest,
+                ),
+                child: doctor.photoUrl == null
+                    ? Icon(
+                        Icons.person,
+                        size: 64,
+                        color: colorScheme.onSurfaceVariant,
+                      )
+                    : null,
+              ),
+              if (doctor.isCurrentlyAvailable)
+                Positioned(
+                  bottom: 4,
+                  right: 4,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.green, // active status color
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        width: 3,
+                      ),
                     ),
                   ),
                 ),
-              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Name & Specialty
+          Text(
+            doctor.fullName,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
             ),
-            // Button and text - floating
-            Positioned(
-              left: AppTheme.spacing16,
-              right: AppTheme.spacing16,
-              bottom: AppTheme.spacing16,
-              child: _buildRequestButton(context, doctor),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'specialties.${doctor.specialty.name}'.tr(),
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-          ],
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          // Verified Badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.verified, size: 16, color: colorScheme.primary),
+                const SizedBox(width: 4),
+                Text(
+                  'doctor_profile.verified'.tr(),
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStats(BuildContext context) {
+    final doctor = widget.doctor;
+    final rowItems = [
+      {
+        'icon': Icons.medical_services,
+        'value': '${doctor.experienceYears} ${'common.years_short'.tr()}',
+        'label': 'doctor_profile.experience_label'.tr(),
+      },
+      {
+        'icon': Icons.payments,
+        'value':
+            '\$${doctor.consultationPrice.toStringAsFixed(0)}', // Currency formatting
+        'label': 'doctor_profile.price_label'.tr(),
+      },
+      {
+        'icon': Icons.translate,
+        'value': doctor.languages.take(2).join(', '),
+        'label': 'doctor_profile.languages_label'.tr(),
+      },
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: rowItems
+            .map((item) => Expanded(child: _buildStatCard(context, item)))
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(BuildContext context, Map<String, dynamic> item) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.6),
         ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4),
+        ],
       ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      title: Text(
-        widget.doctor.fullName,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, DoctorModel doctor) {
-    return SurfaceCard(
-      padding: AppTheme.cardPadding,
-      borderColor: Theme.of(context).dividerColor,
-      showShadow: Theme.of(context).brightness == Brightness.light,
       child: Column(
         children: [
-          Row(
-            children: [
-              _Avatar(initials: _initialsFromName(doctor.fullName)),
-              const SizedBox(width: AppTheme.spacing16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      doctor.fullName,
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
-                    ),
-                    const SizedBox(height: AppTheme.spacing8),
-                    Text(
-                      _getSpecialtyName(doctor.specialty),
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppTheme.spacing16),
-          Row(
-            children: [
-              _Badge(
-                icon: doctor.isCurrentlyAvailable
-                    ? Icons.circle
-                    : Icons.access_time,
-                iconSize: doctor.isCurrentlyAvailable ? 12 : AppTheme.iconSmall,
-                iconColor: doctor.isCurrentlyAvailable
-                    ? Theme.of(context).colorScheme.secondary
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
-                label: doctor.isCurrentlyAvailable
-                    ? 'common.availability.available_now'.tr()
-                    : 'common.availability.currently_unavailable'.tr(),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickInfo(BuildContext context, DoctorModel doctor) {
-    final priceFormat = NumberFormat('#,##0.00', 'en_US');
-
-    return SurfaceCard(
-      padding: AppTheme.cardPadding,
-      borderColor: Theme.of(context).dividerColor,
-      showShadow: false,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: _InfoColumn(
-              icon: Icons.language,
-              label: 'common.languages'.tr(),
-              value: doctor.languagesLabel,
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              item['icon'] as IconData,
+              color: colorScheme.primary,
+              size: 20,
             ),
           ),
-          Container(
-            width: 1,
-            height: 48,
-            color: Theme.of(context).dividerColor,
-          ),
-          Expanded(
-            child: _InfoColumn(
-              icon: Icons.attach_money,
-              label: 'doctor_profile.consultation_price'.tr(),
-              value: '${priceFormat.format(doctor.consultationPrice)} ${'doctor_profile.currency'.tr()}',
+          Text(
+            item['value'] as String,
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              height: 1,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          Container(
-            width: 1,
-            height: 48,
-            color: Theme.of(context).dividerColor,
-          ),
-          Expanded(
-            child: _InfoColumn(
-              icon: Icons.badge_outlined,
-              label: 'common.experience'.tr(),
-              value: 'common.years_format'.tr(namedArgs: {'years': doctor.experienceYears.toString()}),
+          const SizedBox(height: 4),
+          Text(
+            item['label'] as String,
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodySmall?.color,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -210,62 +320,256 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildBioSection(BuildContext context, DoctorModel doctor) {
-    final bioLines = doctor.bio.split('\n').length;
-    final shouldShowExpandButton = bioLines > 5;
+  Widget _buildAbout(BuildContext context) {
+    final doctor = widget.doctor;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'doctor_profile.about'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-        SurfaceCard(
-          padding: AppTheme.cardPadding,
-          borderColor: Theme.of(context).dividerColor,
-          showShadow: false,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                doctor.bio,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.6,
-                    ),
-                maxLines: _isBioExpanded ? null : 5,
-                overflow: _isBioExpanded ? null : TextOverflow.ellipsis,
+    if (doctor.bio.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.6),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'doctor_profile.about'.tr(),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
-              if (shouldShowExpandButton) ...[
-                const SizedBox(height: AppTheme.spacing12),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      _isBioExpanded = !_isBioExpanded;
-                    });
-                  },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              doctor.bio,
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+                fontSize: 14,
+                height: 1.5,
+              ),
+              maxLines: _isAboutExpanded ? null : 3,
+              overflow: _isAboutExpanded
+                  ? TextOverflow.visible
+                  : TextOverflow.ellipsis,
+            ),
+            if (doctor.bio.length >
+                150) // Arbitrary char limit for determining if toggle implies
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: InkWell(
+                  onTap: () =>
+                      setState(() => _isAboutExpanded = !_isAboutExpanded),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _isBioExpanded
+                        _isAboutExpanded
                             ? 'doctor_profile.read_less'.tr()
                             : 'doctor_profile.read_more'.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      const SizedBox(width: AppTheme.spacing4),
                       Icon(
-                        _isBioExpanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        size: AppTheme.iconSmall,
-                        color: Theme.of(context).colorScheme.primary,
+                        _isAboutExpanded
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                        color: colorScheme.primary,
+                        size: 18,
                       ),
                     ],
                   ),
                 ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubspecialties(BuildContext context) {
+    final doctor = widget.doctor;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (doctor.subspecialties.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              'doctor_profile.subspecialties'.tr(),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: doctor.subspecialties.map((sub) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Text(
+                  sub, // Assuming subspecialties are either translated keys or raw strings. Using raw for now.
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEducation(BuildContext context) {
+    final doctor = widget.doctor;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (doctor.education.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+              'doctor_profile.education'.tr(),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.6),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 4,
+                ),
               ],
+            ),
+            child: Column(
+              children: [
+                for (int i = 0; i < doctor.education.length; i++) ...[
+                  if (i > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 54,
+                        top: 12,
+                        bottom: 12,
+                      ), // Indent separator
+                      child: Divider(
+                        height: 1,
+                        color: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  _buildEducationItem(context, doctor.education[i]),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEducationItem(BuildContext context, EducationEntry entry) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Theme.of(context).disabledColor.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.school,
+            size: 20,
+            color: Theme.of(context).disabledColor,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                entry.institution,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                entry.degree,
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                entry.year.toString(), // Simplified year range
+                style: TextStyle(
+                  color: Theme.of(context).disabledColor,
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
         ),
@@ -273,460 +577,65 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     );
   }
 
-  Widget _buildEducationSection(BuildContext context, DoctorModel doctor) {
-    final sortedEducation = [...doctor.education]
-      ..sort((a, b) => b.year.compareTo(a.year));
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'doctor_profile.education'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-        ...sortedEducation.map((education) {
-          final theme = Theme.of(context);
-          final isDark = theme.brightness == Brightness.dark;
-          final iconColor = theme.colorScheme.onSurface;
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppTheme.spacing12),
-            child: SurfaceCard(
-              padding: AppTheme.cardPadding,
-              borderColor: Theme.of(context).dividerColor,
-              showShadow: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(AppTheme.spacing8),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary
-                              .withValues(alpha: isDark ? 0.25 : 0.1),
-                          borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                        ),
-                        child: Icon(
-                          Icons.school,
-                          size: AppTheme.iconMedium,
-                          color: iconColor,
-                        ),
-                      ),
-                      const SizedBox(width: AppTheme.spacing12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              education.degree,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                            const SizedBox(height: AppTheme.spacing4),
-                            Text(
-                              education.institution,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppTheme.spacing8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacing12,
-                      vertical: AppTheme.spacing4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                    ),
-                    child: Text(
-                      education.year.toString(),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget _buildSubspecialtiesSection(BuildContext context, DoctorModel doctor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'doctor_profile.subspecialties'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-        SurfaceCard(
-          padding: AppTheme.cardPadding,
-          borderColor: Theme.of(context).dividerColor,
-          showShadow: false,
-          child: Wrap(
-            spacing: AppTheme.spacing8,
-            runSpacing: AppTheme.spacing8,
-            children: doctor.subspecialties.map((subspecialty) {
-              return _Badge(
-                label: SpecialtyRegistry.translateSubspecialty(subspecialty),
-                icon: Icons.medical_services_outlined,
-                iconColor: Theme.of(context).colorScheme.primary,
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAvailabilitySection(BuildContext context, DoctorModel doctor) {
-    // Availability is already shown in the header badge and the footer handles
-    // unavailable state with vacation details, so this section is redundant.
-    return const SizedBox.shrink();
-  }
-
-  Widget _buildRequestButton(BuildContext context, DoctorModel doctor) {
+  Widget _buildFooter(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final now = DateTime.now();
-    final activeOrUpcomingVacations = doctor.vacationPeriods
-        .where((vac) => vac.isActive() || vac.startDate.isAfter(now))
-        .toList()
-      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    // Check if user has completed profile
-    final user = context.watch<AuthController>().currentUser;
-    final isProfileComplete = user?.profileCompleted ?? false;
-
-    String? startDate;
-    String? endDate;
-    String? unavailableReason;
-    if (!doctor.isCurrentlyAvailable &&
-        activeOrUpcomingVacations.isNotEmpty) {
-      final vac = activeOrUpcomingVacations.first;
-      final dateFormat = DateFormat('dd MMM yyyy');
-      startDate = dateFormat.format(vac.startDate);
-      endDate = dateFormat.format(vac.endDate);
-      if (vac.reason != null && vac.reason!.isNotEmpty) {
-        unavailableReason = vac.reason!;
-      }
-    }
-
-    if (doctor.isCurrentlyAvailable) {
-      // Profile incomplete - show disabled state
-      if (!isProfileComplete) {
-        // Create solid opaque disabled colors by blending with surface
-        final disabledBg = Color.alphaBlend(
-          colorScheme.onSurface.withValues(alpha: 0.12),
-          colorScheme.surface,
-        );
-        final disabledFg = Color.alphaBlend(
-          colorScheme.onSurface.withValues(alpha: 0.38),
-          colorScheme.surface,
-        );
-        return Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: isDark ? 0.3 : 0.15),
-                    blurRadius: 12,
-                    spreadRadius: 0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ElevatedButton.icon(
-                onPressed: null,
-                icon: const Icon(Icons.medical_services_outlined),
-                label: Text('doctor_profile.request_consultation'.tr()),
-                style: ElevatedButton.styleFrom(
-                  disabledBackgroundColor: disabledBg,
-                  disabledForegroundColor: disabledFg,
-                  minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppTheme.spacing8),
-            Text(
-              'doctor_profile.complete_profile_required'.tr(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        );
-      }
-
-      // Profile complete - show enabled button with colored shadow
-      return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.primary.withValues(alpha: isDark ? 0.4 : 0.3),
-              blurRadius: 16,
-              spreadRadius: 0,
-              offset: const Offset(0, 6),
-            ),
-            BoxShadow(
-              color: colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.15),
-              blurRadius: 6,
-              spreadRadius: 0,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => CreateRequestScreen(
-                  doctor: doctor,
-                ),
-              ),
-            );
-          },
-          icon: const Icon(Icons.medical_services_outlined),
-          label: Text('doctor_profile.request_consultation'.tr()),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
-            minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Doctor unavailable - show vacation info
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacing16),
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottomPadding),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
         boxShadow: [
           BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: isDark ? 0.3 : 0.15),
-            blurRadius: 12,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (startDate != null && endDate != null)
-            RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurface,
-                    ),
-                children: [
-                  TextSpan(text: 'doctor_profile.on_vacation_prefix'.tr()),
-                  TextSpan(
-                    text: ' $startDate ',
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  TextSpan(text: 'doctor_profile.on_vacation_to'.tr()),
-                  TextSpan(
-                    text: ' $endDate',
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          if (unavailableReason != null) ...[
-            const SizedBox(height: AppTheme.spacing8),
-            Text(
-              unavailableReason,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-  String _initialsFromName(String name) {
-    final trimmed = name.trim();
-    if (trimmed.isEmpty) return '';
-    final parts = trimmed.split(RegExp(r'\s+'));
-    final first = parts.first.isNotEmpty ? parts.first[0] : '';
-    final last = parts.length > 1 && parts.last.isNotEmpty ? parts.last[0] : '';
-    return (first + last).toUpperCase();
-  }
-
-  String _getSpecialtyName(dynamic specialty) {
-    // Extract enum value (e.g., "cardiology" from "MedicalSpecialty.cardiology")
-    final specialtyKey = specialty.toString().split('.').last;
-    return 'specialties.$specialtyKey'.tr();
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar({required this.initials});
-
-  final String initials;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 72,
-      height: 72,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-      ),
-      child: Center(
-        child: Text(
-          initials,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.label,
-    this.icon,
-    this.iconColor,
-    this.iconSize = AppTheme.iconSmall,
-  });
-
-  final String label;
-  final IconData? icon;
-  final Color? iconColor;
-  final double iconSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacing12,
-        vertical: AppTheme.spacing8,
-      ),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-      ),
-      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null)
-            Icon(
-              icon,
-              size: iconSize,
-              color: iconColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          if (icon != null) const SizedBox(width: AppTheme.spacing4),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CreateRequestScreen(doctor: widget.doctor),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.calendar_month, size: 20),
+              label: Text(
+                'doctor_profile.request_consultation'.tr(),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoColumn extends StatelessWidget {
-  const _InfoColumn({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    // Calculate minimum height for 2 lines of labelSmall text
-    final labelStyle = Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        );
-    final labelLineHeight =
-        (labelStyle?.fontSize ?? 11) * (labelStyle?.height ?? 1.2);
-    final twoLineLabelHeight = labelLineHeight * 2 + 4; // 2 lines + padding
-
-    // Calculate minimum height for 2 lines of bodyMedium text (for value)
-    final valueStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-        );
-    final valueLineHeight =
-        (valueStyle?.fontSize ?? 14) * (valueStyle?.height ?? 1.4);
-    final twoLineValueHeight = valueLineHeight * 2 + 4; // 2 lines + padding
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacing4),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: AppTheme.iconMedium,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(height: AppTheme.spacing8),
-          SizedBox(
-            height: twoLineLabelHeight,
-            child: Center(
-              child: Text(
-                label,
-                style: labelStyle,
-                textAlign: TextAlign.center,
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+                shadowColor: colorScheme.primary.withValues(alpha: 0.4),
               ),
             ),
           ),
-          const SizedBox(height: AppTheme.spacing4),
-          SizedBox(
-            height: twoLineValueHeight,
-            child: Center(
-              child: Text(
-                value,
-                style: valueStyle,
-                textAlign: TextAlign.center,
-              ),
+          const SizedBox(height: 8),
+          Text(
+            'doctor_profile.requires_profile'.tr(),
+            style: TextStyle(
+              color: Theme.of(context).disabledColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

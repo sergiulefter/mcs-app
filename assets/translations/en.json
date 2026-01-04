@@ -137,19 +137,19 @@
       "doctor_reviewing_title": "Doctor Reviewing",
       "info_requested_title": "Info Requested",
       "request_pending": "Request Pending",
-      "request_update": "Request Update"
+      "request_update": "Request Updated"
     }
   },
   "doctors": {
     "title": "Browse Doctors",
     "subtitle": "Find and connect with medical specialists",
     "placeholder_info": "Search for doctors by specialty, view their profiles, and request second opinions.",
-    "search_hint": "Search specialists",
+    "search_hint": "Search doctor, specialty...",
     "results_title": "Available Specialists",
     "results_count": "{count} doctors",
     "view_profile": "View profile",
     "verified": "Verified profile",
-    "price_format": "{price} RON / consultation",
+    "price_format": "${price}",
     "availability_description": {
       "available": "Accepting second opinion requests",
       "unavailable": "Currently reviewing existing consultations"
@@ -160,7 +160,8 @@
       "experience": "Experience",
       "price_asc": "Price (low to high)",
       "price_desc": "Price (high to low)",
-      "name": "Name"
+      "name": "Name",
+      "rating": "Highest Rated"
     },
     "experience": {
       "new": "New practitioner",
@@ -372,6 +373,11 @@
     "criticalCareEM": "Critical Care"
   },
   "doctor_profile": {
+    "title": "Doctor Profile",
+    "verified": "Verified",
+    "experience_label": "Experience",
+    "price_label": "Price",
+    "languages_label": "Languages",
     "about": "About",
     "education": "Education & Credentials",
     "subspecialties": "Subspecialties",
@@ -386,6 +392,7 @@
     "read_more": "Read more",
     "read_less": "Read less",
     "request_consultation": "Request Consultation",
+    "requires_profile": "Requires profile completion",
     "complete_profile_required": "Please complete your profile before requesting a consultation"
   },
   "consultations": {
@@ -643,7 +650,12 @@
     "full_name": "Full Name",
     "coming_soon": "Coming Soon",
     "years": "years",
-    "years_format": "{years} years",
+    "years_short": "Yrs",
+    "years_format": "{years} Years Experience",
+    "speaks": "Speaks {language}",
+    "book_appointment": "Book Appointment",
+    "consultation_fee": "Consultation Fee",
+    "away_until": "Away until {date}",
     "urgency": {
       "standard": "Standard",
       "priority": "Priority"
