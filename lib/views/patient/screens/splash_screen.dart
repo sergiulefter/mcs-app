@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
-import 'package:mcs_app/utils/app_theme.dart';
+
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
