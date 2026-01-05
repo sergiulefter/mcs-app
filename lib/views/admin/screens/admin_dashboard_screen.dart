@@ -10,6 +10,7 @@ import 'create_doctor_screen.dart';
 import 'doctor_management_screen.dart';
 import 'user_management_screen.dart';
 import 'system_settings_screen.dart';
+import 'admin_settings_screen.dart';
 
 /// Admin dashboard with statistics, navigation to admin features.
 class AdminDashboardScreen extends StatefulWidget {
@@ -235,24 +236,57 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ),
             ],
           ),
-          // Logout Button - icon only, with hover effect
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _handleSignOut(context),
-              borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-              hoverColor: isDark
-                  ? AppTheme.red900.withValues(alpha: 0.2)
-                  : AppTheme.red50,
-              child: Padding(
-                padding: const EdgeInsets.all(AppTheme.spacing8),
-                child: Icon(
-                  Icons.logout_outlined,
-                  size: AppTheme.iconMedium,
-                  color: colorScheme.onSurfaceVariant,
+
+          Row(
+            children: [
+              // Settings Button
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (context) => const AdminSettingsScreen(),
+                          ),
+                        )
+                        .then((_) => _refreshStatisticsSilently());
+                  },
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                  hoverColor: isDark
+                      ? AppTheme.slate700.withValues(alpha: 0.5)
+                      : AppTheme.slate100,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.spacing8),
+                    child: Icon(
+                      Icons.settings_outlined,
+                      size: AppTheme.iconMedium,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: AppTheme.spacing8),
+              // Logout Button - icon only, with hover effect
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => _handleSignOut(context),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                  hoverColor: isDark
+                      ? AppTheme.red900.withValues(alpha: 0.2)
+                      : AppTheme.red50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.spacing8),
+                    child: Icon(
+                      Icons.logout_outlined,
+                      size: AppTheme.iconMedium,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
