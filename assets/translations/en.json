@@ -836,7 +836,10 @@
       "delete_title": "Delete Doctor",
       "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
       "delete_success": "Doctor deleted successfully",
-      "delete_error": "Failed to delete doctor. Please try again."
+      "delete_error": "Failed to delete doctor. Please try again.",
+      "column_doctor": "DOCTOR",
+      "column_status": "AVAILABILITY",
+      "column_actions": "ACTIONS"
     },
     "users": {
       "search_hint": "Search by name or email",
@@ -850,7 +853,11 @@
       "delete_title": "Delete User",
       "delete_message": "Are you sure you want to delete {name}? This action cannot be undone.",
       "delete_success": "User deleted successfully",
-      "delete_error": "Failed to delete user. Please try again."
+      "delete_error": "Failed to delete user. Please try again.",
+      "column_user": "USER",
+      "column_status": "STATUS",
+      "column_actions": "ACTIONS",
+      "unnamed": "Unnamed User"
     }
   },
   "doctor": {
