@@ -5,10 +5,7 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
-import 'package:mcs_app/views/patient/screens/main_shell.dart';
-import 'package:mcs_app/views/patient/widgets/cards/stat_card.dart';
 import 'create_doctor_screen.dart';
 import 'doctor_management_screen.dart';
 import 'user_management_screen.dart';
@@ -75,53 +72,34 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   }
 
   void _navigateToCreateDoctor(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const CreateDoctorScreen(),
-      ),
-    ).then((_) => _refreshStatisticsSilently());
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(builder: (context) => const CreateDoctorScreen()),
+        )
+        .then((_) => _refreshStatisticsSilently());
   }
 
   void _navigateToDoctorManagement(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const DoctorManagementScreen(),
-      ),
-    ).then((_) => _refreshStatisticsSilently());
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => const DoctorManagementScreen(),
+          ),
+        )
+        .then((_) => _refreshStatisticsSilently());
   }
 
   void _navigateToUserManagement(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const UserManagementScreen(),
-      ),
-    ).then((_) => _refreshStatisticsSilently());
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(builder: (context) => const UserManagementScreen()),
+        )
+        .then((_) => _refreshStatisticsSilently());
   }
 
   void _navigateToSystemSettings(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const SystemSettingsScreen(),
-      ),
-    );
-  }
-
-  void _navigateToPatientApp(BuildContext context) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const MainShell(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-            ),
-            child: child,
-          );
-        },
-        transitionDuration: AppConstants.longDuration,
-      ),
+      MaterialPageRoute(builder: (context) => const SystemSettingsScreen()),
     );
   }
 
@@ -163,55 +141,46 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('admin.dashboard_title'.tr()),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_outlined),
-            onPressed: () => _handleSignOut(context),
-            tooltip: 'admin.sign_out'.tr(),
-          ),
-        ],
-      ),
+      backgroundColor: isDark ? colorScheme.surface : AppTheme.backgroundLight,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _loadStatistics,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: AppTheme.screenPadding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header
+                // Header Section
                 _buildHeader(context),
-                const SizedBox(height: AppTheme.sectionSpacing),
 
-                // Statistics Section
-                _buildSectionHeader(context, 'admin.statistics'.tr()),
-                const SizedBox(height: AppTheme.spacing16),
-                _buildStatisticsSection(context),
-                const SizedBox(height: AppTheme.sectionSpacing),
+                // Main Content
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacing20,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: AppTheme.spacing24),
 
-                // Quick Actions Section
-                _buildSectionHeader(context, 'common.quick_actions'.tr()),
-                const SizedBox(height: AppTheme.spacing16),
+                      // Overview Section
+                      _buildSectionLabel(context, 'admin.statistics'.tr()),
+                      const SizedBox(height: AppTheme.spacing16),
+                      _buildStatisticsGrid(context),
+                      const SizedBox(height: AppTheme.spacing32),
 
-                // Management Cards
-                _buildManageDoctorsCard(context),
-                const SizedBox(height: AppTheme.spacing12),
-                _buildManageUsersCard(context),
-                const SizedBox(height: AppTheme.spacing12),
-                _buildCreateDoctorCard(context),
-                const SizedBox(height: AppTheme.spacing12),
-                _buildSystemSettingsCard(context),
-                const SizedBox(height: AppTheme.spacing12),
-                _buildViewPatientAppCard(context),
-                const SizedBox(height: AppTheme.sectionSpacing),
-
-                // Info Section
-                _buildInfoSection(context),
+                      // Quick Actions Section
+                      _buildSectionLabel(context, 'common.quick_actions'.tr()),
+                      const SizedBox(height: AppTheme.spacing16),
+                      _buildQuickActionsGrid(context),
+                      const SizedBox(height: AppTheme.spacing32),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -220,7 +189,95 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildStatisticsSection(BuildContext context) {
+  /// Builds the header with welcome message and logout button.
+  Widget _buildHeader(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Subtle border color matching HTML: border-slate-200/50 dark:border-slate-800/50
+    final borderColor = isDark
+        ? AppTheme.slate800.withValues(alpha: 0.5)
+        : AppTheme.slate200.withValues(alpha: 0.5);
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.spacing24,
+        AppTheme.spacing20,
+        AppTheme.spacing24,
+        AppTheme.spacing20,
+      ),
+      decoration: BoxDecoration(
+        color: isDark
+            ? colorScheme.surface.withValues(alpha: 0.9)
+            : AppTheme.backgroundLight.withValues(alpha: 0.9),
+        border: Border(bottom: BorderSide(color: borderColor, width: 1)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'admin.welcome'.tr(),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacing4),
+              Text(
+                'admin.dashboard_title'.tr(),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          // Logout Button - icon only, with hover effect
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _handleSignOut(context),
+              borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+              hoverColor: isDark
+                  ? AppTheme.red900.withValues(alpha: 0.2)
+                  : AppTheme.red50,
+              child: Padding(
+                padding: const EdgeInsets.all(AppTheme.spacing8),
+                child: Icon(
+                  Icons.logout_outlined,
+                  size: AppTheme.iconMedium,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds an uppercase section label.
+  Widget _buildSectionLabel(BuildContext context, String title) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: AppTheme.spacing4),
+      child: Text(
+        title.toUpperCase(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onSurfaceVariant,
+          letterSpacing: 1.0,
+        ),
+      ),
+    );
+  }
+
+  /// Builds the statistics grid with 4 stat cards.
+  Widget _buildStatisticsGrid(BuildContext context) {
     if (_isLoading) {
       return const Center(
         child: Padding(
@@ -231,38 +288,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     }
 
     if (_error != null) {
-      return Container(
-        padding: const EdgeInsets.all(AppTheme.spacing16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.errorContainer,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.error_outline,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(width: AppTheme.spacing12),
-            Expanded(
-              child: Text(
-                'admin.stats_error'.tr(),
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onErrorContainer,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: _loadStatistics,
-              child: Text('common.retry'.tr()),
-            ),
-          ],
-        ),
-      );
+      return _buildErrorState(context);
     }
 
-    final colorScheme = Theme.of(context).colorScheme;
-    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Column(
       children: [
@@ -270,43 +299,59 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         Row(
           children: [
             Expanded(
-              child: StatCard(
-                icon: Icons.people_outlined,
-                value: '${_stats?['totalPatients'] ?? 0}',
+              child: _buildStatCard(
+                context: context,
+                icon: Icons.group_outlined,
                 label: 'admin.stats.patients'.tr(),
-                color: colorScheme.primary,
+                value: '${_stats?['totalPatients'] ?? 0}',
+                iconColor: isDark ? AppTheme.blue400 : AppTheme.blue600,
+                iconBackgroundColor: isDark
+                    ? AppTheme.blue900.withValues(alpha: 0.3)
+                    : AppTheme.blue50,
               ),
             ),
-            const SizedBox(width: AppTheme.spacing12),
+            const SizedBox(width: AppTheme.spacing16),
             Expanded(
-              child: StatCard(
+              child: _buildStatCard(
+                context: context,
                 icon: Icons.medical_services_outlined,
-                value: '${_stats?['totalDoctors'] ?? 0}',
                 label: 'admin.stats.doctors'.tr(),
-                color: colorScheme.secondary,
+                value: '${_stats?['totalDoctors'] ?? 0}',
+                iconColor: isDark ? AppTheme.emerald400 : AppTheme.emerald600,
+                iconBackgroundColor: isDark
+                    ? AppTheme.emerald900.withValues(alpha: 0.3)
+                    : AppTheme.emerald50,
               ),
             ),
           ],
         ),
-        const SizedBox(height: AppTheme.spacing12),
-        // Second row: Total and Pending Consultations
+        const SizedBox(height: AppTheme.spacing16),
+        // Second row: Consultations and Pending
         Row(
           children: [
             Expanded(
-              child: StatCard(
+              child: _buildStatCard(
+                context: context,
                 icon: Icons.assignment_outlined,
-                value: '${_stats?['totalConsultations'] ?? 0}',
                 label: 'admin.stats.consultations'.tr(),
-                color: colorScheme.tertiary,
+                value: '${_stats?['totalConsultations'] ?? 0}',
+                iconColor: isDark ? AppTheme.purple400 : AppTheme.purple600,
+                iconBackgroundColor: isDark
+                    ? AppTheme.purple900.withValues(alpha: 0.3)
+                    : AppTheme.purple50,
               ),
             ),
-            const SizedBox(width: AppTheme.spacing12),
+            const SizedBox(width: AppTheme.spacing16),
             Expanded(
-              child: StatCard(
-                icon: Icons.pending_outlined,
-                value: '${_stats?['pendingConsultations'] ?? 0}',
+              child: _buildStatCard(
+                context: context,
+                icon: Icons.hourglass_top_outlined,
                 label: 'common.status.pending'.tr(),
-                color: semantic.warning,
+                value: '${_stats?['pendingConsultations'] ?? 0}',
+                iconColor: isDark ? AppTheme.amber400 : AppTheme.amber600,
+                iconBackgroundColor: isDark
+                    ? AppTheme.amber900.withValues(alpha: 0.3)
+                    : AppTheme.amber50,
               ),
             ),
           ],
@@ -315,211 +360,225 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final authController = context.read<AuthController>();
-    final user = authController.currentUser;
+  /// Builds an individual stat card with modern design.
+  Widget _buildStatCard({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color iconColor,
+    required Color iconBackgroundColor,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    // Border matching HTML: border-slate-100 dark:border-slate-700
+    final borderColor = isDark ? AppTheme.slate700 : AppTheme.slate100;
+
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacing20),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.slate800 : Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        border: Border.all(color: borderColor, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icon and label row
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6), // p-1.5 = 6px
+                decoration: BoxDecoration(
+                  color: iconBackgroundColor,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                ),
+                child: Icon(icon, size: 20, color: iconColor),
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppTheme.spacing8),
+          // Value
+          Text(
+            value,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+              letterSpacing: -0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds error state for statistics loading failure.
+  Widget _buildErrorState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: colorScheme.error),
+          const SizedBox(width: AppTheme.spacing12),
+          Expanded(
+            child: Text(
+              'admin.stats_error'.tr(),
+              style: TextStyle(color: colorScheme.onErrorContainer),
+            ),
+          ),
+          TextButton(
+            onPressed: _loadStatistics,
+            child: Text('common.retry'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the quick actions grid with 4 action buttons.
+  Widget _buildQuickActionsGrid(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          ),
-          child: Icon(
-            Icons.admin_panel_settings_outlined,
-            size: AppTheme.iconXLarge,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: AppTheme.spacing24),
-        Text(
-          'admin.welcome'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
+        // First row: Manage Doctors and Manage Users
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                icon: Icons.medical_services_outlined,
+                label: 'admin.manage_doctors.title'.tr(),
+                onTap: () => _navigateToDoctorManagement(context),
               ),
-        ),
-        const SizedBox(height: AppTheme.spacing8),
-        Text(
-          user?.email ?? 'admin.admin_user'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).hintColor,
+            ),
+            const SizedBox(width: AppTheme.spacing16),
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                icon: Icons.group_outlined,
+                label: 'admin.manage_users.title'.tr(),
+                onTap: () => _navigateToUserManagement(context),
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppTheme.spacing16),
+        // Second row: Create Doctor and System Settings
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                icon: Icons.person_add_outlined,
+                label: 'admin.create_doctor.button'.tr(),
+                onTap: () => _navigateToCreateDoctor(context),
+              ),
+            ),
+            const SizedBox(width: AppTheme.spacing16),
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                icon: Icons.settings_outlined,
+                label: 'admin.system_settings.title'.tr(),
+                onTap: () => _navigateToSystemSettings(context),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-    );
-  }
-
+  /// Builds an action card with secondary style and primary color on press.
+  /// Matches HTML: bg-white dark:bg-slate-800 with hover:border-primary effect.
   Widget _buildActionCard({
     required BuildContext context,
     required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
+    required String label,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        side: BorderSide(color: Theme.of(context).dividerColor),
-      ),
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Border color matching HTML: border-slate-200 dark:border-slate-700
+    final borderColor = isDark ? AppTheme.slate700 : AppTheme.slate200;
+
+    // Icon background matching HTML: bg-slate-50 dark:bg-slate-700
+    final iconBgColor = isDark ? AppTheme.slate700 : AppTheme.slate50;
+
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-        child: Padding(
-          padding: const EdgeInsets.all(AppTheme.spacing16),
-          child: Row(
+        borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+        // Highlight on press with primary color border effect
+        highlightColor: colorScheme.primary.withValues(alpha: 0.1),
+        splashColor: colorScheme.primary.withValues(alpha: 0.1),
+        child: Ink(
+          padding: const EdgeInsets.all(AppTheme.spacing24),
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.slate800 : Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+            border: Border.all(color: borderColor, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 48,
-                height: 48,
+                padding: const EdgeInsets.all(AppTheme.spacing12),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  color: iconBgColor,
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  size: AppTheme.iconMedium,
-                  color: color,
+                  size: 28,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(width: AppTheme.spacing16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    const SizedBox(height: AppTheme.spacing4),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).hintColor,
-                          ),
-                    ),
-                  ],
+              const SizedBox(height: AppTheme.spacing12),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
                 ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: Theme.of(context).hintColor,
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildManageDoctorsCard(BuildContext context) {
-    return _buildActionCard(
-      context: context,
-      icon: Icons.medical_services_outlined,
-      title: 'admin.manage_doctors.title'.tr(),
-      subtitle: 'admin.manage_doctors.subtitle'.tr(),
-      color: Theme.of(context).colorScheme.secondary,
-      onTap: () => _navigateToDoctorManagement(context),
-    );
-  }
-
-  Widget _buildManageUsersCard(BuildContext context) {
-    return _buildActionCard(
-      context: context,
-      icon: Icons.people_outlined,
-      title: 'admin.manage_users.title'.tr(),
-      subtitle: 'admin.manage_users.subtitle'.tr(),
-      color: Theme.of(context).colorScheme.primary,
-      onTap: () => _navigateToUserManagement(context),
-    );
-  }
-
-  Widget _buildCreateDoctorCard(BuildContext context) {
-    return _buildActionCard(
-      context: context,
-      icon: Icons.person_add_outlined,
-      title: 'admin.create_doctor.button'.tr(),
-      subtitle: 'admin.create_doctor.description'.tr(),
-      color: Theme.of(context).colorScheme.tertiary,
-      onTap: () => _navigateToCreateDoctor(context),
-    );
-  }
-
-  Widget _buildSystemSettingsCard(BuildContext context) {
-    return _buildActionCard(
-      context: context,
-      icon: Icons.settings_outlined,
-      title: 'admin.system_settings.title'.tr(),
-      subtitle: 'admin.system_settings.subtitle'.tr(),
-      color: Theme.of(context).hintColor,
-      onTap: () => _navigateToSystemSettings(context),
-    );
-  }
-
-  Widget _buildViewPatientAppCard(BuildContext context) {
-    return _buildActionCard(
-      context: context,
-      icon: Icons.visibility_outlined,
-      title: 'admin.view_patient_app'.tr(),
-      subtitle: 'admin.view_patient_app_desc'.tr(),
-      color: Theme.of(context).colorScheme.outline,
-      onTap: () => _navigateToPatientApp(context),
-    );
-  }
-
-  Widget _buildInfoSection(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppTheme.spacing16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.info_outline,
-            size: AppTheme.iconMedium,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          const SizedBox(width: AppTheme.spacing12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'admin.info_title'.tr(),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-                const SizedBox(height: AppTheme.spacing4),
-                Text(
-                  'admin.info_description'.tr(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).hintColor,
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -76,6 +76,57 @@ class AppTheme {
   static const Color infoBlueDark = Color(0xFF4DABF7); // Lighter info blue
 
   // ============================================================================
+  // SLATE COLOR PALETTE (Tailwind CSS compatible)
+  // ============================================================================
+
+  // Light Mode Slate Colors
+  static const Color slate50 = Color(0xFFF8FAFC);
+  static const Color slate100 = Color(0xFFF1F5F9);
+  static const Color slate200 = Color(0xFFE2E8F0);
+  static const Color slate300 = Color(0xFFCBD5E1);
+  static const Color slate400 = Color(0xFF94A3B8);
+  static const Color slate500 = Color(0xFF64748B);
+  static const Color slate600 = Color(0xFF475569);
+  static const Color slate700 = Color(0xFF334155);
+  static const Color slate800 = Color(0xFF1E293B);
+  static const Color slate900 = Color(0xFF0F172A);
+
+  // ============================================================================
+  // ACCENT COLORS (Tailwind CSS compatible)
+  // For stat cards, badges, and visual differentiation
+  // ============================================================================
+
+  // Blue Accent
+  static const Color blue50 = Color(0xFFEFF6FF);
+  static const Color blue400 = Color(0xFF60A5FA);
+  static const Color blue600 = Color(0xFF2563EB);
+  static const Color blue900 = Color(0xFF1E3A8A);
+
+  // Emerald/Green Accent
+  static const Color emerald50 = Color(0xFFECFDF5);
+  static const Color emerald400 = Color(0xFF34D399);
+  static const Color emerald600 = Color(0xFF059669);
+  static const Color emerald900 = Color(0xFF064E3B);
+
+  // Purple Accent
+  static const Color purple50 = Color(0xFFFAF5FF);
+  static const Color purple400 = Color(0xFFC084FC);
+  static const Color purple600 = Color(0xFF9333EA);
+  static const Color purple900 = Color(0xFF581C87);
+
+  // Amber Accent
+  static const Color amber50 = Color(0xFFFFFBEB);
+  static const Color amber400 = Color(0xFFFBBF24);
+  static const Color amber600 = Color(0xFFD97706);
+  static const Color amber900 = Color(0xFF78350F);
+
+  // Red Accent (for hover effects)
+  static const Color red50 = Color(0xFFFEF2F2);
+  static const Color red400 = Color(0xFFF87171);
+  static const Color red600 = Color(0xFFDC2626);
+  static const Color red900 = Color(0xFF7F1D1D);
+
+  // ============================================================================
   // SPACING - 8px Grid System
   // ============================================================================
 
