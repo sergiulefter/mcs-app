@@ -6,7 +6,6 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
 import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card.dart';
 import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card_skeleton.dart';
-import 'package:mcs_app/views/doctor/widgets/filters/doctor_request_segment_filter.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:provider/provider.dart';
 
@@ -44,54 +43,17 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor: isDark
+          ? AppTheme.backgroundDark
+          : AppTheme.backgroundLight,
       body: SafeArea(
         child: Column(
           children: [
             // Sticky header with title and segment filter
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                border: Border(
-                  bottom: BorderSide(color: Theme.of(context).dividerColor),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title bar
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppTheme.spacing16,
-                      AppTheme.spacing16,
-                      AppTheme.spacing16,
-                      AppTheme.spacing8,
-                    ),
-                    child: Text(
-                      'doctor.requests.incoming_title'.tr(),
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.5,
-                          ),
-                    ),
-                  ),
-
-                  // Segment filter
-                  Consumer<DoctorConsultationsController>(
-                    builder: (context, controller, _) {
-                      return DoctorRequestSegmentFilter(
-                        selectedSegment: controller.selectedSegment,
-                        onSegmentChanged: controller.setSegmentFilter,
-                        newCount: controller.newCount,
-                        inProgressCount: controller.inProgressCount,
-                        completedCount: controller.completedCount,
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
+            _buildStickyHeader(context),
 
             // Content area
             Expanded(
@@ -114,6 +76,129 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
     );
   }
 
+  Widget _buildStickyHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppTheme.backgroundDark.withValues(alpha: 0.95)
+            : AppTheme.backgroundLight,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppTheme.slate800 : AppTheme.slate200,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.spacing16,
+              AppTheme.spacing12,
+              AppTheme.spacing16,
+              AppTheme.spacing8,
+            ),
+            child: Text(
+              'doctor.requests.incoming_title'.tr(),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ),
+
+          // Segment filter (horizontal scrollable pills)
+          Consumer<DoctorConsultationsController>(
+            builder: (context, controller, _) {
+              return _buildSegmentFilter(context, controller);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSegmentFilter(
+    BuildContext context,
+    DoctorConsultationsController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final segments = [
+      {'key': 'new', 'label': 'doctor.requests.segments.new'.tr()},
+      {
+        'key': 'in_progress',
+        'label': 'doctor.requests.segments.in_progress'.tr(),
+      },
+      {'key': 'completed', 'label': 'doctor.requests.segments.completed'.tr()},
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.spacing16,
+        AppTheme.spacing8,
+        AppTheme.spacing16,
+        AppTheme.spacing16,
+      ),
+      child: Row(
+        children: segments.map((segment) {
+          final isSelected = controller.selectedSegment == segment['key'];
+          return Padding(
+            padding: EdgeInsets.only(
+              right: segment != segments.last ? AppTheme.spacing12 : 0,
+            ),
+            child: GestureDetector(
+              onTap: () => controller.setSegmentFilter(segment['key']!),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? colorScheme.primary
+                      : (isDark ? AppTheme.surfaceDark : Colors.white),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                  border: isSelected
+                      ? null
+                      : Border.all(
+                          color: isDark ? AppTheme.slate700 : AppTheme.slate200,
+                        ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: colorScheme.primary.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Text(
+                  segment['label']!,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? AppTheme.slate300 : AppTheme.slate600),
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildLoadingState() {
     return ListView.separated(
       padding: const EdgeInsets.all(AppTheme.spacing16),
@@ -126,7 +211,7 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
 
   Widget _buildContent(DoctorConsultationsController controller) {
     final consultations = controller.segmentFilteredConsultations;
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (consultations.isEmpty) {
       return ListView(
@@ -148,9 +233,10 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
             child: Center(
               child: Text(
                 'doctor.requests.end_of_requests'.tr().toUpperCase(),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                style: TextStyle(
+                  color: isDark ? AppTheme.slate600 : AppTheme.slate400,
                   fontWeight: FontWeight.w600,
+                  fontSize: 12,
                   letterSpacing: 2,
                 ),
               ),

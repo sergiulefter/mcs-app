@@ -70,35 +70,42 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) => controller.setSearchQuery(value),
+                  decoration: InputDecoration(
+                    hintText: 'doctors.search_hint'.tr(),
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).hintColor,
+                      fontSize: 14,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Theme.of(context).hintColor,
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).cardColor,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).dividerColor,
                       ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (value) => controller.setSearchQuery(value),
-                    decoration: InputDecoration(
-                      hintText: 'doctors.search_hint'.tr(),
-                      hintStyle: TextStyle(color: Theme.of(context).hintColor),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Theme.of(context).disabledColor,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).dividerColor,
                       ),
-                      border: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        vertical: 11,
-                      ), // Vertically center text
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 0, // Icons ensure height
                     ),
                   ),
                 ),
@@ -109,69 +116,14 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
 
           // Tools Row: Sort + Filter
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSortDropdown(context, controller),
+              Expanded(child: _AnimatedSortDropdown(controller: controller)),
               const SizedBox(width: 8),
               _buildFilterButton(context, controller),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSortDropdown(
-    BuildContext context,
-    DoctorsController controller,
-  ) {
-    // Mapping internal sort key to translated label
-    final sortLabels = {
-      'availability': 'doctors.sort.availability'.tr(),
-      'price_asc': 'doctors.sort.price_asc'.tr(),
-      'price_desc': 'doctors.sort.price_desc'.tr(),
-      'name': 'doctors.sort.name'.tr(),
-      'experience': 'doctors.sort.experience'.tr(),
-    };
-
-    return Expanded(
-      child: Container(
-        height: 46,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            value: controller.selectedSort,
-            icon: const Icon(Icons.keyboard_arrow_down, size: 20),
-            isExpanded: true,
-            hint: Text('doctors.sort.label'.tr()),
-            items: sortLabels.entries.map((entry) {
-              return DropdownMenuItem(
-                value: entry.key,
-                child: Text(
-                  entry.value,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              if (value != null) controller.setSortOption(value);
-            },
-          ),
-        ),
       ),
     );
   }
@@ -271,17 +223,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                     .tr() // Or just "All"
               : 'specialties.$specialty'.tr();
 
-          // Icon mapping (simplified)
-          IconData? icon;
-          if (specialty == 'general') {
-            icon = Icons.medical_services;
-          } else if (specialty == 'dentist')
-            icon = Icons.masks; // Approximation
-          else if (specialty == 'cardiology')
-            icon = Icons.favorite;
-          else if (specialty == 'neurology')
-            icon = Icons.psychology;
-
           final backgroundColor = isSelected
               ? colorScheme.primary
               : Theme.of(context).cardColor;
@@ -315,10 +256,6 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
               ),
               child: Row(
                 children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 18, color: foregroundColor),
-                    const SizedBox(width: 8),
-                  ],
                   Text(
                     label,
                     style: TextStyle(
@@ -416,6 +353,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
   ) async {
     // Reuse existing filter sheet logic, preserving context
     var tempSelectedSpecialties = {...controller.selectedSpecialties};
+    var tempSelectedSubspecialties = {...controller.selectedSubspecialties};
+    var tempSelectedLanguages = {...controller.selectedLanguages};
     var tempSelectedExperienceRanges = {...controller.selectedExperienceRanges};
     var tempAvailableOnly = controller.availableOnly;
 
@@ -435,20 +374,15 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
           builder: (context, scrollController) {
             return StatefulBuilder(
               builder: (context, setModalState) {
+                // Determine valid subspecialties based on current selection
+                final availableSubspecialties = controller.getSubspecialtiesFor(
+                  tempSelectedSpecialties,
+                );
+
                 return Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                   child: Column(
                     children: [
-                      // Handle
-                      Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -463,6 +397,8 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                             onPressed: () {
                               setModalState(() {
                                 tempSelectedSpecialties.clear();
+                                tempSelectedSubspecialties.clear();
+                                tempSelectedLanguages.clear();
                                 tempSelectedExperienceRanges.clear();
                                 tempAvailableOnly = false;
                               });
@@ -475,6 +411,194 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         child: ListView(
                           controller: scrollController,
                           children: [
+                            // Specialty Section
+                            if (controller.availableSpecialties.length > 1) ...[
+                              _buildFilterSection(
+                                context,
+                                'doctors.filters.specialty'.tr(),
+                                controller.availableSpecialties.map((
+                                  specialty,
+                                ) {
+                                  final isSelected = tempSelectedSpecialties
+                                      .contains(specialty);
+                                  return FilterChip(
+                                    label: Text(
+                                      specialty == 'all'
+                                          ? 'common.all'.tr()
+                                          : 'specialties.$specialty'.tr(),
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
+                                            : Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                      ),
+                                    ),
+                                    selected: isSelected,
+                                    selectedColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withValues(alpha: 0.2),
+                                    checkmarkColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? Colors.transparent
+                                            : Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                    onSelected: (val) {
+                                      setModalState(() {
+                                        if (specialty == 'all') {
+                                          tempSelectedSpecialties.clear();
+                                        } else if (isSelected) {
+                                          tempSelectedSpecialties.remove(
+                                            specialty,
+                                          );
+                                        } else {
+                                          tempSelectedSpecialties.add(
+                                            specialty,
+                                          );
+                                        }
+                                        // Clear subspecialties if parent specialty removed could be done here,
+                                        // but filtering on apply is safer and easier.
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+
+                            // Subspecialty Section - ONLY SHOW IF VALID OPTIONS EXIST
+                            if (availableSubspecialties.isNotEmpty) ...[
+                              _buildFilterSection(
+                                context,
+                                'doctors.filters.subspecialty'.tr(),
+                                availableSubspecialties.map((sub) {
+                                  final isSelected = tempSelectedSubspecialties
+                                      .contains(sub);
+                                  return FilterChip(
+                                    label: Text(
+                                      sub,
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
+                                            : Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                      ),
+                                    ),
+                                    selected: isSelected,
+                                    selectedColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withValues(alpha: 0.2),
+                                    checkmarkColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? Colors.transparent
+                                            : Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                    onSelected: (val) {
+                                      setModalState(() {
+                                        if (isSelected) {
+                                          tempSelectedSubspecialties.remove(
+                                            sub,
+                                          );
+                                        } else {
+                                          tempSelectedSubspecialties.add(sub);
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+
+                            // Language Section
+                            if (controller.availableLanguages.isNotEmpty) ...[
+                              _buildFilterSection(
+                                context,
+                                'doctors.filters.language'.tr(),
+                                controller.availableLanguages.map((lang) {
+                                  final isSelected = tempSelectedLanguages
+                                      .contains(lang);
+                                  return FilterChip(
+                                    label: Text(
+                                      lang,
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
+                                            : Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        fontWeight: isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
+                                      ),
+                                    ),
+                                    selected: isSelected,
+                                    selectedColor: Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withValues(alpha: 0.2),
+                                    checkmarkColor: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                      side: BorderSide(
+                                        color: isSelected
+                                            ? Colors.transparent
+                                            : Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                    onSelected: (val) {
+                                      setModalState(() {
+                                        if (isSelected) {
+                                          tempSelectedLanguages.remove(lang);
+                                        } else {
+                                          tempSelectedLanguages.add(lang);
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+
                             _buildFilterSection(
                               context,
                               'doctors.filters.availability'.tr(),
@@ -482,17 +606,44 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                                 FilterChip(
                                   label: Text(
                                     'doctors.filters.available_now'.tr(),
+                                    style: TextStyle(
+                                      color: tempAvailableOnly
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                      fontWeight: tempAvailableOnly
+                                          ? FontWeight.w600
+                                          : FontWeight.w400,
+                                    ),
                                   ),
                                   selected: tempAvailableOnly,
+                                  selectedColor: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer
+                                      .withValues(alpha: 0.2),
+                                  checkmarkColor: Theme.of(
+                                    context,
+                                  ).colorScheme.primary,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).colorScheme.surface,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(
+                                      color: tempAvailableOnly
+                                          ? Colors.transparent
+                                          : Theme.of(context).dividerColor,
+                                    ),
+                                  ),
                                   onSelected: (val) => setModalState(
                                     () => tempAvailableOnly = val,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 24),
-                            // ... Add other filter sections (Specialty, Experience) similarly if needed broadly
-                            // For brevity, relying on general logic
                           ],
                         ),
                       ),
@@ -501,8 +652,18 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
                         height: 56,
                         child: FilledButton(
                           onPressed: () {
+                            // Ensure we only apply subspecialties that are valid for selected specialties
+                            final validSubspecialties = availableSubspecialties
+                                .toSet();
+                            final finalSubspecialties =
+                                tempSelectedSubspecialties.intersection(
+                                  validSubspecialties,
+                                );
+
                             controller.applyFilters(
                               specialties: tempSelectedSpecialties,
+                              subspecialties: finalSubspecialties,
+                              languages: tempSelectedLanguages,
                               experienceRanges: tempSelectedExperienceRanges,
                               availableOnly: tempAvailableOnly,
                             );
@@ -537,6 +698,231 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
         const SizedBox(height: 12),
         Wrap(spacing: 8, runSpacing: 8, children: children),
       ],
+    );
+  }
+}
+
+class _AnimatedSortDropdown extends StatefulWidget {
+  final DoctorsController controller;
+
+  const _AnimatedSortDropdown({required this.controller});
+
+  @override
+  State<_AnimatedSortDropdown> createState() => _AnimatedSortDropdownState();
+}
+
+class _AnimatedSortDropdownState extends State<_AnimatedSortDropdown>
+    with SingleTickerProviderStateMixin {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  bool _isExpanded = false;
+  late AnimationController _animationController;
+  late Animation<double> _expandAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _expandAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _toggleDropdown() {
+    if (_isExpanded) {
+      _animationController.reverse().then((_) {
+        _overlayEntry?.remove();
+        _overlayEntry = null;
+        if (mounted) {
+          setState(() {
+            _isExpanded = false;
+          });
+        }
+      });
+    } else {
+      _overlayEntry = _createOverlayEntry();
+      Overlay.of(context).insert(_overlayEntry!);
+      _animationController.forward();
+      setState(() {
+        _isExpanded = true;
+      });
+    }
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    var size = renderBox.size;
+
+    // Sort labels map (same as in build)
+    final sortLabels = {
+      'availability': 'doctors.sort.availability'.tr(),
+      'price_asc': 'doctors.sort.price_asc'.tr(),
+      'price_desc': 'doctors.sort.price_desc'.tr(),
+      'name': 'doctors.sort.name'.tr(),
+      'experience': 'doctors.sort.experience'.tr(),
+    };
+
+    return OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          // Transparent barrier to close dropdown on outside tap
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _toggleDropdown,
+              behavior: HitTestBehavior.translucent,
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          Positioned(
+            width: size.width,
+            child: CompositedTransformFollower(
+              link: _layerLink,
+              showWhenUnlinked: false,
+              offset: Offset(0, size.height + 8),
+              child: Material(
+                color: Colors.transparent,
+                child: FadeTransition(
+                  opacity: _expandAnimation,
+                  child: SizeTransition(
+                    sizeFactor: _expandAnimation,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: sortLabels.entries.map((entry) {
+                          final isSelected =
+                              widget.controller.selectedSort == entry.key;
+                          return InkWell(
+                            onTap: () {
+                              widget.controller.setSortOption(entry.key);
+                              _toggleDropdown();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              color: isSelected
+                                  ? Theme.of(context)
+                                        .colorScheme
+                                        .primaryContainer
+                                        .withValues(alpha: 0.1)
+                                  : Colors.transparent,
+                              child: Text(
+                                entry.value,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w400,
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    if (_isExpanded && _overlayEntry != null) {
+      _overlayEntry?.remove();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Mapping internal sort key to translated label
+    final sortLabels = {
+      'availability': 'doctors.sort.availability'.tr(),
+      'price_asc': 'doctors.sort.price_asc'.tr(),
+      'price_desc': 'doctors.sort.price_desc'.tr(),
+      'name': 'doctors.sort.name'.tr(),
+      'experience': 'doctors.sort.experience'.tr(),
+    };
+
+    final currentLabel =
+        sortLabels[widget.controller.selectedSort] ?? 'doctors.sort.label'.tr();
+
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: InkWell(
+        onTap: _toggleDropdown,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _isExpanded
+                  ? Theme.of(context).primaryColor
+                  : Theme.of(context).dividerColor,
+              width: _isExpanded ? 1.5 : 1.0,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  currentLabel,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              RotationTransition(
+                turns: Tween(begin: 0.0, end: 0.5).animate(_expandAnimation),
+                child: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 20,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -26,6 +26,8 @@ class DoctorsController extends ChangeNotifier {
 
   // Filters
   Set<String> _selectedSpecialties = {};
+  Set<String> _selectedSubspecialties = {};
+  Set<String> _selectedLanguages = {};
   Set<String> _selectedExperienceRanges = {};
   bool _availableOnly = false;
   String _selectedSort = 'availability';
@@ -37,6 +39,8 @@ class DoctorsController extends ChangeNotifier {
   bool get hasPrimed => _hasPrimed;
   bool get hasMore => _hasMore;
   Set<String> get selectedSpecialties => _selectedSpecialties;
+  Set<String> get selectedSubspecialties => _selectedSubspecialties;
+  Set<String> get selectedLanguages => _selectedLanguages;
   Set<String> get selectedExperienceRanges => _selectedExperienceRanges;
   bool get availableOnly => _availableOnly;
   String get selectedSort => _selectedSort;
@@ -44,24 +48,60 @@ class DoctorsController extends ChangeNotifier {
 
   bool get hasActiveFilters =>
       _selectedSpecialties.isNotEmpty ||
+      _selectedSubspecialties.isNotEmpty ||
+      _selectedLanguages.isNotEmpty ||
       _selectedExperienceRanges.isNotEmpty ||
       _availableOnly;
 
   int get activeFilterCount {
     int count = 0;
     if (_selectedSpecialties.isNotEmpty) count++;
+    if (_selectedSubspecialties.isNotEmpty) count++;
+    if (_selectedLanguages.isNotEmpty) count++;
     if (_selectedExperienceRanges.isNotEmpty) count++;
     if (_availableOnly) count++;
     return count;
   }
 
   List<String> get availableSpecialties {
-    final specialties = _doctors
-        .map((d) => d.specialty.toString().split('.').last)
-        .toSet()
-        .toList()
-      ..sort();
+    final specialties =
+        _doctors
+            .map((d) => d.specialty.toString().split('.').last)
+            .toSet()
+            .toList()
+          ..sort();
     return ['all', ...specialties];
+  }
+
+  List<String> getSubspecialtiesFor(Set<String> specialtyKeys) {
+    if (specialtyKeys.isEmpty || specialtyKeys.contains('all')) {
+      return [];
+    }
+
+    final subspecialties =
+        _doctors
+            .where(
+              (d) => specialtyKeys.contains(
+                d.specialty.toString().split('.').last,
+              ),
+            )
+            .expand((d) => d.subspecialties)
+            .toSet()
+            .toList()
+          ..sort();
+    return subspecialties;
+  }
+
+  List<String> get availableSubspecialties {
+    final subspecialties =
+        _doctors.expand((d) => d.subspecialties).toSet().toList()..sort();
+    return subspecialties;
+  }
+
+  List<String> get availableLanguages {
+    final languages = _doctors.expand((d) => d.languages).toSet().toList()
+      ..sort();
+    return languages;
   }
 
   // Filtered and sorted doctors
@@ -86,6 +126,22 @@ class DoctorsController extends ChangeNotifier {
       if (_selectedSpecialties.isNotEmpty &&
           !_selectedSpecialties.contains(specialtyKey)) {
         return false;
+      }
+
+      // Subspecialty filter
+      if (_selectedSubspecialties.isNotEmpty) {
+        final matches = _selectedSubspecialties.any(
+          (sub) => doctor.subspecialties.contains(sub),
+        );
+        if (!matches) return false;
+      }
+
+      // Language filter
+      if (_selectedLanguages.isNotEmpty) {
+        final matches = _selectedLanguages.any(
+          (lang) => doctor.languages.contains(lang),
+        );
+        if (!matches) return false;
       }
 
       // Experience filter
@@ -117,10 +173,12 @@ class DoctorsController extends ChangeNotifier {
         result.sort((a, b) => b.experienceYears.compareTo(a.experienceYears));
       case 'price_asc':
         result.sort(
-            (a, b) => a.consultationPrice.compareTo(b.consultationPrice));
+          (a, b) => a.consultationPrice.compareTo(b.consultationPrice),
+        );
       case 'price_desc':
         result.sort(
-            (a, b) => b.consultationPrice.compareTo(a.consultationPrice));
+          (a, b) => b.consultationPrice.compareTo(a.consultationPrice),
+        );
       case 'name':
         result.sort((a, b) => a.fullName.compareTo(b.fullName));
     }
@@ -214,6 +272,24 @@ class DoctorsController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleSubspecialty(String sub) {
+    if (_selectedSubspecialties.contains(sub)) {
+      _selectedSubspecialties.remove(sub);
+    } else {
+      _selectedSubspecialties.add(sub);
+    }
+    notifyListeners();
+  }
+
+  void toggleLanguage(String lang) {
+    if (_selectedLanguages.contains(lang)) {
+      _selectedLanguages.remove(lang);
+    } else {
+      _selectedLanguages.add(lang);
+    }
+    notifyListeners();
+  }
+
   void toggleExperienceRange(String range) {
     if (_selectedExperienceRanges.contains(range)) {
       _selectedExperienceRanges.remove(range);
@@ -230,6 +306,8 @@ class DoctorsController extends ChangeNotifier {
 
   void clearFilters() {
     _selectedSpecialties.clear();
+    _selectedSubspecialties.clear();
+    _selectedLanguages.clear();
     _selectedExperienceRanges.clear();
     _availableOnly = false;
     notifyListeners();
@@ -237,10 +315,14 @@ class DoctorsController extends ChangeNotifier {
 
   void applyFilters({
     required Set<String> specialties,
+    required Set<String> subspecialties,
+    required Set<String> languages,
     required Set<String> experienceRanges,
     required bool availableOnly,
   }) {
     _selectedSpecialties = specialties;
+    _selectedSubspecialties = subspecialties;
+    _selectedLanguages = languages;
     _selectedExperienceRanges = experienceRanges;
     _availableOnly = availableOnly;
     notifyListeners();

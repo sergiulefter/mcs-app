@@ -7,10 +7,11 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
-import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
+import 'package:mcs_app/views/shared/widgets/detail_screen_header.dart';
+import 'package:mcs_app/views/shared/widgets/timeline_message.dart';
 
+/// Patient screen for responding to doctor's information request.
+/// Redesigned to match the modern UI with custom header and styled form fields.
 class RespondToInfoScreen extends StatefulWidget {
   final ConsultationModel consultation;
   final InfoRequestModel infoRequest;
@@ -36,7 +37,6 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize answer controllers and keys for each question
     for (var i = 0; i < widget.infoRequest.questions.length; i++) {
       _answerControllers.add(TextEditingController());
       _answerKeys.add(GlobalKey());
@@ -55,93 +55,73 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Register fields in order for scroll-to-error
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Register fields for scroll-to-error
     for (var i = 0; i < _answerKeys.length; i++) {
       _scrollHelper.register('answer_$i', _answerKeys[i]);
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('info_response.title'.tr()),
-      ),
+      backgroundColor: isDark
+          ? AppTheme.backgroundDark
+          : AppTheme.backgroundLight,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Doctor's message section
-                Padding(
-                  padding: AppTheme.screenPadding,
+        child: Column(
+          children: [
+            // Custom header
+            DetailScreenHeader(title: 'info_response.title'.tr()),
+
+            // Scrollable form content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppTheme.spacing24),
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Doctor's message section
                       _buildDoctorMessage(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
+
+                      const SizedBox(height: AppTheme.spacing24),
+
+                      // Questions section
                       _buildQuestionsSection(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
+
+                      const SizedBox(height: AppTheme.spacing24),
+
+                      // Additional info section
                       _buildAdditionalInfo(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
-                      _buildAttachmentsPlaceholder(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
-                      _buildSubmitButton(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
+
+                      const SizedBox(height: 100), // Space for fixed button
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+
+            // Fixed submit button
+            _buildSubmitButton(context),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildDoctorMessage(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'info_response.doctor_message_title'.tr()),
+        _buildSectionLabel(context, 'info_response.doctor_message_title'.tr()),
         const SizedBox(height: AppTheme.spacing16),
-        SurfaceCard(
-          padding: AppTheme.cardPadding,
-          backgroundColor: colorScheme.secondary.withValues(alpha: 0.05),
-          borderColor: colorScheme.secondary.withValues(alpha: 0.2),
-          showShadow: false,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.medical_information_outlined,
-                color: colorScheme.secondary,
-                size: AppTheme.iconMedium,
-              ),
-              const SizedBox(width: AppTheme.spacing12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.infoRequest.message,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            height: 1.6,
-                          ),
-                    ),
-                    const SizedBox(height: AppTheme.spacing8),
-                    Text(
-                      DateFormat.yMMMd().format(widget.infoRequest.requestedAt),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+
+        // Display as timeline message
+        TimelineMessage(
+          sender: TimelineMessageSender.doctor,
+          senderName: widget.consultation.doctorName ?? 'Doctor',
+          message: widget.infoRequest.message,
+          timestamp: widget.infoRequest.requestedAt,
         ),
       ],
     );
@@ -151,12 +131,17 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(
-          title: 'info_response.questions_title'.tr(
-            namedArgs: {'count': widget.infoRequest.questions.length.toString()},
+        _buildSectionLabel(
+          context,
+          'info_response.questions_title'.tr(
+            namedArgs: {
+              'count': widget.infoRequest.questions.length.toString(),
+            },
           ),
         ),
         const SizedBox(height: AppTheme.spacing16),
+
+        // Question cards with answer fields
         ...List.generate(widget.infoRequest.questions.length, (index) {
           return Padding(
             padding: EdgeInsets.only(
@@ -175,12 +160,18 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
   }
 
   Widget _buildQuestionCard(BuildContext context, int index) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SurfaceCard(
-      padding: AppTheme.cardPadding,
-      borderColor: colorScheme.outline.withValues(alpha: 0.3),
-      showShadow: false,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppTheme.slate700 : AppTheme.slate200,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -188,25 +179,26 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
           Text(
             '${'info_response.question_label'.tr()} ${index + 1}',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          const SizedBox(height: AppTheme.spacing8),
+          const SizedBox(height: 8),
+
           // Question text
           Text(
             widget.infoRequest.questions[index],
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: AppTheme.spacing16),
-          // Answer input
-          AppTextField(
-            label: 'info_response.your_answer'.tr(),
-            hintText: 'info_response.answer_hint'.tr(),
+          const SizedBox(height: 16),
+
+          // Answer field
+          TextFormField(
             controller: _answerControllers[index],
             maxLines: 4,
+            style: Theme.of(context).textTheme.bodyMedium,
             onChanged: (_) => setState(() {}),
             validator: (value) {
               final text = value?.trim() ?? '';
@@ -215,20 +207,46 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
               }
               if (text.length < AppConstants.infoAnswerMinLength) {
                 return 'info_response.validation.answer_too_short'.tr(
-                  namedArgs: {'min': AppConstants.infoAnswerMinLength.toString()},
+                  namedArgs: {
+                    'min': AppConstants.infoAnswerMinLength.toString(),
+                  },
                 );
               }
               return null;
             },
+            decoration: InputDecoration(
+              labelText: 'info_response.your_answer'.tr(),
+              hintText: 'info_response.answer_hint'.tr(),
+              hintStyle: TextStyle(
+                color: isDark ? AppTheme.slate500 : AppTheme.slate400,
+              ),
+              filled: true,
+              fillColor: isDark ? AppTheme.slate800 : AppTheme.slate50,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: colorScheme.primary, width: 2),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: colorScheme.error),
+              ),
+              contentPadding: const EdgeInsets.all(12),
+            ),
           ),
-          const SizedBox(height: AppTheme.spacing8),
+
+          // Character count
+          const SizedBox(height: 4),
           Align(
             alignment: Alignment.centerRight,
             child: Text(
               '${_answerControllers[index].text.trim().length}/${AppConstants.infoAnswerMaxLength}',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
+                color: isDark ? AppTheme.slate500 : AppTheme.slate400,
+              ),
             ),
           ),
         ],
@@ -237,75 +255,121 @@ class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
   }
 
   Widget _buildAdditionalInfo(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'info_response.additional_info_title'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-        AppTextField(
-          label: 'info_response.additional_info_label'.tr(),
-          hintText: 'info_response.additional_info_hint'.tr(),
-          controller: _additionalInfoController,
-          maxLines: 4,
-          isOptional: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAttachmentsPlaceholder(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(title: 'info_response.attachments_title'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-        SurfaceCard(
-          padding: AppTheme.cardPadding,
-          backgroundColor: colorScheme.surfaceContainerHighest,
-          showShadow: false,
-          child: Column(
-            children: [
-              Icon(
-                Icons.attach_file_outlined,
-                size: AppTheme.iconLarge,
-                color: colorScheme.onSurfaceVariant,
+        _buildSectionLabel(
+          context,
+          'info_response.additional_info_title'.tr(),
+          isOptional: true,
+        ),
+        const SizedBox(height: AppTheme.spacing12),
+
+        TextFormField(
+          controller: _additionalInfoController,
+          maxLines: 4,
+          style: Theme.of(context).textTheme.bodyMedium,
+          decoration: InputDecoration(
+            hintText: 'info_response.additional_info_hint'.tr(),
+            hintStyle: TextStyle(
+              color: isDark ? AppTheme.slate500 : AppTheme.slate400,
+            ),
+            filled: true,
+            fillColor: isDark ? AppTheme.surfaceDark : Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? AppTheme.slate700 : AppTheme.slate200,
               ),
-              const SizedBox(height: AppTheme.spacing12),
-              Text(
-                'info_response.attachments_coming_soon'.tr(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                      fontStyle: FontStyle.italic,
-                    ),
-                textAlign: TextAlign.center,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: isDark ? AppTheme.slate700 : AppTheme.slate200,
               ),
-            ],
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+            ),
+            contentPadding: const EdgeInsets.all(16),
           ),
         ),
       ],
     );
   }
 
+  Widget _buildSectionLabel(
+    BuildContext context,
+    String label, {
+    bool isOptional = false,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: isDark ? AppTheme.slate400 : AppTheme.slate500,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.5,
+          ),
+        ),
+        if (isOptional) ...[
+          const SizedBox(width: 8),
+          Text(
+            '(${'common.optional'.tr()})',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: isDark ? AppTheme.slate500 : AppTheme.slate400,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   Widget _buildSubmitButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: _isSubmitting ? null : _submit,
-        icon: _isSubmitting
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                ),
-              )
-            : const Icon(Icons.send_outlined),
-        label: Text('info_response.submit'.tr()),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: AppTheme.spacing16),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.surfaceDark : Colors.white,
+        border: Border(
+          top: BorderSide(
+            color: isDark ? AppTheme.slate800 : AppTheme.slate200,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _isSubmitting ? null : _submit,
+            icon: _isSubmitting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.send_outlined, size: 20),
+            label: Text('info_response.submit'.tr()),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              backgroundColor: colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
+          ),
         ),
       ),
     );

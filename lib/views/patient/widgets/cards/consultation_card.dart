@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/shared/widgets/status_badge.dart';
-import 'package:mcs_app/views/shared/widgets/urgency_badge.dart';
 
+/// Consultation card for patient flows.
+/// Matches the modern HTML/CSS design with avatar, urgency badge, and view button.
 class ConsultationCard extends StatefulWidget {
   final ConsultationModel consultation;
   final VoidCallback onTap;
@@ -25,6 +25,17 @@ class _ConsultationCardState extends State<ConsultationCard> {
   @override
   Widget build(BuildContext context) {
     final consultation = widget.consultation;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Build doctor info subtitle
+    final doctorName =
+        consultation.doctorName ?? 'consultations.awaiting_assignment'.tr();
+    String doctorInfo = doctorName;
+    if (consultation.doctorSpecialty != null) {
+      final specialty = 'specialties.${consultation.doctorSpecialty}'.tr();
+      doctorInfo = '$doctorName • $specialty';
+    }
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -32,203 +43,302 @@ class _ConsultationCardState extends State<ConsultationCard> {
       onTapCancel: () => setState(() => _isPressed = false),
       onTap: widget.onTap,
       child: AnimatedScale(
-        scale: _isPressed ? 0.98 : 1.0,
+        scale: _isPressed ? 0.99 : 1.0,
         duration: const Duration(milliseconds: 100),
         curve: Curves.easeOutCubic,
-        child: Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-            side: BorderSide(
-              color: Theme.of(context).dividerColor,
-            ),
-          ),
-          child: Padding(
-            padding: AppTheme.cardPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header row with status badge, urgency badge, and relative time
-                _buildHeaderRow(context, consultation),
-                const SizedBox(height: AppTheme.spacing12),
-
-                // Title
-                Text(
-                  consultation.title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppTheme.spacing4),
-
-                // Description (1 line only)
-                Text(
-                  consultation.description,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: AppTheme.spacing16),
-
-                // Doctor info row
-                _buildDoctorRow(context, consultation),
-
-                // Action indicator (if applicable)
-                _buildActionIndicator(context, consultation),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderRow(BuildContext context, ConsultationModel consultation) {
-    return Row(
-      children: [
-        // Status badge
-        StatusBadge(status: consultation.status),
-
-        // Urgency badge (only shows for priority)
-        const SizedBox(width: AppTheme.spacing8),
-        UrgencyBadge(urgency: consultation.urgency),
-      ],
-    );
-  }
-
-  Widget _buildDoctorRow(BuildContext context, ConsultationModel consultation) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.spacing16),
           decoration: BoxDecoration(
-            color:
-                Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+            color: isDark ? AppTheme.surfaceDark : Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+            border: Border.all(color: Colors.transparent),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          child: Icon(
-            Icons.person_outline,
-            size: 18,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        const SizedBox(width: AppTheme.spacing12),
-        Expanded(
-          child: Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                consultation.doctorName ??
-                    'consultations.awaiting_assignment'.tr(),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (consultation.doctorSpecialty != null)
-                Text(
-                  'specialties.${consultation.doctorSpecialty}'.tr(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+              // Doctor avatar (56px as per design)
+              _buildAvatar(context, doctorName),
+              const SizedBox(width: AppTheme.spacing16),
+
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title
+                    Text(
+                      consultation.title,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppTheme.textPrimary,
                       ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+
+                    // Doctor info subtitle
+                    Text(
+                      doctorInfo,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: isDark ? AppTheme.slate400 : AppTheme.slate500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    // Divider and footer row
+                    const SizedBox(height: AppTheme.spacing12),
+                    Container(
+                      padding: const EdgeInsets.only(top: AppTheme.spacing8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: isDark
+                                ? AppTheme.slate700.withValues(alpha: 0.5)
+                                : AppTheme.slate100,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Timestamp and status/urgency badge
+                          Expanded(
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: AppTheme.spacing8,
+                              runSpacing: AppTheme.spacing4,
+                              children: [
+                                Text(
+                                  _formatReceivedTime(consultation.createdAt),
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: isDark
+                                            ? AppTheme.slate500
+                                            : AppTheme.slate400,
+                                      ),
+                                ),
+                                _buildStatusBadge(context, consultation),
+                              ],
+                            ),
+                          ),
+
+                          // View button
+                          GestureDetector(
+                            onTap: widget.onTap,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'consultations.view_button'.tr(),
+                                  style: Theme.of(context).textTheme.labelLarge
+                                      ?.copyWith(
+                                        color: colorScheme.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(
+                                  Icons.chevron_right,
+                                  size: 18,
+                                  color: colorScheme.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
-        // Relative time
-        Text(
-          _formatRelativeTime(consultation.createdAt),
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-        ),
-        const SizedBox(width: AppTheme.spacing4),
-        Icon(
-          Icons.chevron_right,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionIndicator(
-      BuildContext context, ConsultationModel consultation) {
-    final semantic = Theme.of(context).extension<AppSemanticColors>();
-    final colorScheme = Theme.of(context).colorScheme;
-
-    // Determine which action indicator to show (priority order)
-    IconData? icon;
-    String? text;
-    Color? color;
-
-    if (consultation.status == 'info_requested') {
-      icon = Icons.info_outline;
-      text = 'consultations.actions.action_required'.tr();
-      color = semantic?.warning ?? colorScheme.error;
-    } else if (consultation.doctorResponse != null) {
-      icon = Icons.check_circle_outline;
-      text = 'consultations.actions.response_available'.tr();
-      color = semantic?.success ?? colorScheme.primary;
-    } else if (consultation.attachments.isNotEmpty) {
-      icon = Icons.attach_file;
-      text = 'consultations.actions.attachments_count'.tr(namedArgs: {
-        'count': consultation.attachments.length.toString(),
-      });
-      color = colorScheme.onSurfaceVariant;
-    }
-
-    if (icon == null || text == null) {
-      return const SizedBox.shrink();
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: AppTheme.spacing12),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: AppTheme.iconSmall,
-            color: color,
-          ),
-          const SizedBox(width: AppTheme.spacing8),
-          Text(
-            text,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w500,
-                ),
-          ),
-        ],
       ),
     );
   }
 
-  String _formatRelativeTime(DateTime dateTime) {
+  /// Build doctor avatar with initials fallback (56px as per design)
+  Widget _buildAvatar(BuildContext context, String doctorName) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final initials = _getInitials(doctorName);
+
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isDark
+            ? colorScheme.primary.withValues(alpha: 0.2)
+            : colorScheme.primaryContainer.withValues(alpha: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Text(
+          initials,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: colorScheme.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Get initials from name (e.g., "Dr. John Doe" -> "JD")
+  String _getInitials(String name) {
+    // Remove common prefixes like "Dr."
+    final cleanName = name.replaceAll(
+      RegExp(r'^Dr\.?\s*', caseSensitive: false),
+      '',
+    );
+    final parts = cleanName.trim().split(' ');
+    if (parts.isEmpty || parts[0].isEmpty) return '?';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+  }
+
+  /// Build status badge (shows urgency for active, status for completed)
+  Widget _buildStatusBadge(
+    BuildContext context,
+    ConsultationModel consultation,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // For completed/resolved consultations, show status
+    if (consultation.status == 'completed' ||
+        consultation.status == 'resolved') {
+      return _buildBadge(
+        context,
+        label: 'common.status.${consultation.status}'.tr(),
+        bgColor: isDark
+            ? Colors.green.shade900.withValues(alpha: 0.4)
+            : Colors.green.shade100,
+        textColor: isDark ? Colors.green.shade300 : Colors.green.shade800,
+      );
+    }
+
+    // For cancelled
+    if (consultation.status == 'cancelled') {
+      return _buildBadge(
+        context,
+        label: 'common.status.cancelled'.tr(),
+        bgColor: isDark ? AppTheme.slate700 : AppTheme.slate100,
+        textColor: isDark ? AppTheme.slate400 : AppTheme.slate600,
+      );
+    }
+
+    // For active consultations, show urgency
+    return _buildUrgencyBadge(context, consultation.urgency);
+  }
+
+  /// Build urgency badge with appropriate colors matching HTML design
+  Widget _buildUrgencyBadge(BuildContext context, String urgency) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    Color bgColor;
+    Color textColor;
+    String label;
+
+    switch (urgency.toLowerCase()) {
+      case 'high':
+      case 'urgent':
+        bgColor = isDark
+            ? Colors.red.shade900.withValues(alpha: 0.4)
+            : Colors.red.shade100;
+        textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
+        label = 'common.urgency.high'.tr();
+        break;
+      case 'moderate':
+      case 'medium':
+        bgColor = isDark
+            ? Colors.amber.shade900.withValues(alpha: 0.4)
+            : Colors.amber.shade100;
+        textColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
+        label = 'common.urgency.moderate'.tr();
+        break;
+      case 'low':
+      case 'general':
+      default:
+        bgColor = isDark
+            ? Colors.teal.shade900.withValues(alpha: 0.4)
+            : Colors.teal.shade100;
+        textColor = isDark ? Colors.teal.shade300 : Colors.teal.shade800;
+        label = 'common.urgency.low'.tr();
+        break;
+    }
+
+    return _buildBadge(
+      context,
+      label: label,
+      bgColor: bgColor,
+      textColor: textColor,
+    );
+  }
+
+  Widget _buildBadge(
+    BuildContext context, {
+    required String label,
+    required Color bgColor,
+    required Color textColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacing8,
+        vertical: 2,
+      ),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.w500,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  /// Format relative time as "Created: X ago"
+  String _formatReceivedTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
 
-    if (difference.inMinutes < 60) {
-      return 'consultations.time.just_now'.tr();
+    String timeAgo;
+    if (difference.inMinutes < 1) {
+      timeAgo = 'consultations.time.just_now'.tr();
+      return 'Created: $timeAgo';
+    } else if (difference.inMinutes < 60) {
+      timeAgo = '${difference.inMinutes} min ago';
     } else if (difference.inHours < 24) {
-      return 'consultations.time.hours_ago'
-          .tr(namedArgs: {'count': difference.inHours.toString()});
+      timeAgo = '${difference.inHours}h ago';
     } else if (difference.inDays == 1) {
-      return 'consultations.time.yesterday'.tr();
+      timeAgo = '1 day ago';
     } else if (difference.inDays < 7) {
-      return 'consultations.time.days_ago'
-          .tr(namedArgs: {'count': difference.inDays.toString()});
-    } else if (dateTime.year == now.year) {
-      return DateFormat('MMM d').format(dateTime);
+      timeAgo = '${difference.inDays} days ago';
     } else {
-      return DateFormat('MMM d, yyyy').format(dateTime);
+      timeAgo = DateFormat('MMM d').format(dateTime);
+      return 'Created: $timeAgo';
     }
+
+    return 'Created: $timeAgo';
   }
 }

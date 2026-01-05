@@ -76,63 +76,72 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Theme.of(context).dividerColor,
-                            width: 2,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.1),
-                          backgroundImage:
-                              profileImage != null && profileImage.isNotEmpty
-                              ? NetworkImage(profileImage)
-                              : null,
-                          child: (profileImage == null || profileImage.isEmpty)
-                              ? Icon(
-                                  Icons.person,
-                                  color: Theme.of(context).colorScheme.primary,
-                                )
-                              : null,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _getGreeting(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.5,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 2,
                             ),
                           ),
-                          Text(
-                            '$displayName 👋',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              height: 1.2,
-                            ),
+                          child: CircleAvatar(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary.withValues(alpha: 0.1),
+                            backgroundImage:
+                                profileImage != null && profileImage.isNotEmpty
+                                ? NetworkImage(profileImage)
+                                : null,
+                            child:
+                                (profileImage == null || profileImage.isEmpty)
+                                ? Icon(
+                                    Icons.person,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  )
+                                : null,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _getGreeting(),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
+                              Text(
+                                displayName,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 16),
                   Stack(
                     children: [
                       Container(
@@ -265,43 +274,46 @@ class _HomeScreenState extends State<HomeScreen> {
                 Theme.of(context).colorScheme.onSurface,
               ),
               const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                clipBehavior: Clip.none,
-                child: Row(
-                  children: [
-                    _buildSpecialistItem(
-                      context,
-                      'specialties.general'.tr(),
-                      Icons.medical_services_outlined,
-                      true,
-                    ),
-                    _buildSpecialistItem(
-                      context,
-                      'specialties.dentist'.tr(),
-                      Icons.masks_outlined,
-                      false,
-                    ),
-                    _buildSpecialistItem(
-                      context,
-                      'specialties.vision'.tr(),
-                      Icons.visibility_outlined,
-                      false,
-                    ),
-                    _buildSpecialistItem(
-                      context,
-                      'specialties.heart'.tr(),
-                      Icons.favorite_outline,
-                      false,
-                    ),
-                    _buildSpecialistItem(
-                      context,
-                      'specialties.lungs'.tr(),
-                      Icons.air,
-                      false,
-                    ),
-                  ],
-                ),
+              GridView.count(
+                crossAxisCount: 3,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 1.0,
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildSpecialistItem(
+                    context,
+                    'specialties.general'.tr(),
+                    Icons.medical_services_outlined,
+                  ),
+                  _buildSpecialistItem(
+                    context,
+                    'specialties.dentist'.tr(),
+                    Icons.masks_outlined,
+                  ),
+                  _buildSpecialistItem(
+                    context,
+                    'specialties.vision'.tr(),
+                    Icons.visibility_outlined,
+                  ),
+                  _buildSpecialistItem(
+                    context,
+                    'specialties.heart'.tr(),
+                    Icons.favorite_outline,
+                  ),
+                  _buildSpecialistItem(
+                    context,
+                    'specialties.lungs'.tr(),
+                    Icons.air,
+                  ),
+                  _buildSpecialistItem(
+                    context,
+                    'common.more'.tr(),
+                    Icons.grid_view_rounded,
+                  ),
+                ],
               ),
               const SizedBox(height: 32),
 
@@ -643,61 +655,68 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     String label,
     IconData icon,
-    bool isActive,
   ) {
     final theme = Theme.of(context);
-    final bgColor = isActive ? theme.colorScheme.primary : theme.cardColor;
-    final iconColor = isActive
-        ? theme.colorScheme.onPrimary
-        : theme.colorScheme.onSurfaceVariant;
-    final borderColor = theme.dividerColor;
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: InkWell(
-        onTap: () => _navigateToTab(context, 1),
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          children: [
-            Container(
-              width: 76,
-              height: 76,
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(16),
-                border: isActive ? null : Border.all(color: borderColor),
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withValues(alpha: 0.25),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+    // Icon background matching Admin Dashboard: bg-slate-50 dark:bg-slate-700
+    final iconBgColor = isDark ? AppTheme.slate700 : AppTheme.slate50;
+
+    return Column(
+      children: [
+        Expanded(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _navigateToTab(context, 1),
+              borderRadius: BorderRadius.circular(16),
+              highlightColor: colorScheme.primary.withValues(alpha: 0.1),
+              splashColor: colorScheme.primary.withValues(alpha: 0.1),
+              child: Ink(
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: theme.dividerColor),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconBgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 24,
+                    ),
+                  ),
+                ),
               ),
-              child: Icon(icon, color: iconColor, size: 32),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 

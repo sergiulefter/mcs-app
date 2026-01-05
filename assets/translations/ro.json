@@ -96,6 +96,7 @@
       "account_info": "Informații Cont",
       "account_info_hint": "Aceste informații nu pot fi modificate",
       "personal_info": "Informații Personale",
+      "contact_info": "Informații Contact",
       "save_changes": "Salvează Modificările",
       "success": "Profilul a fost actualizat cu succes",
       "error": "Nu s-a putut actualiza profilul. Încercați din nou."
@@ -197,6 +198,8 @@
       "experience_15_plus": "15+ ani",
       "availability": "Disponibilitate",
       "available_now": "Afișează doar medicii disponibili",
+      "subspecialty": "Subspecialitate",
+      "language": "Limbă",
       "active_count": "{count} active"
     },
     "empty_state_title": "Niciun medic nu se potrivește cu filtrele",
@@ -445,9 +448,14 @@
       "browse_doctors": "Explorează Medicii"
     },
     "filter_title": "Filtrează Consultațiile",
-    "filter_status": "După Status"
+    "filter_status": "După Status",
+    "view_button": "Vezi",
+    "end_of_consultations": "Sfârșit consultații"
   },
   "request_detail": {
+    "your_request": "Cererea Ta",
+    "conversation": "Conversație",
+    "waiting_your_response": "În așteptarea răspunsului tău",
     "title": "Detalii consultație",
     "request_info": "Informații cerere",
     "title_label": "Titlu",
@@ -633,6 +641,7 @@
     "no_user_logged_in": "Niciun utilizator autentificat"
   },
   "common": {
+    "optional": "(Opțional)",
     "search": "Caută...",
     "skip": "Omite",
     "next": "Următorul",
@@ -646,6 +655,7 @@
     "close": "Închide",
     "clear": "Șterge",
     "loading": "Se încarcă...",
+    "more": "Mai multe",
     "error": "Eroare",
     "success": "Succes",
     "warning": "Avertisment",
@@ -943,10 +953,14 @@
         "info_requests_subtitle": "Mesaje trimise pacientului",
         "actions": "Acțiuni",
         "actions_subtitle": "Gestionează această consultație",
-        "start_review": "Începe evaluarea",
-        "request_more_info": "Solicită mai multe informații",
-        "write_response": "Scrie răspunsul",
-        "status_updated": "Status actualizat",
+        "start_review": "Începe Evaluarea",
+        "submit_diagnosis": "Trimite Diagnostic",
+        "request_info": "Solicită Info",
+        "patient_report": "Raport Pacient",
+        "conversation": "Conversație",
+        "waiting_patient_response": "Se așteaptă răspunsul pacientului...",
+        "waiting_doctor_action": "Se așteaptă acțiunea ta...",
+        "status_updated": "Status actualizat cu succes",
         "info_request_card": {
           "your_questions": "Întrebările Tale",
           "asked_on": "Întrebat pe {date}",
@@ -962,40 +976,36 @@
       }
     },
     "response_form": {
-      "title": "Trimite răspunsul",
-      "response_label": "Opinia medicală",
-      "response_hint": "Oferă o opinie medicală clară și structurată pentru pacient...",
-      "recommendations_label": "Recomandări (opțional)",
-      "recommendations_hint": "Pași de urmat, idei de tratament sau sfaturi suplimentare",
-      "follow_up_title": "Este nevoie de o consultație ulterioară?",
-      "follow_up_subtitle": "Bifează dacă pacientul trebuie să programeze o consultație ulterioară",
-      "submit": "Trimite răspunsul",
-      "success": "Răspuns trimis pacientului",
-      "error": "Trimiterea răspunsului a eșuat. Te rugăm să încerci din nou.",
+      "title": "Trimite Opinie Medicală",
+      "responding_to": "Răspuns la solicitarea de consultație",
+      "response_label": "Opinie Medicală",
+      "response_hint": "Oferă opinia medicală detaliată, diagnosticul și explicațiile...",
+      "recommendations_label": "Recomandări",
+      "recommendations_hint": "Schimbări stil de viață, medicamente, analize suplimentare...",
+      "follow_up_title": "Necesită Control",
+      "follow_up_subtitle": "Bifează dacă recomanzi un control ulterior",
+      "submit": "Trimite Diagnostic",
+      "success": "Opinie medicală trimisă cu succes",
       "validation": {
-        "required": "Răspunsul este obligatoriu",
-        "min_length": "Răspunsul trebuie să aibă cel puțin {min} de caractere",
-        "max_length": "Răspunsul trebuie să aibă sub {max} de caractere"
+        "required": "Opinia medicală este obligatorie",
+        "min_length": "Opinia trebuie să aibă cel puțin {min} caractere"
       }
     },
     "request_more_info": {
-      "title": "Solicită mai multe informații",
-      "message_label": "Mesaj pentru pacient",
-      "message_hint": "Descrie ce informații ai nevoie (ex: simptome, analize)...",
-      "questions_title": "Întrebări specifice",
+      "title": "Solicită Informații",
+      "message_label": "Mesaj către pacient",
+      "message_hint": "Explică ce informații suplimentare sunt necesare...",
+      "questions_title": "Întrebări Specifice",
+      "add_question": "Adaugă Întrebare",
       "question_label": "Întrebare",
-      "question_hint": "Adaugă o întrebare specifică pentru pacient",
-      "add_question": "Adaugă încă o întrebare",
-      "submit": "Trimite solicitarea",
-      "success": "Solicitare de informații trimisă pacientului",
-      "error": "Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.",
+      "question_hint": "Scrie întrebarea aici...",
+      "submit": "Trimite Solicitarea",
+      "success": "Solicitare de informații trimisă",
       "validation": {
         "required": "Mesajul este obligatoriu",
-        "min_length": "Mesajul trebuie să aibă cel puțin {min} de caractere",
-        "max_length": "Mesajul trebuie să aibă sub {max} de caractere",
-        "question_required": "Întrebarea este obligatorie",
-        "question_too_short": "Întrebarea trebuie să aibă cel puțin {min} caractere",
-        "question_too_long": "Întrebarea trebuie să aibă sub {max} caractere"
+        "min_length": "Mesajul trebuie să aibă cel puțin {min} caractere",
+        "question_required": "Întrebarea nu poate fi goală",
+        "question_too_short": "Întrebarea este prea scurtă (min {min} caractere)"
       }
     },
     "calendar": {

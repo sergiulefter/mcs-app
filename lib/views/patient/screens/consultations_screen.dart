@@ -7,11 +7,11 @@ import 'package:mcs_app/controllers/navigation_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/cards/consultation_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/consultation_card_skeleton.dart';
-import 'package:mcs_app/views/patient/widgets/filters/consultation_segment_filter.dart';
-import 'package:mcs_app/views/patient/widgets/filters/themed_filter_chip.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'request_detail_screen.dart';
 
+/// Patient consultations screen matching the HTML/CSS design.
+/// Features sticky header with title and horizontal scrollable filter chips.
 class ConsultationsScreen extends StatefulWidget {
   const ConsultationsScreen({super.key});
 
@@ -33,119 +33,272 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
     final consultationsController = context.read<ConsultationsController>();
 
     if (authController.currentUser != null) {
-      await consultationsController.fetchUserConsultations(
-        authController.currentUser!.uid,
-      );
+      try {
+        await consultationsController.fetchUserConsultations(
+          authController.currentUser!.uid,
+        );
+      } catch (e) {
+        debugPrint('Error loading consultations: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error loading consultations: $e'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Retry',
+                textColor: Colors.white,
+                onPressed: _fetchConsultations,
+              ),
+            ),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final consultationsController = context.watch<ConsultationsController>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('consultations.title'.tr()),
+      backgroundColor: isDark
+          ? AppTheme.backgroundDark
+          : AppTheme.backgroundLight,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Sticky header with title and segment filter
+            _buildStickyHeader(context),
+
+            // Content area
+            Expanded(
+              child:
+                  consultationsController.isLoading &&
+                      !consultationsController.hasPrimedForUser
+                  ? _buildLoadingState()
+                  : _buildConsultationsContent(consultationsController),
+            ),
+          ],
+        ),
       ),
-      body: consultationsController.isLoading && !consultationsController.hasPrimedForUser
-          ? _buildLoadingState()
-          : _buildConsultationsContent(consultationsController),
+    );
+  }
+
+  Widget _buildStickyHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppTheme.backgroundDark.withValues(alpha: 0.95)
+            : AppTheme.backgroundLight,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppTheme.slate800 : AppTheme.slate200,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Title bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppTheme.spacing16,
+              AppTheme.spacing12,
+              AppTheme.spacing16,
+              AppTheme.spacing8,
+            ),
+            child: Text(
+              'consultations.title'.tr(),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+            ),
+          ),
+
+          // Segment filter (horizontal scrollable pills)
+          Consumer<ConsultationsController>(
+            builder: (context, controller, _) {
+              return _buildSegmentFilter(context, controller);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSegmentFilter(
+    BuildContext context,
+    ConsultationsController controller,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final segments = [
+      {'key': 'active', 'label': 'consultations.segments.active'.tr()},
+      {'key': 'completed', 'label': 'common.status.completed'.tr()},
+      {'key': 'all', 'label': 'common.all'.tr()},
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(
+        AppTheme.spacing16,
+        AppTheme.spacing8,
+        AppTheme.spacing16,
+        AppTheme.spacing16,
+      ),
+      child: Row(
+        children: segments.map((segment) {
+          final isSelected = controller.selectedSegment == segment['key'];
+          return Padding(
+            padding: EdgeInsets.only(
+              right: segment != segments.last ? AppTheme.spacing12 : 0,
+            ),
+            child: GestureDetector(
+              onTap: () => controller.setSegmentFilter(segment['key']!),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? colorScheme.primary
+                      : (isDark ? AppTheme.surfaceDark : Colors.white),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                  border: isSelected
+                      ? null
+                      : Border.all(
+                          color: isDark ? AppTheme.slate700 : AppTheme.slate200,
+                        ),
+                  boxShadow: isSelected
+                      ? [
+                          BoxShadow(
+                            color: colorScheme.primary.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Text(
+                  segment['label']!,
+                  style: TextStyle(
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? AppTheme.slate300 : AppTheme.slate600),
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 
   Widget _buildLoadingState() {
-    return Column(
-      children: [
-        // Show segment filter even during loading
-        Consumer<ConsultationsController>(
-          builder: (context, controller, _) => ConsultationSegmentFilter(
-            selectedSegment: controller.selectedSegment,
-            onSegmentChanged: controller.setSegmentFilter,
-            onFilterTap: () => _showFilterBottomSheet(context),
-            activeCount: null,
-            completedCount: null,
-          ),
-        ),
-        // Skeleton cards
-        Expanded(
-          child: ListView.separated(
-            padding: AppTheme.screenPadding,
-            itemCount: 4,
-            separatorBuilder: (context, index) =>
-                const SizedBox(height: AppTheme.spacing16),
-            itemBuilder: (context, index) => const ConsultationCardSkeleton(),
-          ),
-        ),
-      ],
+    return ListView.separated(
+      padding: const EdgeInsets.all(AppTheme.spacing16),
+      itemCount: 4,
+      separatorBuilder: (context, index) =>
+          const SizedBox(height: AppTheme.spacing16),
+      itemBuilder: (context, index) => const ConsultationCardSkeleton(),
     );
   }
 
   Widget _buildConsultationsContent(ConsultationsController controller) {
     final consultations = controller.segmentFilteredConsultations;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return RefreshIndicator(
       onRefresh: _fetchConsultations,
-      child: Column(
-        children: [
-          // Segment filter
-          ConsultationSegmentFilter(
-            selectedSegment: controller.selectedSegment,
-            onSegmentChanged: controller.setSegmentFilter,
-            onFilterTap: () => _showFilterBottomSheet(context),
-            activeCount: controller.activeCount,
-            completedCount: controller.completedCount,
-          ),
-          // Content
-          Expanded(
-            child: consultations.isEmpty
-                ? ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: AppTheme.screenPadding,
-                    children: [
-                      _buildEmptyStateContent(controller),
-                    ],
-                  )
-                : NotificationListener<ScrollNotification>(
-                    onNotification: (scrollInfo) {
-                      // Load more when user scrolls near the bottom
-                      if (scrollInfo.metrics.pixels >=
-                          scrollInfo.metrics.maxScrollExtent - 200) {
-                        controller.fetchMore();
-                      }
-                      return false;
-                    },
-                    child: ListView.separated(
-                      padding: AppTheme.screenPadding,
-                      itemCount: consultations.length + (controller.hasMore ? 1 : 0),
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: AppTheme.spacing16),
-                      itemBuilder: (context, index) {
-                        // Loading indicator at the end
-                        if (index == consultations.length) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(vertical: AppTheme.spacing16),
-                            child: Center(child: CircularProgressIndicator()),
-                          );
-                        }
+      child: consultations.isEmpty
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(AppTheme.spacing16),
+              children: [_buildEmptyStateContent(controller)],
+            )
+          : NotificationListener<ScrollNotification>(
+              onNotification: (scrollInfo) {
+                // Load more when user scrolls near the bottom
+                if (scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent - 200) {
+                  controller.fetchMore();
+                }
+                return false;
+              },
+              child: ListView.builder(
+                padding: const EdgeInsets.all(AppTheme.spacing16),
+                itemCount:
+                    consultations.length +
+                    (controller.hasMore ? 1 : 1), // +1 for footer or loading
+                itemBuilder: (context, index) {
+                  // Loading indicator at the end
+                  if (index == consultations.length && controller.hasMore) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppTheme.spacing16,
+                      ),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
 
-                        final consultation = consultations[index];
-                        return ConsultationCard(
-                          consultation: consultation,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RequestDetailScreen(consultation: consultation),
-                              ),
-                            );
-                          },
+                  // Footer: "End of consultations"
+                  if (index == consultations.length) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppTheme.spacing24,
+                      ),
+                      child: Center(
+                        child: Text(
+                          'consultations.end_of_consultations'
+                              .tr()
+                              .toUpperCase(),
+                          style: TextStyle(
+                            color: isDark
+                                ? AppTheme.slate600
+                                : AppTheme.slate400,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            letterSpacing: 2,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final consultation = consultations[index];
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: index < consultations.length - 1
+                          ? AppTheme.spacing16
+                          : 0,
+                    ),
+                    child: ConsultationCard(
+                      consultation: consultation,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                RequestDetailScreen(consultation: consultation),
+                          ),
                         );
                       },
                     ),
-                  ),
-          ),
-        ],
-      ),
+                  );
+                },
+              ),
+            ),
     );
   }
 
@@ -194,151 +347,9 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
         ),
         if (action != null && actionLabel != null) ...[
           const SizedBox(height: AppTheme.spacing24),
-          ElevatedButton(
-            onPressed: action,
-            child: Text(actionLabel),
-          ),
+          ElevatedButton(onPressed: action, child: Text(actionLabel)),
         ],
       ],
-    );
-  }
-
-  void _showFilterBottomSheet(BuildContext context) {
-    final consultationsController = context.read<ConsultationsController>();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AppTheme.radiusLarge),
-        ),
-      ),
-      builder: (context) => _FilterBottomSheet(
-        selectedStatus: consultationsController.selectedStatus,
-        onStatusChanged: (status) {
-          consultationsController.setStatusFilter(status);
-        },
-      ),
-    );
-  }
-}
-
-class _FilterBottomSheet extends StatefulWidget {
-  final String selectedStatus;
-  final ValueChanged<String> onStatusChanged;
-
-  const _FilterBottomSheet({
-    required this.selectedStatus,
-    required this.onStatusChanged,
-  });
-
-  @override
-  State<_FilterBottomSheet> createState() => _FilterBottomSheetState();
-}
-
-class _FilterBottomSheetState extends State<_FilterBottomSheet> {
-  late String _selectedStatus;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedStatus = widget.selectedStatus;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    final statuses = [
-      {'key': 'all', 'label': 'common.all'.tr()},
-      {'key': 'pending', 'label': 'common.status.pending'.tr()},
-      {'key': 'in_review', 'label': 'common.status.in_review'.tr()},
-      {'key': 'cancelled', 'label': 'common.status.cancelled'.tr()},
-    ];
-
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Padding(
-            padding: AppTheme.sheetHeaderPadding,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'consultations.filter_title'.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppTheme.sheetTitleSpacing),
-
-          // Content
-          Padding(
-            padding: AppTheme.sheetContentPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Status filters label
-                Text(
-                  'consultations.filter_status'.tr(),
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                ),
-                const SizedBox(height: AppTheme.spacing12),
-                Wrap(
-                  spacing: AppTheme.spacing8,
-                  runSpacing: AppTheme.spacing8,
-                  children: statuses.map((status) {
-                    final isSelected = _selectedStatus == status['key'];
-                    return ThemedFilterChip(
-                      label: status['label']!,
-                      selected: isSelected,
-                      onSelected: (_) {
-                        setState(() {
-                          _selectedStatus = status['key']!;
-                        });
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: AppTheme.spacing32),
-
-                // Action buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedStatus = 'all';
-                          });
-                        },
-                        child: Text('common.clear'.tr()),
-                      ),
-                    ),
-                    const SizedBox(width: AppTheme.spacing12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          widget.onStatusChanged(_selectedStatus);
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('common.apply'.tr()),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

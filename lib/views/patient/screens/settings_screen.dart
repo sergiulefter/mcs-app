@@ -223,6 +223,41 @@ class SettingsScreen extends StatelessWidget {
 
                     const SizedBox(height: 32),
                     // Sign Out (Optional placement here or just keep in header/account screen, but design had home nav. Adding useful logout here too as fallback)
+                    // Back to Admin Dashboard (Only for Admins)
+                    Consumer<AuthController>(
+                      builder: (context, authController, _) {
+                        if (authController.currentUser?.userType != 'admin') {
+                          return const SizedBox.shrink();
+                        }
+                        return Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                onPressed: () {
+                                  // Pop until we find the dashboard or empty the stack
+                                  // Since we pushed MainShell from AdminDashboard, popping until first should work
+                                  Navigator.of(
+                                    context,
+                                  ).popUntil((route) => route.isFirst);
+                                },
+                                icon: const Icon(Icons.admin_panel_settings),
+                                label: const Text('Back to Admin Dashboard'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: colorScheme.primary,
+                                  side: BorderSide(color: colorScheme.primary),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      },
+                    ),
+
                     SizedBox(
                       width: double.infinity,
                       child: TextButton.icon(

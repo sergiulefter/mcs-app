@@ -2,20 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
-import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/constants.dart';
-import 'package:mcs_app/utils/form_scroll_helper.dart';
-import 'package:mcs_app/views/patient/widgets/cards/list_card.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_date_picker_field.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
-import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'package:mcs_app/views/patient/widgets/layout/profile_detail_row.dart';
-import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 import 'package:mcs_app/views/patient/widgets/skeletons/patient_profile_edit_skeleton.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
 
-/// Patient profile edit screen - dedicated screen for editing profile
-/// (separate from the onboarding CompleteProfileScreen)
+/// Patient profile edit screen matching the doctor profile edit screen design.
+/// Features: Cancel header, avatar section, form fields, fixed Save footer.
 class PatientProfileEditScreen extends StatefulWidget {
   const PatientProfileEditScreen({super.key});
 
@@ -26,21 +18,11 @@ class PatientProfileEditScreen extends StatefulWidget {
 
 class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _scrollHelper = FormScrollHelper();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  // GlobalKeys for scroll-to-error functionality
-  final _nameKey = GlobalKey();
-  final _dateOfBirthKey = GlobalKey();
-  final _sexKey = GlobalKey();
-  final _phoneKey = GlobalKey();
-
   DateTime? _selectedDateOfBirth;
   String? _selectedGender;
-
-  // Inline error messages
-  String? _dateOfBirthError;
 
   // Screen state
   bool _isLoading = true;
@@ -62,7 +44,6 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
 
   @override
   void dispose() {
-    _scrollHelper.dispose();
     _nameController.dispose();
     _phoneController.dispose();
     super.dispose();
@@ -93,34 +74,22 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
   }
 
   Future<void> _saveProfile() async {
-    // Clear previous errors
-    _scrollHelper.clearErrors();
-    setState(() {
-      _dateOfBirthError = null;
-    });
+    if (!_formKey.currentState!.validate()) return;
 
-    // Validate form and custom fields
-    bool hasError = false;
-
-    if (!_formKey.currentState!.validate()) {
-      hasError = true;
-    }
-
+    // Custom validations
     if (_selectedDateOfBirth == null) {
-      setState(() {
-        _dateOfBirthError = 'validation.select_date_of_birth'.tr();
-      });
-      _scrollHelper.setError('dateOfBirth');
-      hasError = true;
+      NotificationsHelper().showError(
+        'validation.select_date_of_birth'.tr(),
+        context: context,
+      );
+      return;
     }
 
     if (_selectedGender == null) {
-      _formKey.currentState!.validate();
-      hasError = true;
-    }
-
-    if (hasError) {
-      _scrollHelper.scrollToFirstError(context);
+      NotificationsHelper().showError(
+        'validation.select_sex'.tr(),
+        context: context,
+      );
       return;
     }
 
@@ -142,8 +111,11 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
 
       if (!mounted) return;
 
-      NotificationsHelper().showSuccess('profile.edit.success'.tr(), context: context);
-      Navigator.of(context).pop();
+      NotificationsHelper().showSuccess(
+        'profile.edit.success'.tr(),
+        context: context,
+      );
+      Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
       NotificationsHelper().showError(e.toString(), context: context);
@@ -156,222 +128,657 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Register fields in order for scroll-to-error
-    _scrollHelper.register('name', _nameKey);
-    _scrollHelper.register('dateOfBirth', _dateOfBirthKey);
-    _scrollHelper.register('sex', _sexKey);
-    _scrollHelper.register('phone', _phoneKey);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: colorScheme.surface,
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              const Expanded(child: PatientProfileEditSkeleton()),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('profile.edit.title'.tr()),
-      ),
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: _isLoading
-            ? const PatientProfileEditSkeleton()
-            : SingleChildScrollView(
-                padding: AppTheme.screenPadding,
-                child: Form(
-                  key: _formKey,
+        child: Column(
+          children: [
+            // Header
+            _buildHeader(context),
+
+            // Scrollable Content
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Read-only section
-                      _buildReadOnlySection(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
+                      // Profile Avatar Section
+                      _buildAvatarSection(context),
 
-                      // Editable section
-                      _buildEditableSection(context),
-                      const SizedBox(height: AppTheme.sectionSpacing),
+                      // Personal Information Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(
+                              context,
+                              'profile.edit.personal_info'.tr(),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildNameField(context),
+                            const SizedBox(height: 16),
+                            _buildDateOfBirthField(context),
+                            const SizedBox(height: 16),
+                            _buildSexField(context),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
 
-                      // Save button
-                      _buildSaveButton(context),
-                      const SizedBox(height: AppTheme.spacing16),
+                      // Divider
+                      Container(
+                        height: 1,
+                        color: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Contact Section
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionTitle(
+                              context,
+                              'profile.edit.contact_info'.tr(),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildPhoneField(context),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Divider
+                      Container(
+                        height: 1,
+                        color: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Account Info Section (read-only)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: _buildAccountInfoSection(context),
+                      ),
+
+                      // Bottom spacing for fixed button
+                      const SizedBox(height: 96),
                     ],
                   ),
                 ),
               ),
+            ),
+
+            // Fixed Save Button Footer
+            _buildSaveFooter(context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildReadOnlySection(BuildContext context) {
-    final currentUser = context.read<AuthController>().currentUser;
+  Widget _buildHeader(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Cancel button
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Text(
+              'common.cancel'.tr(),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          // Title
+          Expanded(
+            child: Text(
+              'profile.edit.title'.tr(),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          // Empty spacer for balance
+          const SizedBox(width: 56),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatarSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final currentUser = context.read<AuthController>().currentUser;
+    final displayName = currentUser?.displayName ?? '';
+    final initials = _getInitials(displayName);
     final email = currentUser?.email ?? '';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      child: Column(
+        children: [
+          // Avatar with camera button
+          Stack(
+            children: [
+              Container(
+                width: 96,
+                height: 96,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: colorScheme.primaryContainer,
+                  border: Border.all(color: colorScheme.surface, width: 4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    initials,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: colorScheme.surface, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.primary.withValues(alpha: 0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.camera_alt,
+                    size: 16,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Email (read-only, grayed out)
+          Text(
+            email,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(
+        context,
+      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildNameField(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'common.full_name'.tr(),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _nameController,
+          textCapitalization: TextCapitalization.words,
+          textInputAction: TextInputAction.next,
+          decoration: InputDecoration(
+            hintText: 'auth.name_hint'.tr(),
+            hintStyle: TextStyle(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
+            prefixIcon: Icon(
+              Icons.person_outlined,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            filled: true,
+            fillColor: colorScheme.surfaceContainerLow,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.error),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.error, width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'validation.please_enter_full_name'.tr();
+            }
+            if (value.trim().length < AppConstants.nameMinLength) {
+              return 'validation.name_too_short'.tr(
+                namedArgs: {'min': AppConstants.nameMinLength.toString()},
+              );
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateOfBirthField(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+
+    final formattedDate = _selectedDateOfBirth != null
+        ? DateFormat.yMMMd(
+            context.locale.toLanguageTag(),
+          ).format(_selectedDateOfBirth!)
+        : null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'profile.date_of_birth'.tr(),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: _selectedDateOfBirth ?? DateTime(now.year - 30),
+              firstDate: DateTime(now.year - 120),
+              lastDate: DateTime(now.year - 18),
+            );
+            if (date != null) {
+              setState(() => _selectedDateOfBirth = date);
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).dividerColor),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 20,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    formattedDate ?? 'profile.date_of_birth_hint'.tr(),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: formattedDate != null
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.expand_more,
+                  size: 20,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSexField(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'profile.sex'.tr(),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: _sexKeys.map((sex) {
+            final isSelected = _selectedGender == sex;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: sex == _sexKeys.first ? 0 : 8,
+                  right: sex == _sexKeys.last ? 0 : 8,
+                ),
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedGender = sex),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? colorScheme.primary.withValues(alpha: 0.1)
+                          : colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? colorScheme.primary
+                            : Theme.of(context).dividerColor,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          sex == 'male' ? Icons.male : Icons.female,
+                          size: 20,
+                          color: isSelected
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'profile.$sex'.tr(),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: isSelected
+                                    ? colorScheme.primary
+                                    : colorScheme.onSurface,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPhoneField(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'common.phone'.tr(),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '(${('profile.optional'.tr())})',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+          textInputAction: TextInputAction.done,
+          decoration: InputDecoration(
+            hintText: 'profile.phone_hint'.tr(),
+            hintStyle: TextStyle(
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            ),
+            prefixIcon: Icon(
+              Icons.phone_outlined,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+            filled: true,
+            fillColor: colorScheme.surfaceContainerLow,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: colorScheme.primary, width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+          ),
+          validator: (value) {
+            if (value != null && value.trim().isNotEmpty) {
+              final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+              if (digitsOnly.length < AppConstants.phoneMinDigits) {
+                return 'validation.invalid_phone'.tr();
+              }
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAccountInfoSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final currentUser = context.read<AuthController>().currentUser;
+
     final memberSince = currentUser?.createdAt != null
-        ? DateFormat.yMMMd(context.locale.toLanguageTag())
-            .format(currentUser!.createdAt)
+        ? DateFormat.yMMMd(
+            context.locale.toLanguageTag(),
+          ).format(currentUser!.createdAt)
         : '';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header with info icon
-        Row(
-          children: [
-            Icon(
-              Icons.info_outline,
-              size: AppTheme.iconSmall,
-              color: colorScheme.primary,
-            ),
-            const SizedBox(width: AppTheme.spacing8),
-            Text(
-              'profile.edit.account_info'.tr(),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacing4),
+        _buildSectionTitle(context, 'profile.edit.account_info'.tr()),
+        const SizedBox(height: 8),
         Text(
           'profile.edit.account_info_hint'.tr(),
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
-        const SizedBox(height: AppTheme.spacing16),
+        const SizedBox(height: 16),
 
-        // Card with read-only details
-        ListCard(
-          padding: EdgeInsets.zero,
-          children: [
-            ProfileDetailRow(
-              icon: Icons.email_outlined,
-              label: 'common.email'.tr(),
-              value: email,
-            ),
-            ProfileDetailRow(
-              icon: Icons.calendar_today_outlined,
-              label: 'account.member_since'.tr(),
-              value: memberSince,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEditableSection(BuildContext context) {
-    final now = DateTime.now();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SectionHeader(title: 'profile.edit.personal_info'.tr()),
-        const SizedBox(height: AppTheme.spacing16),
-
-        // Full Name
-        KeyedSubtree(
-          key: _nameKey,
-          child: AppTextField(
-            label: 'common.full_name'.tr(),
-            hintText: 'auth.name_hint'.tr(),
-            controller: _nameController,
-            prefixIcon: Icons.person_outlined,
-            keyboardType: TextInputType.name,
-            textInputAction: TextInputAction.next,
-            textCapitalization: TextCapitalization.words,
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'validation.please_enter_full_name'.tr();
-              }
-              if (value.trim().length < AppConstants.nameMinLength) {
-                return 'validation.name_too_short'.tr(
-                  namedArgs: {'min': AppConstants.nameMinLength.toString()},
-                );
-              }
-              return null;
-            },
+        // Member Since
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Theme.of(context).dividerColor),
           ),
-        ),
-        const SizedBox(height: AppTheme.spacing16),
-
-        // Date of Birth
-        KeyedSubtree(
-          key: _dateOfBirthKey,
-          child: AppDatePickerField(
-            label: 'profile.date_of_birth'.tr(),
-            hintText: 'profile.date_of_birth_hint'.tr(),
-            selectedDate: _selectedDateOfBirth,
-            onDateSelected: (date) {
-              setState(() {
-                _selectedDateOfBirth = date;
-                if (_dateOfBirthError != null) _dateOfBirthError = null;
-              });
-            },
-            firstDate: DateTime(now.year - 120),
-            lastDate: DateTime(now.year - 18),
-            errorText: _dateOfBirthError,
-          ),
-        ),
-        const SizedBox(height: AppTheme.spacing16),
-
-        // Sex
-        KeyedSubtree(
-          key: _sexKey,
-          child: AppDropdownField(
-            label: 'profile.sex'.tr(),
-            hintText: 'profile.sex_hint'.tr(),
-            value: _selectedGender,
-            items: _sexKeys,
-            translationPrefix: 'profile',
-            prefixIcon: Icons.wc_outlined,
-            onChanged: (value) {
-              setState(() {
-                _selectedGender = value;
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'validation.select_sex'.tr();
-              }
-              return null;
-            },
-          ),
-        ),
-        const SizedBox(height: AppTheme.spacing16),
-
-        // Phone
-        KeyedSubtree(
-          key: _phoneKey,
-          child: AppTextField(
-            label: 'common.phone'.tr(),
-            hintText: 'profile.phone_hint'.tr(),
-            controller: _phoneController,
-            prefixIcon: Icons.phone_outlined,
-            keyboardType: TextInputType.phone,
-            textInputAction: TextInputAction.done,
-            isOptional: true,
-            optionalText: 'profile.optional'.tr(),
-            validator: (value) {
-              if (value != null && value.trim().isNotEmpty) {
-                final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
-                if (digitsOnly.length < AppConstants.phoneMinDigits) {
-                  return 'validation.invalid_phone'.tr();
-                }
-              }
-              return null;
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSaveButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _isSaving ? null : _saveProfile,
-      child: _isSaving
-          ? SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Theme.of(context).colorScheme.onPrimary,
+          child: Row(
+            children: [
+              Icon(
+                Icons.calendar_today_outlined,
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
               ),
-            )
-          : Text('profile.edit.save_changes'.tr()),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'account.member_since'.tr(),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    memberSince,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
+  }
+
+  Widget _buildSaveFooter(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.3),
+          ),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: _isSaving ? null : _saveProfile,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: _isSaving
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colorScheme.onPrimary,
+                    ),
+                  )
+                : Text(
+                    'profile.edit.save_changes'.tr(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getInitials(String name) {
+    if (name.isEmpty) return '?';
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return name[0].toUpperCase();
   }
 }

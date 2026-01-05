@@ -28,6 +28,25 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     final patientName =
         patient?.displayName ?? 'doctor.requests.patient_unknown'.tr();
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Build patient info subtitle
+    final patientAge = patient?.dateOfBirth != null
+        ? DateTime.now().year - patient!.dateOfBirth!.year
+        : null;
+    final patientGender = patient?.gender;
+    String patientInfo = patientName;
+    if (patientAge != null || patientGender != null) {
+      final parts = <String>[];
+      if (patientAge != null) parts.add('$patientAge');
+      if (patientGender != null) {
+        final genderLabel = 'profile.$patientGender'.tr();
+        parts.add(genderLabel);
+      }
+      if (parts.isNotEmpty) {
+        patientInfo = '$patientName • ${parts.join(' ')}';
+      }
+    }
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -41,12 +60,12 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
         child: Container(
           padding: const EdgeInsets.all(AppTheme.spacing16),
           decoration: BoxDecoration(
-            color: colorScheme.surface,
+            color: isDark ? AppTheme.surfaceDark : Colors.white,
             borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
             border: Border.all(color: Colors.transparent),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.onSurface.withValues(alpha: 0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -55,7 +74,7 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Patient avatar
+              // Patient avatar (56px as per design)
               _buildAvatar(context, patientName),
               const SizedBox(width: AppTheme.spacing16),
 
@@ -64,20 +83,23 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title and patient info
+                    // Title
                     Text(
                       consultation.title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : AppTheme.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: AppTheme.spacing4),
+                    const SizedBox(height: 2),
+
+                    // Patient info subtitle
                     Text(
-                      patientName,
+                      patientInfo,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+                        color: isDark ? AppTheme.slate400 : AppTheme.slate500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -90,9 +112,9 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
                       decoration: BoxDecoration(
                         border: Border(
                           top: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).dividerColor.withValues(alpha: 0.5),
+                            color: isDark
+                                ? AppTheme.slate700.withValues(alpha: 0.5)
+                                : AppTheme.slate100,
                           ),
                         ),
                       ),
@@ -109,8 +131,9 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
                                   _formatReceivedTime(consultation.createdAt),
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(
-                                        color: colorScheme.onSurfaceVariant
-                                            .withValues(alpha: 0.7),
+                                        color: isDark
+                                            ? AppTheme.slate500
+                                            : AppTheme.slate400,
                                       ),
                                 ),
                                 _buildUrgencyBadge(
@@ -135,7 +158,7 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
-                                const SizedBox(width: AppTheme.spacing2),
+                                const SizedBox(width: 2),
                                 Icon(
                                   Icons.chevron_right,
                                   size: 18,
@@ -157,9 +180,10 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     );
   }
 
-  /// Build patient avatar with initials fallback
+  /// Build patient avatar with initials fallback (56px as per design)
   Widget _buildAvatar(BuildContext context, String patientName) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final initials = _getInitials(patientName);
 
     return Container(
@@ -167,14 +191,23 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
       height: 56,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+        color: isDark
+            ? colorScheme.primary.withValues(alpha: 0.2)
+            : colorScheme.primaryContainer.withValues(alpha: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
       ),
       child: Center(
         child: Text(
           initials,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             color: colorScheme.primary,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -189,10 +222,9 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
   }
 
-  /// Build urgency badge with appropriate colors
+  /// Build urgency badge with appropriate colors matching HTML design
   Widget _buildUrgencyBadge(BuildContext context, String urgency) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     Color bgColor;
     Color textColor;
@@ -201,21 +233,27 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     switch (urgency.toLowerCase()) {
       case 'high':
       case 'urgent':
-        bgColor = colorScheme.error.withValues(alpha: 0.1);
-        textColor = colorScheme.error;
+        bgColor = isDark
+            ? Colors.red.shade900.withValues(alpha: 0.4)
+            : Colors.red.shade100;
+        textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
         label = 'common.urgency.high'.tr();
         break;
       case 'moderate':
       case 'medium':
-        bgColor = semantic.warning.withValues(alpha: 0.1);
-        textColor = semantic.warning;
+        bgColor = isDark
+            ? Colors.amber.shade900.withValues(alpha: 0.4)
+            : Colors.amber.shade100;
+        textColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
         label = 'common.urgency.moderate'.tr();
         break;
       case 'low':
       case 'general':
       default:
-        bgColor = colorScheme.secondary.withValues(alpha: 0.1);
-        textColor = colorScheme.secondary;
+        bgColor = isDark
+            ? Colors.teal.shade900.withValues(alpha: 0.4)
+            : Colors.teal.shade100;
+        textColor = isDark ? Colors.teal.shade300 : Colors.teal.shade800;
         label = 'common.urgency.low'.tr();
         break;
     }
@@ -223,17 +261,17 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacing8,
-        vertical: AppTheme.spacing2,
+        vertical: 2,
       ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        style: TextStyle(
           color: textColor,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
           fontSize: 10,
         ),
       ),
@@ -248,18 +286,20 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     String timeAgo;
     if (difference.inMinutes < 1) {
       timeAgo = 'consultations.time.just_now'.tr();
+      return 'Received: $timeAgo';
     } else if (difference.inMinutes < 60) {
-      timeAgo = '${difference.inMinutes} min';
+      timeAgo = '${difference.inMinutes} min ago';
     } else if (difference.inHours < 24) {
-      timeAgo = '${difference.inHours}h';
+      timeAgo = '${difference.inHours}h ago';
     } else if (difference.inDays == 1) {
-      timeAgo = '1 day';
+      timeAgo = '1 day ago';
     } else if (difference.inDays < 7) {
-      timeAgo = '${difference.inDays} days';
+      timeAgo = '${difference.inDays} days ago';
     } else {
       timeAgo = DateFormat('MMM d').format(dateTime);
+      return 'Received: $timeAgo';
     }
 
-    return 'Received: $timeAgo ago';
+    return 'Received: $timeAgo';
   }
 }

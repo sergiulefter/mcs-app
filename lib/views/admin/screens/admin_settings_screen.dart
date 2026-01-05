@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
+import 'package:mcs_app/utils/seed_dev_data.dart';
 
 class AdminSettingsScreen extends StatelessWidget {
   const AdminSettingsScreen({super.key});
@@ -86,6 +87,24 @@ class AdminSettingsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
+                    // Developer Options
+                    _buildSectionHeader(context, 'Developer Options'),
+                    _buildSectionContainer(
+                      context,
+                      children: [
+                        _buildSettingsTile(
+                          context,
+                          icon: Icons.storage,
+                          iconColor: Colors.orange,
+                          iconBgColor: Colors.orange.withValues(alpha: 0.1),
+                          title: 'Seed Database',
+                          onTap: () => _showSeedConfirmDialog(context),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
                     // App Version
                     Text(
                       'profile.app_version'.tr(
@@ -98,6 +117,8 @@ class AdminSettingsScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
+
+                    const SizedBox(height: 24),
 
                     const SizedBox(height: 32),
                     // Sign Out
@@ -310,6 +331,71 @@ class AdminSettingsScreen extends StatelessWidget {
         MaterialPageRoute(builder: (context) => const LoginScreen()),
         (route) => false,
       );
+    }
+  }
+
+  void _showSeedConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Seed Database?'),
+        content: const Text(
+          'This will DELETE all existing doctors and consultations and replace them with generated test data. This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('common.cancel'.tr()),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _runSeeder(context);
+            },
+            child: const Text('Seed Data'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _runSeeder(BuildContext context) async {
+    final authController = context.read<AuthController>();
+    final userId = authController.currentUser?.uid;
+
+    if (userId == null) return;
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await runDevSeeder(patientId: userId);
+      if (context.mounted) {
+        Navigator.pop(context); // Hide loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Database seeded successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Hide loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error seeding database: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

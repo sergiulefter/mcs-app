@@ -96,6 +96,7 @@
       "account_info": "Account Information",
       "account_info_hint": "This information cannot be changed",
       "personal_info": "Personal Information",
+      "contact_info": "Contact Information",
       "save_changes": "Save Changes",
       "success": "Profile updated successfully",
       "error": "Failed to update profile. Please try again."
@@ -197,6 +198,8 @@
       "experience_15_plus": "15+ years",
       "availability": "Availability",
       "available_now": "Only show available doctors",
+      "subspecialty": "Subspecialty",
+      "language": "Language",
       "active_count": "{count} active"
     },
     "empty_state_title": "No doctors match your filters",
@@ -445,9 +448,14 @@
       "browse_doctors": "Browse Doctors"
     },
     "filter_title": "Filter Options",
-    "filter_status": "Status"
+    "filter_status": "Status",
+    "view_button": "View",
+    "end_of_consultations": "End of consultations"
   },
   "request_detail": {
+    "your_request": "Your Request",
+    "conversation": "Conversation",
+    "waiting_your_response": "Waiting for your response...",
     "title": "Consultation Details",
     "request_info": "Request Information",
     "title_label": "Title",
@@ -633,6 +641,7 @@
     "no_user_logged_in": "No user logged in"
   },
   "common": {
+    "optional": "(Optional)",
     "search": "Search...",
     "skip": "Skip",
     "next": "Next",
@@ -646,6 +655,7 @@
     "close": "Close",
     "clear": "Clear",
     "loading": "Loading...",
+    "more": "More",
     "error": "Error",
     "success": "Success",
     "warning": "Warning",
@@ -944,9 +954,13 @@
         "actions": "Actions",
         "actions_subtitle": "Manage this consultation",
         "start_review": "Start Review",
-        "request_more_info": "Request More Info",
-        "write_response": "Write Response",
-        "status_updated": "Status updated",
+        "submit_diagnosis": "Submit Diagnosis",
+        "request_info": "Request Info",
+        "patient_report": "Patient Report",
+        "conversation": "Conversation",
+        "waiting_patient_response": "Waiting for patient response...",
+        "waiting_doctor_action": "Waiting for your action...",
+        "status_updated": "Status updated successfully",
         "info_request_card": {
           "your_questions": "Your Questions",
           "asked_on": "Asked on {date}",

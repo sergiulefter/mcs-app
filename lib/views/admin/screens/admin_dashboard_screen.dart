@@ -6,6 +6,7 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
+import 'package:mcs_app/views/patient/screens/main_shell.dart';
 import 'create_doctor_screen.dart';
 import 'doctor_management_screen.dart';
 import 'user_management_screen.dart';
@@ -239,6 +240,33 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
           Row(
             children: [
+              // View Patient App Button
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const MainShell(),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
+                  hoverColor: isDark
+                      ? AppTheme.slate700.withValues(alpha: 0.5)
+                      : AppTheme.slate100,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.spacing8),
+                    child: Icon(
+                      Icons.visibility_outlined,
+                      size: AppTheme.iconMedium,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacing8),
+
               // Settings Button
               Material(
                 color: Colors.transparent,
