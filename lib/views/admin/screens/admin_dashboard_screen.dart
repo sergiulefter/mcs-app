@@ -605,6 +605,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               Text(
                 label,
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,

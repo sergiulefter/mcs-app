@@ -5,6 +5,7 @@ import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/views/patient/screens/patient_profile_edit_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
+import 'help_center_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -186,7 +187,12 @@ class SettingsScreen extends StatelessWidget {
                           iconBgColor: Colors.deepPurple.withValues(alpha: 0.1),
                           title: 'home.help_center'.tr(),
                           onTap: () {
-                            // Navigate to Help Center (placeholder if route needed, or just standard nav)
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HelpCenterScreen(),
+                              ),
+                            );
                           },
                         ),
                         const Divider(height: 1, thickness: 1),

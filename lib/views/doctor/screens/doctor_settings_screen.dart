@@ -8,6 +8,7 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
 import 'package:mcs_app/views/doctor/screens/availability_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
+import 'package:mcs_app/views/patient/screens/help_center_screen.dart';
 
 /// Doctor settings hub screen matching the patient settings design.
 class DoctorSettingsScreen extends StatelessWidget {
@@ -156,7 +157,14 @@ class DoctorSettingsScreen extends StatelessWidget {
                           iconColor: Colors.deepPurple,
                           iconBgColor: Colors.deepPurple.withValues(alpha: 0.1),
                           title: 'home.help_center'.tr(),
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const HelpCenterScreen(),
+                              ),
+                            );
+                          },
                         ),
                         const Divider(height: 1, thickness: 1),
                         _buildSettingsTile(
