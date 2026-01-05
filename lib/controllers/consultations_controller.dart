@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/consultation_model.dart';
@@ -19,9 +20,11 @@ class ConsultationsController extends ChangeNotifier
   static const int _pageSize = 20;
 
   // State - SplayTreeSet for automatic deduplication and sorting
-  final Set<ConsultationModel> _consultations = SplayTreeSet(
-    (a, b) => b.createdAt.compareTo(a.createdAt), // newest first
-  );
+  final Set<ConsultationModel> _consultations = SplayTreeSet((a, b) {
+    final timeComparison = b.createdAt.compareTo(a.createdAt);
+    if (timeComparison != 0) return timeComparison;
+    return b.id.compareTo(a.id); // Tie-breaker
+  });
   bool _isLoading = false;
   String? _loadedUserId;
   bool _hasPrimedForUser = false;
@@ -108,6 +111,9 @@ class ConsultationsController extends ChangeNotifier
 
       _loadedUserId = userId;
       _hasPrimedForUser = true;
+    } catch (e) {
+      debugPrint('Error fetching consultations: $e');
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
