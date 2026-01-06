@@ -98,6 +98,7 @@
     "weight": "Weight",
     "blood_type": "Blood Type",
     "medical_records_updated": "Medical records last updated: {date}",
+    "patient_id": "Patient ID",
     "edit": {
       "title": "Edit Profile",
       "account_info": "Account Information",

@@ -128,11 +128,8 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: colorScheme.surface,
         body: SafeArea(
           child: Column(
             children: [
@@ -145,7 +142,6 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
     }
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -247,7 +243,7 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: Theme.of(context).scaffoldBackgroundColor,
         border: Border(
           bottom: BorderSide(
             color: Theme.of(context).dividerColor.withValues(alpha: 0.3),

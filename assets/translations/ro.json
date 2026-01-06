@@ -98,6 +98,7 @@
     "weight": "Greutate",
     "blood_type": "Grupă Sanguină",
     "medical_records_updated": "Dosar medical actualizat: {date}",
+    "patient_id": "ID Pacient",
     "edit": {
       "title": "Editare Profil",
       "account_info": "Informații Cont",

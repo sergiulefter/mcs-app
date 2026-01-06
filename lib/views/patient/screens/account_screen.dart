@@ -229,7 +229,7 @@ class AccountScreen extends StatelessWidget {
             ),
           ),
           child: Text(
-            'Patient ID: #${user.uid.substring(0, 5).toUpperCase()}',
+            '${'profile.patient_id'.tr()}: #${user.uid.substring(0, 5).toUpperCase()}',
             style: TextStyle(
               color: colorScheme.primary,
               fontSize: 14,
@@ -454,6 +454,7 @@ class AccountScreen extends StatelessWidget {
               color: colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
           Text(
