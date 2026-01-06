@@ -14,7 +14,6 @@ class AdminSettingsScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Column(
           children: [
@@ -152,7 +151,7 @@ class AdminSettingsScreen extends StatelessWidget {
           bottom: BorderSide(
             color: Theme.of(
               context,
-            ).colorScheme.outlineVariant.withValues(alpha: 0.2),
+            ).colorScheme.outlineVariant.withValues(alpha: 0.1),
           ),
         ),
       ),
@@ -210,7 +209,7 @@ class AdminSettingsScreen extends StatelessWidget {
         border: Border.all(
           color: Theme.of(
             context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.2),
+          ).colorScheme.outlineVariant.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
