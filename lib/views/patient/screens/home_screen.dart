@@ -182,23 +182,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      // Notification Badge Logic (Placeholder)
-                      Positioned(
-                        top: 10,
-                        right: 12,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.error,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Theme.of(context).cardColor,
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ],
