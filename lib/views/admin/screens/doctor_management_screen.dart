@@ -331,7 +331,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
                   ),
                 ),
                 SizedBox(
-                  width: 80,
+                  width: 110,
                   child: Text(
                     'admin.doctors.column_status'.tr(),
                     textAlign: TextAlign.center,
@@ -546,7 +546,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
 
               // Availability badge
               SizedBox(
-                width: 80,
+                width: 110,
                 child: Center(
                   child: _buildAvailabilityBadge(context, doctor, isDark),
                 ),

@@ -328,7 +328,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                   ),
                 ),
                 SizedBox(
-                  width: 48,
+                  width: 80,
                   child: Text(
                     'admin.users.column_actions'.tr(),
                     textAlign: TextAlign.right,
@@ -539,7 +539,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
               // Delete button
               SizedBox(
-                width: 48,
+                width: 80,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
