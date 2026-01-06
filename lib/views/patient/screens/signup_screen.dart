@@ -113,9 +113,9 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 // Welcome Text
                 Text(
-                  'Create Account',
+                  'auth.sign_up'.tr(),
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontSize: 28, // Reduced font size
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
                   ),
@@ -123,7 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign up to get started with your medical consultations.',
+                  'auth.sign_up_subtitle'.tr(),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -134,7 +134,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 KeyedSubtree(
                   key: _nameKey,
                   child: _buildLabelledField(
-                    'Full Name',
+                    'common.full_name'.tr(),
                     AppTextField(
                       hintText: 'John Doe',
                       controller: _nameController,
@@ -151,7 +151,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 KeyedSubtree(
                   key: _emailKey,
                   child: _buildLabelledField(
-                    'Email Address',
+                    'common.email'.tr(),
                     AppTextField(
                       hintText: 'name@example.com',
                       controller: _emailController,
@@ -167,7 +167,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 KeyedSubtree(
                   key: _passwordKey,
                   child: _buildLabelledField(
-                    'Password',
+                    'auth.password'.tr(),
                     AppTextField(
                       hintText: '••••••••',
                       controller: _passwordController,
@@ -191,7 +191,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 KeyedSubtree(
                   key: _confirmPasswordKey,
                   child: _buildLabelledField(
-                    'Confirm Password',
+                    'auth.confirm_password'.tr(),
                     AppTextField(
                       hintText: '••••••••',
                       controller: _confirmPasswordController,
@@ -229,7 +229,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Or continue with',
+                        'auth.or_continue_with'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14,
@@ -247,14 +247,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     Expanded(
                       child: _buildSocialButton(
-                        'Google',
+                        'auth.social_google'.tr(),
                         'assets/icons/google.png',
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildSocialButton(
-                        'Apple',
+                        'auth.social_apple'.tr(),
                         null,
                         icon: Icons.apple,
                       ),
@@ -269,7 +269,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16), // Reduced from 24
                 // Terms
                 Text(
-                  'By signing up, you agree to our Terms of Service and Privacy Policy.',
+                  'auth.terms_agreement'.tr(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -291,7 +291,7 @@ class _SignupScreenState extends State<SignupScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 4),
           child: Text(
-            label, // We use hardcoded English here as per design request for now, or match keys if strict
+            label,
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -327,9 +327,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   )
-                : const Text(
-                    'Sign Up',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                : Text(
+                    'auth.sign_up'.tr(),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
           ),
         );
@@ -374,7 +377,7 @@ class _SignupScreenState extends State<SignupScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Already have an account?',
+          'auth.have_account'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -383,7 +386,7 @@ class _SignupScreenState extends State<SignupScreen> {
         GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: Text(
-            'Sign In',
+            'auth.sign_in'.tr(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,

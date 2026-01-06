@@ -54,7 +54,14 @@
     "forgot_password_title": "Reset Password",
     "forgot_password_subtitle": "Enter your email address and we will send you a link to reset your password.",
     "send_reset_link": "Send Reset Link",
-    "password_reset_sent": "Password reset email sent"
+    "password_reset_sent": "Password reset email sent",
+    "welcome_back": "Welcome Back",
+    "or_continue_with": "Or continue with",
+    "social_google": "Google",
+    "social_apple": "Apple",
+    "role_patient": "Patient",
+    "role_doctor": "Doctor",
+    "terms_agreement": "By signing up, you agree to our Terms of Service and Privacy Policy."
   },
   "profile": {
     "complete_title": "Complete Your Profile",

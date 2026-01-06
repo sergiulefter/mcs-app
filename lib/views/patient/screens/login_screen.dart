@@ -136,9 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Welcome Text
                 Text(
-                  'Welcome Back',
+                  'auth.welcome_back'.tr(),
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    fontSize: 26, // Reduced from 28
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     letterSpacing: -0.5,
                   ),
@@ -146,22 +146,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 4), // Reduced from 8
                 Text(
-                  'Sign in to manage your appointments.', // Shortened text
+                  'auth.sign_in_subtitle'.tr(),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 14, // Explicit smaller size
+                    fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 20), // Reduced from 24
                 // Role Toggle
                 Container(
-                  height: 44,
+                  height: 48,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).dividerColor.withValues(alpha: 0.1),
+                    // Slate background matching Stitch design (bg-slate-200 dark:bg-slate-800)
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Theme.of(context).colorScheme.surfaceContainerHighest
+                        : Theme.of(context).colorScheme.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Stack(
@@ -183,9 +184,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                 BoxShadow(
                                   color: Theme.of(
                                     context,
-                                  ).shadowColor.withValues(alpha: 0.05),
-                                  blurRadius: 2,
+                                  ).shadowColor.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  spreadRadius: 0,
                                   offset: const Offset(0, 1),
+                                ),
+                                BoxShadow(
+                                  color: Theme.of(
+                                    context,
+                                  ).shadowColor.withValues(alpha: 0.05),
+                                  blurRadius: 8,
+                                  spreadRadius: 0,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
@@ -195,8 +205,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Role options text
                       Row(
                         children: [
-                          Expanded(child: _buildRoleToggleOption('Patient')),
-                          Expanded(child: _buildRoleToggleOption('Doctor')),
+                          Expanded(
+                            child: _buildRoleToggleOption(
+                              'Patient',
+                              'auth.role_patient'.tr(),
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildRoleToggleOption(
+                              'Doctor',
+                              'auth.role_doctor'.tr(),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -224,10 +244,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'Or continue with',
+                        'auth.or_continue_with'.tr(),
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 13, // Reduced font size
+                          fontSize: 13,
                         ),
                       ),
                     ),
@@ -242,14 +262,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Expanded(
                       child: _buildSocialButton(
-                        'Google',
+                        'auth.social_google'.tr(),
                         'assets/icons/google.png',
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildSocialButton(
-                        'Apple',
+                        'auth.social_apple'.tr(),
                         null,
                         icon: Icons.apple,
                       ),
@@ -264,9 +284,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 12), // Reduced from 16
                 // Terms
                 Text(
-                  'By signing up, you agree to our Terms of Service.', // Shortened
+                  'auth.terms_agreement'.tr(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontSize: 11, // Reduced font size
+                    fontSize: 11,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
@@ -279,13 +299,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildRoleToggleOption(String role) {
-    final isSelected = _selectedRole == role;
+  Widget _buildRoleToggleOption(String roleKey, String label) {
+    final isSelected = _selectedRole == roleKey;
 
     return GestureDetector(
       onTap: () {
         setState(() {
-          _selectedRole = role;
+          _selectedRole = roleKey;
         });
       },
       behavior: HitTestBehavior.opaque,
@@ -302,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
             fontSize: 14,
             fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily,
           ),
-          child: Text(role),
+          child: Text(label),
         ),
       ),
     );
@@ -315,7 +335,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 4),
           child: Text(
-            'Email Address',
+            'common.email'.tr(),
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -341,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 4),
           child: Text(
-            'Password',
+            'auth.password'.tr(),
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
@@ -399,10 +419,10 @@ class _LoginScreenState extends State<LoginScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              elevation: 4,
+              elevation: 8,
               shadowColor: Theme.of(
                 context,
-              ).colorScheme.primary.withValues(alpha: 0.3),
+              ).colorScheme.primary.withValues(alpha: 0.35),
             ),
             child: (authController.isLoading || _isPrefetching)
                 ? SizedBox(
@@ -413,9 +433,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
                   )
-                : const Text(
-                    'Sign In', // Hardcoded as per design or use tr()
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                : Text(
+                    'auth.sign_in'.tr(),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
           ),
         );
@@ -463,7 +486,7 @@ class _LoginScreenState extends State<LoginScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Don't have an account?",
+          'auth.no_account'.tr(),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -476,7 +499,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           },
           child: Text(
-            'Sign Up',
+            'auth.sign_up'.tr(),
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,

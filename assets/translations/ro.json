@@ -54,7 +54,14 @@
     "forgot_password_title": "Resetare Parolă",
     "forgot_password_subtitle": "Introdu adresa de email și îți vom trimite un link pentru a-ți reseta parola.",
     "send_reset_link": "Trimite Link Resetare",
-    "password_reset_sent": "Email de resetare parolă trimis"
+    "password_reset_sent": "Email de resetare parolă trimis",
+    "welcome_back": "Bine ai Revenit",
+    "or_continue_with": "Sau continuă cu",
+    "social_google": "Google",
+    "social_apple": "Apple",
+    "role_patient": "Pacient",
+    "role_doctor": "Doctor",
+    "terms_agreement": "Prin înregistrare, ești de acord cu Termenii și Condițiile și Politica de Confidențialitate."
   },
   "profile": {
     "complete_title": "Completează Profilul",
