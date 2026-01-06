@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           widthFactor: 0.5,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
+                              color: Theme.of(context).colorScheme.primary,
                               borderRadius: BorderRadius.circular(8),
                               boxShadow: [
                                 BoxShadow(
@@ -316,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
           curve: Curves.easeInOut,
           style: TextStyle(
             color: isSelected
-                ? Theme.of(context).colorScheme.onSurface
+                ? Theme.of(context).colorScheme.onPrimary
                 : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
             fontSize: 14,
