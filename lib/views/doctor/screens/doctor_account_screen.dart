@@ -31,7 +31,7 @@ class DoctorAccountScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
