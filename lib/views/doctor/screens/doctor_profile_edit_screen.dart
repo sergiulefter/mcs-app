@@ -998,31 +998,35 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // Enable scroll control
       builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'doctor.profile_edit.select_subspecialty'.tr(),
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          // Wrap content in SingleChildScrollView
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'doctor.profile_edit.select_subspecialty'.tr(),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
-            const Divider(height: 1),
-            ...available.map(
-              (sub) => ListTile(
-                title: Text('subspecialties.$sub'.tr()),
-                onTap: () {
-                  setState(() => _selectedSubspecialties.add(sub));
-                  Navigator.pop(ctx);
-                },
+              const Divider(height: 1),
+              ...available.map(
+                (sub) => ListTile(
+                  title: Text('subspecialties.$sub'.tr()),
+                  onTap: () {
+                    setState(() => _selectedSubspecialties.add(sub));
+                    Navigator.pop(ctx);
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
