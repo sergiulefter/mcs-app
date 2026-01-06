@@ -401,13 +401,13 @@ class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
       if (mounted) {
         NotificationsHelper().showSuccess(
           'doctor.request_more_info.success'.tr(),
-          context: this.context,
+          context: context,
         );
       }
       navigator.pop(true);
     } catch (e) {
       if (mounted) {
-        NotificationsHelper().showError(e.toString(), context: this.context);
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     } finally {
       if (mounted) {

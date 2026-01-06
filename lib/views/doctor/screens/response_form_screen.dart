@@ -339,7 +339,7 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
           Switch(
             value: _followUpNeeded,
             onChanged: (value) => setState(() => _followUpNeeded = value),
-            activeColor: colorScheme.primary,
+            activeThumbColor: colorScheme.primary,
           ),
         ],
       ),
@@ -412,13 +412,13 @@ class _ResponseFormScreenState extends State<ResponseFormScreen> {
       if (mounted) {
         NotificationsHelper().showSuccess(
           'doctor.response_form.success'.tr(),
-          context: this.context,
+          context: context,
         );
       }
       navigator.pop(true);
     } catch (e) {
       if (mounted) {
-        NotificationsHelper().showError(e.toString(), context: this.context);
+        NotificationsHelper().showError(e.toString(), context: context);
       }
     } finally {
       if (mounted) {
