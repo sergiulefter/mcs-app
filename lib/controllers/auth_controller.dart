@@ -68,7 +68,12 @@ class AuthController extends ChangeNotifier {
 
   /// Sign in an existing user.
   /// Throws exceptions on failure - UI should catch and display.
-  Future<void> signIn({required String email, required String password}) async {
+  /// expectedRole: 'patient' or 'doctor' - validates user exists in correct collection
+  Future<void> signIn({
+    required String email,
+    required String password,
+    String? expectedRole,
+  }) async {
     _isLoading = true;
     notifyListeners();
 
@@ -76,6 +81,7 @@ class AuthController extends ChangeNotifier {
       _currentUser = await _authService.signIn(
         email: email,
         password: password,
+        expectedRole: expectedRole,
       );
     } finally {
       _isLoading = false;

@@ -60,9 +60,11 @@ class AuthService {
   }
 
   // Sign in with email and password
+  // expectedRole: 'patient' or 'doctor' - validates user exists in correct collection
   Future<UserModel?> signIn({
     required String email,
     required String password,
+    String? expectedRole,
   }) async {
     UserCredential userCredential = await _authInstance
         .signInWithEmailAndPassword(email: email, password: password);
@@ -70,18 +72,11 @@ class AuthService {
     User? user = userCredential.user;
     if (user == null) return null;
 
-    // First check if user exists in 'users' collection
+    // Check if user exists in 'users' collection (patients)
     DocumentSnapshot userDoc = await _firestore
         .collection(AppConstants.collectionUsers)
         .doc(user.uid)
         .get();
-
-    if (userDoc.exists) {
-      return UserModel.fromMap(
-        userDoc.data() as Map<String, dynamic>,
-        user.uid,
-      );
-    }
 
     // Check if user exists in 'doctors' collection
     DocumentSnapshot doctorDoc = await _firestore
@@ -89,8 +84,41 @@ class AuthService {
         .doc(user.uid)
         .get();
 
+    // Validate role if expectedRole is specified
+    if (expectedRole == 'patient') {
+      if (!userDoc.exists) {
+        // User tried to log in as patient but doesn't exist in users collection
+        await _authInstance.signOut();
+        throw Exception(
+          'This account is not registered as a patient. Please select "Doctor" to log in.',
+        );
+      }
+      return UserModel.fromMap(
+        userDoc.data() as Map<String, dynamic>,
+        user.uid,
+      );
+    } else if (expectedRole == 'doctor') {
+      if (!doctorDoc.exists) {
+        // User tried to log in as doctor but doesn't exist in doctors collection
+        await _authInstance.signOut();
+        throw Exception(
+          'This account is not registered as a doctor. Please select "Patient" to log in.',
+        );
+      }
+      final doctorData = doctorDoc.data() as Map<String, dynamic>;
+      final doctorModel = DoctorModel.fromMap(doctorData, user.uid);
+      return doctorModel.toUserModel();
+    }
+
+    // No expectedRole specified - use original behavior
+    if (userDoc.exists) {
+      return UserModel.fromMap(
+        userDoc.data() as Map<String, dynamic>,
+        user.uid,
+      );
+    }
+
     if (doctorDoc.exists) {
-      // Create a UserModel from doctor data using the conversion method
       final doctorData = doctorDoc.data() as Map<String, dynamic>;
       final doctorModel = DoctorModel.fromMap(doctorData, user.uid);
       return doctorModel.toUserModel();

@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await authController.signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text,
+        expectedRole: _selectedRole.toLowerCase(),
       );
 
       if (!mounted) return;
@@ -67,16 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final user = authController.currentUser;
       final userId = user?.uid;
-
-      // Validate role selection matches user type
-      // Note: This is an additional client-side check. Real security is server-side.
-      if (_selectedRole == 'Doctor' && user?.isDoctor != true) {
-        // If they tried to sign in as Doctor but aren't one, warn them?
-        // For now, we will just route them based on their ACTUAL account type,
-        // effectively ignoring the toggle if it's wrong, OR we could block access.
-        // Let's route based on ACTUAL type for better UX, but maybe show a snackbar if mismatch?
-        // Actually, simpler to just route correctly.
-      }
 
       // Only prefetch consultations for patients (not doctors/admins)
       if (userId != null &&
@@ -165,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20), // Reduced from 24
                 // Role Toggle
                 Container(
-                  height: 44, // Reduced from 48
+                  height: 44,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Theme.of(
@@ -173,10 +164,41 @@ class _LoginScreenState extends State<LoginScreen> {
                     ).dividerColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Row(
+                  child: Stack(
                     children: [
-                      Expanded(child: _buildRoleToggleOption('Patient')),
-                      Expanded(child: _buildRoleToggleOption('Doctor')),
+                      // Sliding background indicator
+                      AnimatedAlign(
+                        alignment: _selectedRole == 'Patient'
+                            ? Alignment.centerLeft
+                            : Alignment.centerRight,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeInOut,
+                        child: FractionallySizedBox(
+                          widthFactor: 0.5,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(
+                                    context,
+                                  ).shadowColor.withValues(alpha: 0.05),
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Role options text
+                      Row(
+                        children: [
+                          Expanded(child: _buildRoleToggleOption('Patient')),
+                          Expanded(child: _buildRoleToggleOption('Doctor')),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -259,7 +281,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildRoleToggleOption(String role) {
     final isSelected = _selectedRole == role;
-    // final isDark = Theme.of(context).brightness == Brightness.dark; // Removed
 
     return GestureDetector(
       onTap: () {
@@ -267,31 +288,21 @@ class _LoginScreenState extends State<LoginScreen> {
           _selectedRole = role;
         });
       },
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        decoration: BoxDecoration(
-          color: isSelected ? Theme.of(context).cardColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Theme.of(
-                      context,
-                    ).shadowColor.withValues(alpha: 0.05),
-                    blurRadius: 2,
-                  ),
-                ]
-              : null,
-        ),
         alignment: Alignment.center,
-        child: Text(
-          role,
+        child: AnimatedDefaultTextStyle(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
           style: TextStyle(
             color: isSelected
                 ? Theme.of(context).colorScheme.onSurface
                 : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w600,
             fontSize: 14,
+            fontFamily: Theme.of(context).textTheme.bodyLarge?.fontFamily,
           ),
+          child: Text(role),
         ),
       ),
     );
