@@ -11,19 +11,21 @@ import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/utils/validation/consultation_validator.dart';
-import 'package:mcs_app/views/patient/screens/main_shell.dart';
+import 'package:mcs_app/views/patient/screens/patient_main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/cards/surface_card.dart';
 
-class CreateRequestScreen extends StatefulWidget {
+class PatientCreateConsultationScreen extends StatefulWidget {
   final DoctorModel doctor;
 
-  const CreateRequestScreen({super.key, required this.doctor});
+  const PatientCreateConsultationScreen({super.key, required this.doctor});
 
   @override
-  State<CreateRequestScreen> createState() => _CreateRequestScreenState();
+  State<PatientCreateConsultationScreen> createState() =>
+      _PatientCreateConsultationScreenState();
 }
 
-class _CreateRequestScreenState extends State<CreateRequestScreen> {
+class _PatientCreateConsultationScreenState
+    extends State<PatientCreateConsultationScreen> {
   final PageController _pageController = PageController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _scrollHelper = FormScrollHelper();
@@ -192,7 +194,7 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
         // Navigate to consultations tab with bottom navigation visible
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => const MainShell(initialIndex: 2),
+            builder: (context) => const PatientMainShell(initialIndex: 2),
           ),
           (route) => false,
         );
@@ -615,7 +617,9 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
 
   Widget _buildUrgencySelector() {
     final blueColor = Theme.of(context).colorScheme.primary;
-    final orangeColor = Theme.of(context).extension<AppSemanticColors>()!.warning;
+    final orangeColor = Theme.of(
+      context,
+    ).extension<AppSemanticColors>()!.warning;
 
     return Column(
       children: [

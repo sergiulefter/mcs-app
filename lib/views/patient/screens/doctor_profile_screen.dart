@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/patient/screens/create_request_screen.dart';
+import 'package:mcs_app/views/patient/screens/patient_create_consultation_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 
@@ -615,8 +615,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              CreateRequestScreen(doctor: widget.doctor),
+                          builder: (context) => PatientCreateConsultationScreen(
+                            doctor: widget.doctor,
+                          ),
                         ),
                       );
                     }

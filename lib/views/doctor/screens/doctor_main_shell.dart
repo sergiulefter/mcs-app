@@ -6,7 +6,7 @@ import 'package:mcs_app/controllers/doctor_profile_controller.dart';
 import 'package:mcs_app/views/shared/widgets/connectivity_banner.dart';
 import 'package:provider/provider.dart';
 import 'doctor_home_screen.dart';
-import 'requests_list_screen.dart';
+import 'doctor_consultations_screen.dart';
 import 'doctor_calendar_screen.dart';
 import 'doctor_account_screen.dart';
 
@@ -64,7 +64,7 @@ class _DoctorMainShellState extends State<DoctorMainShell> {
       ),
       ChangeNotifierProvider.value(
         value: _doctorConsultationsController,
-        child: const RequestsListScreen(),
+        child: const DoctorConsultationsScreen(),
       ),
       ChangeNotifierProvider.value(
         value: _doctorConsultationsController,

@@ -11,9 +11,9 @@ import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'signup_screen.dart';
-import 'main_shell.dart';
+import 'patient_main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/auth/forgot_password_sheet.dart';
-import 'complete_profile_screen.dart';
+import 'patient_complete_profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -93,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
         final shouldShowCompleteProfile = user?.profileCompleted == false;
 
         navigator.pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainShell()),
+          MaterialPageRoute(builder: (context) => const PatientMainShell()),
         );
 
         // If profile not completed, push CompleteProfileScreen on top
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Future.delayed(const Duration(milliseconds: 800), () {
             navigator.push(
               MaterialPageRoute(
-                builder: (context) => const CompleteProfileScreen(),
+                builder: (context) => const PatientCompleteProfileScreen(),
               ),
             );
           });

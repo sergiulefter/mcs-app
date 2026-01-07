@@ -7,8 +7,8 @@ import 'package:mcs_app/utils/form_scroll_helper.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/utils/validators.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
-import 'complete_profile_screen.dart';
-import 'main_shell.dart';
+import 'patient_complete_profile_screen.dart';
+import 'patient_main_shell.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -67,13 +67,13 @@ class _SignupScreenState extends State<SignupScreen> {
 
       final navigator = Navigator.of(context);
       navigator.pushReplacement(
-        MaterialPageRoute(builder: (context) => const MainShell()),
+        MaterialPageRoute(builder: (context) => const PatientMainShell()),
       );
 
       Future.delayed(const Duration(milliseconds: 800), () {
         navigator.push(
           MaterialPageRoute(
-            builder: (context) => const CompleteProfileScreen(),
+            builder: (context) => const PatientCompleteProfileScreen(),
           ),
         );
       });

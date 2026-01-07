@@ -6,7 +6,7 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/models/doctor_model.dart';
 import 'package:mcs_app/services/doctor_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_consultation_detail_screen.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -645,7 +645,7 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
                     MaterialPageRoute(
                       builder: (_) => ChangeNotifierProvider.value(
                         value: controller,
-                        child: RequestReviewScreen(
+                        child: DoctorConsultationDetailScreen(
                           consultationId: consultation.id,
                         ),
                       ),

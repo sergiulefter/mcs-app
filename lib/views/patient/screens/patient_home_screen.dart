@@ -5,18 +5,18 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/navigation_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
-import 'package:mcs_app/views/patient/screens/request_detail_screen.dart';
+import 'package:mcs_app/views/patient/screens/patient_consultation_detail_screen.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'notifications_screen.dart';
+import 'patient_notifications_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class PatientHomeScreen extends StatefulWidget {
+  const PatientHomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _PatientHomeScreenState extends State<PatientHomeScreen> {
   @override
   void initState() {
     super.initState();
@@ -176,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    const NotificationsScreen(),
+                                    const PatientNotificationsScreen(),
                               ),
                             );
                           },
@@ -549,8 +549,9 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) =>
-                        RequestDetailScreen(consultation: consultation),
+                    builder: (context) => PatientConsultationDetailScreen(
+                      consultation: consultation,
+                    ),
                   ),
                 );
               },

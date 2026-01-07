@@ -13,14 +13,15 @@ import 'package:mcs_app/views/patient/widgets/forms/app_date_range_end_picker_di
 import 'package:mcs_app/views/patient/widgets/layout/section_header.dart';
 
 /// Availability management screen - Toggle availability and manage vacation periods
-class AvailabilityScreen extends StatefulWidget {
-  const AvailabilityScreen({super.key});
+class DoctorAvailabilityScreen extends StatefulWidget {
+  const DoctorAvailabilityScreen({super.key});
 
   @override
-  State<AvailabilityScreen> createState() => _AvailabilityScreenState();
+  State<DoctorAvailabilityScreen> createState() =>
+      _DoctorAvailabilityScreenState();
 }
 
-class _AvailabilityScreenState extends State<AvailabilityScreen> {
+class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
   final DoctorService _doctorService = DoctorService();
   DoctorModel? _doctor;
   bool _isLoading = true;
@@ -101,17 +102,13 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
   Widget build(BuildContext context) {
     if (_isLoading || _doctor == null) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('doctor.availability.title'.tr()),
-        ),
+        appBar: AppBar(title: Text('doctor.availability.title'.tr())),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('doctor.availability.title'.tr()),
-      ),
+      appBar: AppBar(title: Text('doctor.availability.title'.tr())),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: AppTheme.screenPadding,
@@ -161,9 +158,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
               const SizedBox(width: AppTheme.spacing12),
               Text(
                 'doctor.availability.status_section'.tr(),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -199,17 +196,16 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                       ? 'doctor.availability.available_for_consultations'.tr()
                       : 'doctor.availability.not_available'.tr(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: isCurrentlyAvailable
-                            ? colorScheme.secondary
-                            : colorScheme.error,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    color: isCurrentlyAvailable
+                        ? colorScheme.secondary
+                        : colorScheme.error,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: AppTheme.spacing16),
-
         ],
       ),
     );
@@ -225,7 +221,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: SectionHeader(title: 'doctor.availability.vacation_section'.tr()),
+              child: SectionHeader(
+                title: 'doctor.availability.vacation_section'.tr(),
+              ),
             ),
             Flexible(
               child: TextButton.icon(
@@ -274,17 +272,17 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
           const SizedBox(height: AppTheme.spacing12),
           Text(
             'doctor.availability.no_vacations'.tr(),
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppTheme.spacing8),
           Text(
             'doctor.availability.no_vacations_desc'.tr(),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).hintColor,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Theme.of(context).hintColor),
             textAlign: TextAlign.center,
           ),
         ],
@@ -292,7 +290,11 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
     );
   }
 
-  Widget _buildVacationCard(BuildContext context, DateRange vacation, int index) {
+  Widget _buildVacationCard(
+    BuildContext context,
+    DateRange vacation,
+    int index,
+  ) {
     final dateFormat = DateFormat('dd MMM yyyy');
     final now = DateTime.now();
 
@@ -346,8 +348,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                       child: Text(
                         '${dateFormat.format(vacation.startDate)} - ${dateFormat.format(vacation.endDate)}',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          fontWeight: FontWeight.w600,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -359,14 +361,16 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusSmall,
+                        ),
                       ),
                       child: Text(
                         status,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: statusColor,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          color: statusColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -376,8 +380,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                   Text(
                     vacation.reason!,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).hintColor,
-                        ),
+                      color: Theme.of(context).hintColor,
+                    ),
                   ),
                 ],
               ],
@@ -424,16 +428,16 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                 Text(
                   'doctor.availability.info_title'.tr(),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacing4),
                 Text(
                   'doctor.availability.info_text'.tr(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).hintColor,
-                      ),
+                    color: Theme.of(context).hintColor,
+                  ),
                 ),
               ],
             ),
@@ -466,9 +470,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
           children: [
             Text(
               label,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -499,12 +503,14 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
               errorText: errorText,
             ),
             child: Text(
-              selectedDate != null ? dateFormat.format(selectedDate) : 'dd/MM/yyyy',
+              selectedDate != null
+                  ? dateFormat.format(selectedDate)
+                  : 'dd/MM/yyyy',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: selectedDate != null
-                        ? Theme.of(context).colorScheme.onSurface
-                        : Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: selectedDate != null
+                    ? Theme.of(context).colorScheme.onSurface
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ),
@@ -514,8 +520,8 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
             child: Text(
               disabledHint,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).hintColor,
-                  ),
+                color: Theme.of(context).hintColor,
+              ),
             ),
           ),
       ],
@@ -569,7 +575,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                     dialogSubtitle: startDate != null
                         ? 'doctor.availability.range_hint'.tr(
                             namedArgs: {
-                              'date': DateFormat('dd MMM yyyy').format(startDate!),
+                              'date': DateFormat(
+                                'dd MMM yyyy',
+                              ).format(startDate!),
                             },
                           )
                         : null,
@@ -585,7 +593,9 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                     lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
                     rangeStartDate: startDate,
                     enabled: startDate != null,
-                    disabledHint: 'doctor.availability.validation.start_date_required'.tr(),
+                    disabledHint:
+                        'doctor.availability.validation.start_date_required'
+                            .tr(),
                   ),
                   const SizedBox(height: AppTheme.spacing16),
                   AppTextField(
@@ -598,17 +608,28 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
                     validator: (value) {
                       final text = value?.trim() ?? '';
                       if (text.isEmpty) {
-                        return 'doctor.availability.validation.reason_required'.tr();
+                        return 'doctor.availability.validation.reason_required'
+                            .tr();
                       }
-                      if (text.length < AppConstants.availabilityReasonMinLength) {
-                        return 'doctor.availability.validation.reason_too_short'.tr(
-                          namedArgs: {'min': AppConstants.availabilityReasonMinLength.toString()},
-                        );
+                      if (text.length <
+                          AppConstants.availabilityReasonMinLength) {
+                        return 'doctor.availability.validation.reason_too_short'
+                            .tr(
+                              namedArgs: {
+                                'min': AppConstants.availabilityReasonMinLength
+                                    .toString(),
+                              },
+                            );
                       }
-                      if (text.length > AppConstants.availabilityReasonMaxLength) {
-                        return 'doctor.availability.validation.reason_too_long'.tr(
-                          namedArgs: {'max': AppConstants.availabilityReasonMaxLength.toString()},
-                        );
+                      if (text.length >
+                          AppConstants.availabilityReasonMaxLength) {
+                        return 'doctor.availability.validation.reason_too_long'
+                            .tr(
+                              namedArgs: {
+                                'max': AppConstants.availabilityReasonMaxLength
+                                    .toString(),
+                              },
+                            );
                       }
                       return null;
                     },
@@ -629,21 +650,27 @@ class _AvailabilityScreenState extends State<AvailabilityScreen> {
 
                 if (startDate == null) {
                   setDialogState(() {
-                    startDateError = 'doctor.availability.validation.start_date_required'.tr();
+                    startDateError =
+                        'doctor.availability.validation.start_date_required'
+                            .tr();
                   });
                   datesValid = false;
                 }
 
                 if (endDate == null) {
                   setDialogState(() {
-                    endDateError = 'doctor.availability.validation.end_date_required'.tr();
+                    endDateError =
+                        'doctor.availability.validation.end_date_required'.tr();
                   });
                   datesValid = false;
                 }
 
-                if (startDate != null && endDate != null && endDate!.isBefore(startDate!)) {
+                if (startDate != null &&
+                    endDate != null &&
+                    endDate!.isBefore(startDate!)) {
                   setDialogState(() {
-                    endDateError = 'doctor.availability.validation.end_before_start'.tr();
+                    endDateError =
+                        'doctor.availability.validation.end_before_start'.tr();
                   });
                   datesValid = false;
                 }

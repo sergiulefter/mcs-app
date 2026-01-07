@@ -6,10 +6,10 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/patient_profile_edit_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
-import 'help_center_screen.dart';
+import 'patient_help_center_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+class PatientSettingsScreen extends StatelessWidget {
+  const PatientSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -199,7 +199,8 @@ class SettingsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const HelpCenterScreen(),
+                                builder: (context) =>
+                                    const PatientHelpCenterScreen(),
                               ),
                             );
                           },

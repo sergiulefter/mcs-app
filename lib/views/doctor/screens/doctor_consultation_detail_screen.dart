@@ -5,8 +5,8 @@ import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/utils/badge_colors.dart';
 import 'package:mcs_app/utils/constants.dart';
-import 'package:mcs_app/views/doctor/screens/request_more_info_screen.dart';
-import 'package:mcs_app/views/doctor/screens/response_form_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_request_info_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_response_form_screen.dart';
 import 'package:mcs_app/views/doctor/widgets/skeletons/request_review_skeleton.dart';
 import 'package:mcs_app/views/shared/widgets/detail_screen_header.dart';
 import 'package:mcs_app/views/shared/widgets/timeline_message.dart';
@@ -15,16 +15,21 @@ import 'package:provider/provider.dart';
 /// Doctor's request review screen matching the HTML/CSS design.
 /// Features: sticky header, patient info with avatar, status badges,
 /// patient report card, timeline conversation, and fixed action buttons.
-class RequestReviewScreen extends StatefulWidget {
-  const RequestReviewScreen({super.key, required this.consultationId});
+class DoctorConsultationDetailScreen extends StatefulWidget {
+  const DoctorConsultationDetailScreen({
+    super.key,
+    required this.consultationId,
+  });
 
   final String consultationId;
 
   @override
-  State<RequestReviewScreen> createState() => _RequestReviewScreenState();
+  State<DoctorConsultationDetailScreen> createState() =>
+      _DoctorConsultationDetailScreenState();
 }
 
-class _RequestReviewScreenState extends State<RequestReviewScreen> {
+class _DoctorConsultationDetailScreenState
+    extends State<DoctorConsultationDetailScreen> {
   bool _statusBusy = false;
   bool _isLoading = true;
 
@@ -688,7 +693,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                       MaterialPageRoute(
                         builder: (_) => ChangeNotifierProvider.value(
                           value: controller,
-                          child: RequestMoreInfoScreen(
+                          child: DoctorRequestInfoScreen(
                             consultationId: consultation.id,
                           ),
                         ),
@@ -786,7 +791,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
       MaterialPageRoute(
         builder: (_) => ChangeNotifierProvider.value(
           value: controller,
-          child: ResponseFormScreen(consultationId: consultation.id),
+          child: DoctorResponseFormScreen(consultationId: consultation.id),
         ),
       ),
     );

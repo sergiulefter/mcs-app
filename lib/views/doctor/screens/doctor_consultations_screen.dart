@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/doctor/screens/request_review_screen.dart';
+import 'package:mcs_app/views/doctor/screens/doctor_consultation_detail_screen.dart';
 import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card.dart';
 import 'package:mcs_app/views/doctor/widgets/cards/doctor_request_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
@@ -11,14 +11,15 @@ import 'package:provider/provider.dart';
 
 /// Doctor-facing list of consultation requests with segment filters.
 /// Matches the modern HTML/CSS design.
-class RequestsListScreen extends StatefulWidget {
-  const RequestsListScreen({super.key});
+class DoctorConsultationsScreen extends StatefulWidget {
+  const DoctorConsultationsScreen({super.key});
 
   @override
-  State<RequestsListScreen> createState() => _RequestsListScreenState();
+  State<DoctorConsultationsScreen> createState() =>
+      _DoctorConsultationsScreenState();
 }
 
-class _RequestsListScreenState extends State<RequestsListScreen> {
+class _DoctorConsultationsScreenState extends State<DoctorConsultationsScreen> {
   bool _initialized = false;
 
   @override
@@ -257,7 +258,9 @@ class _RequestsListScreenState extends State<RequestsListScreen> {
                 MaterialPageRoute(
                   builder: (_) => ChangeNotifierProvider.value(
                     value: controller,
-                    child: RequestReviewScreen(consultationId: consultation.id),
+                    child: DoctorConsultationDetailScreen(
+                      consultationId: consultation.id,
+                    ),
                   ),
                 ),
               );

@@ -10,9 +10,9 @@ import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'language_selection_screen.dart';
 import 'login_screen.dart';
-import 'main_shell.dart';
+import 'patient_main_shell.dart';
 import 'onboarding_screen.dart';
-import 'complete_profile_screen.dart';
+import 'patient_complete_profile_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final Future<FirebaseApp> firebaseInitialization;
@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
             Future.delayed(const Duration(milliseconds: 800), () {
               navigator.push(
                 MaterialPageRoute(
-                  builder: (context) => const CompleteProfileScreen(),
+                  builder: (context) => const PatientCompleteProfileScreen(),
                 ),
               );
             });
@@ -145,7 +145,7 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const MainShell(),
+            const PatientMainShell(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           final curvedAnimation = CurvedAnimation(
             parent: animation,

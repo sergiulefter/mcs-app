@@ -12,21 +12,22 @@ import 'package:mcs_app/views/shared/widgets/timeline_message.dart';
 
 /// Patient screen for responding to doctor's information request.
 /// Redesigned to match the modern UI with custom header and styled form fields.
-class RespondToInfoScreen extends StatefulWidget {
+class PatientRespondInfoScreen extends StatefulWidget {
   final ConsultationModel consultation;
   final InfoRequestModel infoRequest;
 
-  const RespondToInfoScreen({
+  const PatientRespondInfoScreen({
     super.key,
     required this.consultation,
     required this.infoRequest,
   });
 
   @override
-  State<RespondToInfoScreen> createState() => _RespondToInfoScreenState();
+  State<PatientRespondInfoScreen> createState() =>
+      _PatientRespondInfoScreenState();
 }
 
-class _RespondToInfoScreenState extends State<RespondToInfoScreen> {
+class _PatientRespondInfoScreenState extends State<PatientRespondInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scrollHelper = FormScrollHelper();
   final _additionalInfoController = TextEditingController();

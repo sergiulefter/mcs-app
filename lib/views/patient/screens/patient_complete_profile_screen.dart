@@ -10,14 +10,16 @@ import 'package:mcs_app/views/patient/widgets/forms/app_dropdown_field.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 
-class CompleteProfileScreen extends StatefulWidget {
-  const CompleteProfileScreen({super.key});
+class PatientCompleteProfileScreen extends StatefulWidget {
+  const PatientCompleteProfileScreen({super.key});
 
   @override
-  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
+  State<PatientCompleteProfileScreen> createState() =>
+      _PatientCompleteProfileScreenState();
 }
 
-class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
+class _PatientCompleteProfileScreenState
+    extends State<PatientCompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scrollHelper = FormScrollHelper();
   final _nameController = TextEditingController();
@@ -36,17 +38,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   String? _dateOfBirthError;
 
   // Keys for translation (biological sex for medical purposes)
-  final List<String> _sexKeys = [
-    'male',
-    'female',
-  ];
+  final List<String> _sexKeys = ['male', 'female'];
 
   @override
   void initState() {
     super.initState();
     final currentUser = context.read<AuthController>().currentUser;
     if (currentUser != null) {
-      if (currentUser.displayName != null && currentUser.displayName!.isNotEmpty) {
+      if (currentUser.displayName != null &&
+          currentUser.displayName!.isNotEmpty) {
         _nameController.text = currentUser.displayName!;
       }
       if (currentUser.phone != null && currentUser.phone!.isNotEmpty) {
@@ -148,15 +148,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         automaticallyImplyLeading: false,
         title: Text('profile.complete_title'.tr()),
         actions: [
-          TextButton(
-            onPressed: _handleSkip,
-            child: Text('common.skip'.tr()),
-          ),
+          TextButton(onPressed: _handleSkip, child: Text('common.skip'.tr())),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-            padding: AppTheme.screenPadding,
+          padding: AppTheme.screenPadding,
           child: Form(
             key: _formKey,
             child: Column(
@@ -187,7 +184,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       }
                       if (value.trim().length < AppConstants.nameMinLength) {
                         return 'validation.name_too_short'.tr(
-                          namedArgs: {'min': AppConstants.nameMinLength.toString()},
+                          namedArgs: {
+                            'min': AppConstants.nameMinLength.toString(),
+                          },
                         );
                       }
                       return null;
@@ -310,9 +309,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         const SizedBox(height: AppTheme.spacing24),
         Text(
           'profile.complete_title'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppTheme.spacing8),
         Text(
@@ -327,8 +326,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     return Consumer<AuthController>(
       builder: (context, authController, child) {
         return ElevatedButton(
-          onPressed:
-              authController.isLoading ? null : _handleCompleteProfile,
+          onPressed: authController.isLoading ? null : _handleCompleteProfile,
           child: authController.isLoading
               ? SizedBox(
                   height: 20,
@@ -352,5 +350,3 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     );
   }
 }
-
-

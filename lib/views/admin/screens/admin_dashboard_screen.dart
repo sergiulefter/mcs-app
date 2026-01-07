@@ -6,7 +6,7 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/services/admin_service.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
-import 'package:mcs_app/views/patient/screens/main_shell.dart';
+import 'package:mcs_app/views/patient/screens/patient_main_shell.dart';
 import 'create_doctor_screen.dart';
 import 'doctor_management_screen.dart';
 import 'user_management_screen.dart';
@@ -247,7 +247,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const MainShell(),
+                        builder: (context) => const PatientMainShell(),
                       ),
                     );
                   },

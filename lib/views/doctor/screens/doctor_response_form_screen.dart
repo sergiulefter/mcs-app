@@ -11,16 +11,17 @@ import 'package:provider/provider.dart';
 
 /// Doctor screen for submitting diagnosis/response.
 /// Redesigned to match the modern UI with custom header and styled form fields.
-class ResponseFormScreen extends StatefulWidget {
-  const ResponseFormScreen({super.key, required this.consultationId});
+class DoctorResponseFormScreen extends StatefulWidget {
+  const DoctorResponseFormScreen({super.key, required this.consultationId});
 
   final String consultationId;
 
   @override
-  State<ResponseFormScreen> createState() => _ResponseFormScreenState();
+  State<DoctorResponseFormScreen> createState() =>
+      _DoctorResponseFormScreenState();
 }
 
-class _ResponseFormScreenState extends State<ResponseFormScreen> {
+class _DoctorResponseFormScreenState extends State<DoctorResponseFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scrollHelper = FormScrollHelper();
   final _responseController = TextEditingController();

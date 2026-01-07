@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 
-class NotificationsScreen extends StatelessWidget {
-  const NotificationsScreen({super.key});
+class PatientNotificationsScreen extends StatelessWidget {
+  const PatientNotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('notifications.title'.tr()),
-      ),
+      appBar: AppBar(title: Text('notifications.title'.tr())),
       body: Center(
         child: Padding(
           padding: AppTheme.screenPadding,
@@ -21,7 +19,9 @@ class NotificationsScreen extends StatelessWidget {
                 width: 96,
                 height: 96,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                 ),
                 child: Icon(
@@ -34,8 +34,8 @@ class NotificationsScreen extends StatelessWidget {
               Text(
                 'notifications.no_notifications'.tr(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: AppTheme.spacing12),
               Text(
@@ -47,11 +47,11 @@ class NotificationsScreen extends StatelessWidget {
               Container(
                 padding: AppTheme.cardPadding,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.secondary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                  border: Border.all(
-                    color: Theme.of(context).dividerColor,
-                  ),
+                  border: Border.all(color: Theme.of(context).dividerColor),
                 ),
                 child: Row(
                   children: [
@@ -64,7 +64,9 @@ class NotificationsScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         'notifications.placeholder_info'.tr(),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(),
                       ),
                     ),
                   ],

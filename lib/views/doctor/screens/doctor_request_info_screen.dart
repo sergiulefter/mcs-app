@@ -10,16 +10,17 @@ import 'package:provider/provider.dart';
 
 /// Doctor screen for requesting additional information from patient.
 /// Redesigned to match the modern UI with custom header and styled form fields.
-class RequestMoreInfoScreen extends StatefulWidget {
-  const RequestMoreInfoScreen({super.key, required this.consultationId});
+class DoctorRequestInfoScreen extends StatefulWidget {
+  const DoctorRequestInfoScreen({super.key, required this.consultationId});
 
   final String consultationId;
 
   @override
-  State<RequestMoreInfoScreen> createState() => _RequestMoreInfoScreenState();
+  State<DoctorRequestInfoScreen> createState() =>
+      _DoctorRequestInfoScreenState();
 }
 
-class _RequestMoreInfoScreenState extends State<RequestMoreInfoScreen> {
+class _DoctorRequestInfoScreenState extends State<DoctorRequestInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scrollHelper = FormScrollHelper();
   final _messageController = TextEditingController();

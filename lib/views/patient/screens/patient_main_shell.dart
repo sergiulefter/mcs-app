@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/navigation_controller.dart';
 import 'package:mcs_app/views/shared/widgets/connectivity_banner.dart';
-import 'home_screen.dart';
+import 'patient_home_screen.dart';
 import 'doctors_screen.dart';
-import 'consultations_screen.dart';
-import 'account_screen.dart';
+import 'patient_consultations_screen.dart';
+import 'patient_account_screen.dart';
 
 /// Main navigation shell for Patient user type
 /// Contains bottom navigation with 4 tabs: Home, Doctors, Consultations, Account
-class MainShell extends StatefulWidget {
-  const MainShell({super.key, this.initialIndex = 0});
+class PatientMainShell extends StatefulWidget {
+  const PatientMainShell({super.key, this.initialIndex = 0});
 
   final int initialIndex;
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  State<PatientMainShell> createState() => _PatientMainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _PatientMainShellState extends State<PatientMainShell> {
   int? _currentIndex;
   Set<int>? _visitedTabs;
 
@@ -32,13 +32,13 @@ class _MainShellState extends State<MainShell> {
     }
     switch (index) {
       case 0:
-        return const HomeScreen();
+        return const PatientHomeScreen();
       case 1:
         return const DoctorsScreen();
       case 2:
-        return const ConsultationsScreen();
+        return const PatientConsultationsScreen();
       case 3:
-        return const AccountScreen();
+        return const PatientAccountScreen();
       default:
         return const SizedBox.shrink();
     }

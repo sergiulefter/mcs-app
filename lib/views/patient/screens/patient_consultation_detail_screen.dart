@@ -13,21 +13,26 @@ import 'package:mcs_app/views/patient/widgets/skeletons/request_detail_skeleton.
 import 'package:mcs_app/views/shared/widgets/detail_screen_header.dart';
 import 'package:mcs_app/views/shared/widgets/timeline_message.dart';
 import 'doctor_profile_screen.dart';
-import 'respond_to_info_screen.dart';
+import 'patient_respond_info_screen.dart';
 
 /// Patient's consultation detail screen matching the HTML/CSS design.
 /// Features: sticky header, doctor info with avatar, status badges,
 /// description card, timeline conversation, and action buttons.
-class RequestDetailScreen extends StatefulWidget {
-  const RequestDetailScreen({super.key, required this.consultation});
+class PatientConsultationDetailScreen extends StatefulWidget {
+  const PatientConsultationDetailScreen({
+    super.key,
+    required this.consultation,
+  });
 
   final ConsultationModel consultation;
 
   @override
-  State<RequestDetailScreen> createState() => _RequestDetailScreenState();
+  State<PatientConsultationDetailScreen> createState() =>
+      _PatientConsultationDetailScreenState();
 }
 
-class _RequestDetailScreenState extends State<RequestDetailScreen> {
+class _PatientConsultationDetailScreenState
+    extends State<PatientConsultationDetailScreen> {
   late final DoctorService _doctorService;
   Future<DoctorModel?>? _doctorFuture;
   bool _isProcessing = false;
@@ -915,7 +920,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                 final navigator = Navigator.of(context);
                 final result = await navigator.push<bool>(
                   MaterialPageRoute(
-                    builder: (_) => RespondToInfoScreen(
+                    builder: (_) => PatientRespondInfoScreen(
                       consultation: consultation,
                       infoRequest: pendingInfoRequest,
                     ),

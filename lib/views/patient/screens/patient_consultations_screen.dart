@@ -8,18 +8,20 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/cards/consultation_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/consultation_card_skeleton.dart';
 import 'package:mcs_app/views/patient/widgets/layout/app_empty_state.dart';
-import 'request_detail_screen.dart';
+import 'patient_consultation_detail_screen.dart';
 
 /// Patient consultations screen matching the HTML/CSS design.
 /// Features sticky header with title and horizontal scrollable filter chips.
-class ConsultationsScreen extends StatefulWidget {
-  const ConsultationsScreen({super.key});
+class PatientConsultationsScreen extends StatefulWidget {
+  const PatientConsultationsScreen({super.key});
 
   @override
-  State<ConsultationsScreen> createState() => _ConsultationsScreenState();
+  State<PatientConsultationsScreen> createState() =>
+      _PatientConsultationsScreenState();
 }
 
-class _ConsultationsScreenState extends State<ConsultationsScreen> {
+class _PatientConsultationsScreenState
+    extends State<PatientConsultationsScreen> {
   @override
   void initState() {
     super.initState();
@@ -290,7 +292,9 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) =>
-                                RequestDetailScreen(consultation: consultation),
+                                PatientConsultationDetailScreen(
+                                  consultation: consultation,
+                                ),
                           ),
                         );
                       },
