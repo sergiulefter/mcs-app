@@ -12,7 +12,7 @@ import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'signup_screen.dart';
 import 'package:mcs_app/views/patient/screens/patient_main_shell.dart';
-import 'package:mcs_app/views/patient/widgets/auth/forgot_password_sheet.dart';
+import 'package:mcs_app/views/shared/widgets/auth/forgot_password_sheet.dart';
 import 'package:mcs_app/views/patient/screens/patient_complete_profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
