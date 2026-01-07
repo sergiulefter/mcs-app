@@ -221,7 +221,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                   ? Image.network(
                       patient.photoUrl!,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
+                      errorBuilder: (context, error, stackTrace) =>
                           _buildAvatarInitials(context, patientName),
                     )
                   : _buildAvatarInitials(context, patientName),
@@ -488,7 +488,8 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: consultation.attachments.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 12),
                   itemBuilder: (context, index) {
                     final attachment = consultation.attachments[index];
                     return _buildAttachmentThumbnail(context, attachment);
@@ -525,7 +526,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
             ? Image.network(
                 attachment.url,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (context, error, stackTrace) =>
                     _buildAttachmentIcon(context, attachment),
               )
             : _buildAttachmentIcon(context, attachment),

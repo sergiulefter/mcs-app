@@ -153,7 +153,7 @@ class TimelineMessage extends StatelessWidget {
           child: Image.network(
             avatarUrl!,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _buildInitialsAvatar(
+            errorBuilder: (context, error, stackTrace) => _buildInitialsAvatar(
               context,
               bgColor: bgColor,
               iconColor: iconColor,

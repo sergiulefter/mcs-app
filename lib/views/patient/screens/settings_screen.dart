@@ -452,6 +452,7 @@ class SettingsScreen extends StatelessWidget {
         if (!context.mounted) return;
         final authController = context.read<AuthController>();
         await authController.updatePreferredLanguage(code);
+        if (!dialogContext.mounted) return;
         Navigator.pop(dialogContext);
       },
     );
