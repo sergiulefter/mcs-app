@@ -393,7 +393,7 @@ class _SplashScreenState extends State<SplashScreen>
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: isDark
                               ? const Color(0xFF94A3B8) // Slate 400
-                              : const Color(0xFF4C669A), // Stitch Slate Blue
+                              : const Color(0xFF4C669A), // Slate Blue
                           fontWeight: FontWeight.w500,
                         ),
                       ),

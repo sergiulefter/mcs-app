@@ -363,7 +363,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String statusText = status.toUpperCase().replaceAll('_', ' ');
 
     if (status == 'completed') {
-      statusColor = Colors.green;
+      statusColor = Theme.of(context).extension<AppSemanticColors>()!.success;
     } else if (status == 'in_review') {
       statusColor = const Color(0xFFF59E0B);
     } else if (status == 'pending') {

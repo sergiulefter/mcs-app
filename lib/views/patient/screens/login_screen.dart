@@ -159,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 48,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    // Slate background matching Stitch design (bg-slate-200 dark:bg-slate-800)
+                    // Slate background
                     color: Theme.of(context).brightness == Brightness.dark
                         ? Theme.of(context).colorScheme.surfaceContainerHighest
                         : Theme.of(context).colorScheme.surfaceContainerHigh,

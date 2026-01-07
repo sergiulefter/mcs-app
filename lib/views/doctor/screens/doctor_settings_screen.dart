@@ -5,6 +5,7 @@ import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/controllers/doctor_profile_controller.dart';
 import 'package:mcs_app/controllers/consultations_controller.dart';
+import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
 import 'package:mcs_app/views/doctor/screens/availability_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
@@ -17,6 +18,7 @@ class DoctorSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final iconColors = Theme.of(context).extension<AppIconColors>()!;
 
     return Scaffold(
       body: SafeArea(
@@ -42,8 +44,10 @@ class DoctorSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.person_outline,
-                          iconColor: Colors.blue,
-                          iconBgColor: Colors.blue.withValues(alpha: 0.1),
+                          iconColor: iconColors.profile,
+                          iconBgColor: iconColors.profile.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'account.edit_profile'.tr(),
                           onTap: () async {
                             final profileController = context
@@ -66,8 +70,10 @@ class DoctorSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.event_busy_outlined,
-                          iconColor: Colors.orange,
-                          iconBgColor: Colors.orange.withValues(alpha: 0.1),
+                          iconColor: iconColors.security,
+                          iconBgColor: iconColors.security.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'doctor.account.manage_availability'.tr(),
                           onTap: () async {
                             final profileController = context
@@ -133,8 +139,10 @@ class DoctorSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.language,
-                          iconColor: Colors.green,
-                          iconBgColor: Colors.green.withValues(alpha: 0.1),
+                          iconColor: iconColors.language,
+                          iconBgColor: iconColors.language.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'common.languages'.tr(),
                           value: context.locale.languageCode == 'en'
                               ? 'English (US)'
@@ -153,8 +161,8 @@ class DoctorSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.help_outline,
-                          iconColor: Colors.deepPurple,
-                          iconBgColor: Colors.deepPurple.withValues(alpha: 0.1),
+                          iconColor: iconColors.help,
+                          iconBgColor: iconColors.help.withValues(alpha: 0.1),
                           title: 'home.help_center'.tr(),
                           onTap: () {
                             Navigator.push(
@@ -169,8 +177,10 @@ class DoctorSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.security,
-                          iconColor: Colors.teal,
-                          iconBgColor: Colors.teal.withValues(alpha: 0.1),
+                          iconColor: iconColors.privacy,
+                          iconBgColor: iconColors.privacy.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'profile.privacy_security'.tr(),
                           onTap: () {},
                         ),

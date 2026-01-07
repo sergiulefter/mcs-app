@@ -10,7 +10,7 @@ import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/utils/notifications_helper.dart';
 import 'package:mcs_app/views/doctor/widgets/skeletons/doctor_profile_edit_skeleton.dart';
 
-/// Doctor profile edit screen matching the Stitch HTML/CSS design.
+/// Doctor profile edit screen.
 /// Features: Cancel header, avatar section, About Me, Languages, Subspecialties, Education.
 class DoctorProfileEditScreen extends StatefulWidget {
   const DoctorProfileEditScreen({super.key});

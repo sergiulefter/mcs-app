@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
 import 'package:mcs_app/utils/seed_dev_data.dart';
 
@@ -12,6 +13,7 @@ class AdminSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final iconColors = Theme.of(context).extension<AppIconColors>()!;
 
     return Scaffold(
       body: SafeArea(
@@ -74,8 +76,10 @@ class AdminSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.language,
-                          iconColor: Colors.green, // emerald-600
-                          iconBgColor: Colors.green.withValues(alpha: 0.1),
+                          iconColor: iconColors.language,
+                          iconBgColor: iconColors.language.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'common.languages'.tr(),
                           value: context.locale.languageCode == 'en'
                               ? 'English (US)'
@@ -94,8 +98,10 @@ class AdminSettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.storage,
-                          iconColor: Colors.orange,
-                          iconBgColor: Colors.orange.withValues(alpha: 0.1),
+                          iconColor: iconColors.developer,
+                          iconBgColor: iconColors.developer.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'Seed Database',
                           onTap: () => _showSeedConfirmDialog(context),
                         ),
@@ -382,7 +388,7 @@ class AdminSettingsScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Database seeded successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppTheme.successGreen,
           ),
         );
       }
@@ -392,7 +398,7 @@ class AdminSettingsScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error seeding database: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.errorRed,
           ),
         );
       }

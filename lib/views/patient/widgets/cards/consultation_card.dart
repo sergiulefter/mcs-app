@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/badge_colors.dart';
 
 /// Consultation card for patient flows.
 /// Matches the modern HTML/CSS design with avatar, urgency badge, and view button.
@@ -218,28 +219,18 @@ class _ConsultationCardState extends State<ConsultationCard> {
     BuildContext context,
     ConsultationModel consultation,
   ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final badgeColors = Theme.of(context).extension<AppBadgeColors>()!;
 
-    // For completed/resolved consultations, show status
+    // For completed/resolved/cancelled, show status badge
     if (consultation.status == 'completed' ||
-        consultation.status == 'resolved') {
+        consultation.status == 'resolved' ||
+        consultation.status == 'cancelled') {
+      final style = badgeColors.forStatus(consultation.status);
       return _buildBadge(
         context,
         label: 'common.status.${consultation.status}'.tr(),
-        bgColor: isDark
-            ? Colors.green.shade900.withValues(alpha: 0.4)
-            : Colors.green.shade100,
-        textColor: isDark ? Colors.green.shade300 : Colors.green.shade800,
-      );
-    }
-
-    // For cancelled
-    if (consultation.status == 'cancelled') {
-      return _buildBadge(
-        context,
-        label: 'common.status.cancelled'.tr(),
-        bgColor: isDark ? AppTheme.slate700 : AppTheme.slate100,
-        textColor: isDark ? AppTheme.slate400 : AppTheme.slate600,
+        bgColor: style.bg,
+        textColor: style.text,
       );
     }
 
@@ -247,38 +238,24 @@ class _ConsultationCardState extends State<ConsultationCard> {
     return _buildUrgencyBadge(context, consultation.urgency);
   }
 
-  /// Build urgency badge with appropriate colors matching HTML design
+  /// Build urgency badge with theme-aware colors
   Widget _buildUrgencyBadge(BuildContext context, String urgency) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final badgeColors = Theme.of(context).extension<AppBadgeColors>()!;
+    final style = badgeColors.forUrgency(urgency);
 
-    Color bgColor;
-    Color textColor;
     String label;
-
     switch (urgency.toLowerCase()) {
       case 'high':
       case 'urgent':
-        bgColor = isDark
-            ? Colors.red.shade900.withValues(alpha: 0.4)
-            : Colors.red.shade100;
-        textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
         label = 'common.urgency.high'.tr();
         break;
       case 'moderate':
       case 'medium':
-        bgColor = isDark
-            ? Colors.amber.shade900.withValues(alpha: 0.4)
-            : Colors.amber.shade100;
-        textColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
         label = 'common.urgency.moderate'.tr();
         break;
       case 'low':
       case 'general':
       default:
-        bgColor = isDark
-            ? Colors.teal.shade900.withValues(alpha: 0.4)
-            : Colors.teal.shade100;
-        textColor = isDark ? Colors.teal.shade300 : Colors.teal.shade800;
         label = 'common.urgency.low'.tr();
         break;
     }
@@ -286,8 +263,8 @@ class _ConsultationCardState extends State<ConsultationCard> {
     return _buildBadge(
       context,
       label: label,
-      bgColor: bgColor,
-      textColor: textColor,
+      bgColor: style.bg,
+      textColor: style.text,
     );
   }
 

@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 /// Doctor-facing calendar view for consultations and availability.
-/// Modern design matching the HTML/CSS stitch.
 class DoctorCalendarScreen extends StatefulWidget {
   const DoctorCalendarScreen({super.key});
 
@@ -691,12 +690,21 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     String name,
     ColorScheme colorScheme,
   ) {
+    // Theme-aware avatar color palette
+    final iconColors =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+            Brightness.dark
+        ? AppIconColors.dark
+        : AppIconColors.light;
     final colors = [
       (colorScheme.primary.withValues(alpha: 0.15), colorScheme.primary),
-      (Colors.purple.withValues(alpha: 0.15), Colors.purple),
-      (Colors.teal.withValues(alpha: 0.15), Colors.teal),
-      (Colors.amber.withValues(alpha: 0.15), Colors.amber.shade700),
-      (Colors.pink.withValues(alpha: 0.15), Colors.pink),
+      (iconColors.help.withValues(alpha: 0.15), iconColors.help),
+      (iconColors.privacy.withValues(alpha: 0.15), iconColors.privacy),
+      (iconColors.time.withValues(alpha: 0.15), iconColors.time),
+      (
+        iconColors.notification.withValues(alpha: 0.15),
+        iconColors.notification,
+      ),
     ];
     final index = name.hashCode.abs() % colors.length;
     return (background: colors[index].$1, foreground: colors[index].$2);

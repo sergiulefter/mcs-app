@@ -73,15 +73,16 @@ class AppBadgeColors extends ThemeExtension<AppBadgeColors> {
         return (
           text: neutralText,
           bg: neutralBg,
-          icon: Icons.visibility_outlined
+          icon: Icons.visibility_outlined,
         );
       case 'info_requested':
         return (text: accentText, bg: accentBg, icon: Icons.help_outline);
       case 'completed':
+      case 'resolved':
         return (
           text: successText,
           bg: successBg,
-          icon: Icons.check_circle_outline
+          icon: Icons.check_circle_outline,
         );
       case 'cancelled':
         return (text: errorText, bg: errorBg, icon: Icons.cancel_outlined);
@@ -91,13 +92,20 @@ class AppBadgeColors extends ThemeExtension<AppBadgeColors> {
   }
 
   /// Get colors and icon for urgency level
-  /// Returns null for 'standard' urgency (should not be displayed)
-  ({Color text, Color bg, IconData icon})? forUrgency(String urgency) {
-    switch (urgency) {
+  ({Color text, Color bg, IconData icon}) forUrgency(String urgency) {
+    switch (urgency.toLowerCase()) {
+      case 'high':
+      case 'urgent':
       case 'priority':
-        return (text: accentText, bg: accentBg, icon: Icons.bolt);
+        return (text: errorText, bg: errorBg, icon: Icons.priority_high);
+      case 'moderate':
+      case 'medium':
+        return (text: accentText, bg: accentBg, icon: Icons.remove);
+      case 'low':
+      case 'general':
+      case 'standard':
       default:
-        return null; // Standard urgency - don't show badge
+        return (text: successText, bg: successBg, icon: Icons.check);
     }
   }
 

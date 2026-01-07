@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/models/doctor_model.dart';
+import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/create_request_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
@@ -173,7 +174,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Colors.green, // active status color
+                      color: Theme.of(
+                        context,
+                      ).extension<AppSemanticColors>()!.success,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Theme.of(context).scaffoldBackgroundColor,

@@ -14,12 +14,12 @@ class NotificationsHelper {
   /// Parses Firebase/common errors into user-friendly localized messages.
   void showError(String error, {required BuildContext context}) {
     final message = _parseError(error);
-    final semanticColors = Theme.of(context).extension<AppSemanticColors>();
+    final semanticColors = Theme.of(context).extension<AppSemanticColors>()!;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: semanticColors?.error ?? Colors.red,
+        backgroundColor: semanticColors.error,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -27,12 +27,12 @@ class NotificationsHelper {
 
   /// Shows a success message to the user.
   void showSuccess(String message, {required BuildContext context}) {
-    final semanticColors = Theme.of(context).extension<AppSemanticColors>();
+    final semanticColors = Theme.of(context).extension<AppSemanticColors>()!;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: semanticColors?.success ?? Colors.green,
+        backgroundColor: semanticColors.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -40,12 +40,12 @@ class NotificationsHelper {
 
   /// Shows an informational message to the user.
   void showInfo(String message, {required BuildContext context}) {
-    final semanticColors = Theme.of(context).extension<AppSemanticColors>();
+    final semanticColors = Theme.of(context).extension<AppSemanticColors>()!;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: semanticColors?.info ?? Colors.blue,
+        backgroundColor: semanticColors.info,
         behavior: SnackBarBehavior.floating,
       ),
     );

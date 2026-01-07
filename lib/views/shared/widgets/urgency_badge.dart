@@ -13,10 +13,7 @@ import 'package:mcs_app/utils/badge_colors.dart';
 /// UrgencyBadge(urgency: consultation.urgency)
 /// ```
 class UrgencyBadge extends StatelessWidget {
-  const UrgencyBadge({
-    super.key,
-    required this.urgency,
-  });
+  const UrgencyBadge({super.key, required this.urgency});
 
   /// The urgency level string (standard, priority)
   final String urgency;
@@ -34,9 +31,6 @@ class UrgencyBadge extends StatelessWidget {
     }
 
     final style = badgeColors.forUrgency(urgency);
-    if (style == null) {
-      return const SizedBox.shrink();
-    }
 
     final urgencyLabel = 'common.urgency.$urgency'.tr();
 
@@ -45,10 +39,7 @@ class UrgencyBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: style.bg,
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: style.text.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: style.text.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -63,9 +54,9 @@ class UrgencyBadge extends StatelessWidget {
           Text(
             urgencyLabel,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: style.text,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: style.text,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),

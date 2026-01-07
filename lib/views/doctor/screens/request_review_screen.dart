@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/badge_colors.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/doctor/screens/request_more_info_screen.dart';
 import 'package:mcs_app/views/doctor/screens/response_form_screen.dart';
@@ -269,67 +270,24 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
           // Status badge
           _buildStatusBadge(context, consultation.status, isDark),
           // Urgency badge
-          _buildUrgencyBadge(context, consultation.urgency, isDark),
+          _buildUrgencyBadge(context, consultation.urgency),
         ],
       ),
     );
   }
 
   Widget _buildStatusBadge(BuildContext context, String status, bool isDark) {
-    Color bgColor;
-    Color textColor;
-    Color borderColor;
-    String label;
-    bool showPulse = false;
-
-    switch (status.toLowerCase()) {
-      case 'pending':
-        bgColor = isDark
-            ? Colors.blue.shade900.withValues(alpha: 0.3)
-            : Colors.blue.shade50;
-        textColor = isDark ? Colors.blue.shade300 : Colors.blue.shade700;
-        borderColor = isDark ? Colors.blue.shade800 : Colors.blue.shade200;
-        label = 'common.status.pending'.tr();
-        break;
-      case 'in_review':
-        bgColor = isDark
-            ? Colors.amber.shade900.withValues(alpha: 0.3)
-            : Colors.amber.shade50;
-        textColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
-        borderColor = isDark ? Colors.amber.shade800 : Colors.amber.shade200;
-        label = 'common.status.in_review'.tr();
-        showPulse = true;
-        break;
-      case 'info_requested':
-        bgColor = isDark
-            ? Colors.orange.shade900.withValues(alpha: 0.3)
-            : Colors.orange.shade50;
-        textColor = isDark ? Colors.orange.shade300 : Colors.orange.shade800;
-        borderColor = isDark ? Colors.orange.shade800 : Colors.orange.shade200;
-        label = 'common.status.info_requested'.tr();
-        showPulse = true;
-        break;
-      case 'completed':
-        bgColor = isDark
-            ? Colors.green.shade900.withValues(alpha: 0.3)
-            : Colors.green.shade50;
-        textColor = isDark ? Colors.green.shade300 : Colors.green.shade800;
-        borderColor = isDark ? Colors.green.shade800 : Colors.green.shade200;
-        label = 'common.status.completed'.tr();
-        break;
-      default:
-        bgColor = isDark ? AppTheme.slate800 : AppTheme.slate100;
-        textColor = isDark ? AppTheme.slate300 : AppTheme.slate600;
-        borderColor = isDark ? AppTheme.slate700 : AppTheme.slate200;
-        label = status;
-    }
+    final badgeColors = Theme.of(context).extension<AppBadgeColors>()!;
+    final style = badgeColors.forStatus(status);
+    final label = 'common.status.$status'.tr();
+    final showPulse = status == 'in_review' || status == 'info_requested';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: style.bg,
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: style.text.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -340,7 +298,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
               height: 8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: textColor,
+                color: style.text,
               ),
             ),
             const SizedBox(width: 6),
@@ -348,7 +306,7 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
           Text(
             label,
             style: TextStyle(
-              color: textColor,
+              color: style.text,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -358,62 +316,46 @@ class _RequestReviewScreenState extends State<RequestReviewScreen> {
     );
   }
 
-  Widget _buildUrgencyBadge(BuildContext context, String urgency, bool isDark) {
-    Color bgColor;
-    Color textColor;
-    Color borderColor;
+  Widget _buildUrgencyBadge(BuildContext context, String urgency) {
+    final badgeColors = Theme.of(context).extension<AppBadgeColors>()!;
+    final style = badgeColors.forUrgency(urgency);
+
     String label;
     IconData? icon;
-
     switch (urgency.toLowerCase()) {
       case 'high':
       case 'urgent':
-        bgColor = isDark
-            ? Colors.red.shade900.withValues(alpha: 0.3)
-            : Colors.red.shade50;
-        textColor = isDark ? Colors.red.shade300 : Colors.red.shade600;
-        borderColor = isDark ? Colors.red.shade800 : Colors.red.shade200;
         label = 'common.urgency.high'.tr();
         icon = Icons.priority_high;
         break;
       case 'moderate':
       case 'medium':
-        bgColor = isDark
-            ? Colors.amber.shade900.withValues(alpha: 0.3)
-            : Colors.amber.shade50;
-        textColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
-        borderColor = isDark ? Colors.amber.shade800 : Colors.amber.shade200;
         label = 'common.urgency.moderate'.tr();
         break;
       case 'low':
       case 'general':
       default:
-        bgColor = isDark
-            ? Colors.teal.shade900.withValues(alpha: 0.3)
-            : Colors.teal.shade50;
-        textColor = isDark ? Colors.teal.shade300 : Colors.teal.shade800;
-        borderColor = isDark ? Colors.teal.shade800 : Colors.teal.shade200;
         label = 'common.urgency.low'.tr();
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: style.bg,
         borderRadius: BorderRadius.circular(AppTheme.radiusCircular),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: style.text.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 14, color: textColor),
+            Icon(icon, size: 14, color: style.text),
             const SizedBox(width: 4),
           ],
           Text(
             label,
             style: TextStyle(
-              color: textColor,
+              color: style.text,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),

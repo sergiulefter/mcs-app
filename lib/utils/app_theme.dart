@@ -10,7 +10,7 @@ class AppTheme {
   // ============================================================================
 
   // Primary Colors
-  static const Color primaryBlue = Color(0xFF1152D4); // Stitch Primary
+  static const Color primaryBlue = Color(0xFF1152D4); // Primary
   static const Color primaryBlueDark = Color(0xFF0D3FA0);
   static const Color primaryBlueLight = Color(0xFF4C82E8);
 
@@ -26,7 +26,7 @@ class AppTheme {
   static const Color infoBlue = Color(0xFF17A2B8);
 
   // Neutral Colors
-  static const Color backgroundLight = Color(0xFFF6F6F8); // Stitch Light BG
+  static const Color backgroundLight = Color(0xFFF6F6F8); // Light BG
   static const Color backgroundWhite = Color(0xFFFFFFFF);
   static const Color surfaceColor = Color(0xFFFFFFFF);
   static const Color dividerColor = Color(0xFFE9ECEF);
@@ -34,8 +34,8 @@ class AppTheme {
   // Text Colors
   static const Color textPrimary = Color(
     0xFF101622,
-  ); // Stitch Dark BG (used as text in light)
-  static const Color textSecondary = Color(0xFF4C669A); // Stitch Slate Blue
+  ); // Dark BG (used as text in light)
+  static const Color textSecondary = Color(0xFF4C669A); // Slate Blue
   static const Color textTertiary = Color(0xFFADB5BD);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
   static const Color textOnSecondary = Color(0xFFFFFFFF);
@@ -52,7 +52,7 @@ class AppTheme {
   // ============================================================================
 
   // Dark Backgrounds
-  static const Color backgroundDark = Color(0xFF101622); // Stitch Dark BG
+  static const Color backgroundDark = Color(0xFF101622); // Dark BG
   static const Color backgroundDarkElevated = Color(0xFF1A2130);
   static const Color surfaceDark = Color(0xFF1A2130);
   static const Color surfaceDarkElevated = Color(0xFF252D3F);
@@ -223,6 +223,7 @@ class AppTheme {
           info: infoBlue,
         ),
         AppBadgeColors.light,
+        AppIconColors.light,
       ],
       dividerColor: dividerColor,
 
@@ -705,6 +706,7 @@ class AppTheme {
           info: infoBlueDark,
         ),
         AppBadgeColors.dark,
+        AppIconColors.dark,
       ],
       dividerColor: dividerDark,
 
@@ -1211,6 +1213,100 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       info: Color.lerp(info, other.info, t)!,
+    );
+  }
+}
+
+/// Theme extension for settings/UI icon accent colors.
+///
+/// Provides consistent icon colors for settings screens that adapt to theme.
+class AppIconColors extends ThemeExtension<AppIconColors> {
+  final Color profile;
+  final Color security;
+  final Color notification;
+  final Color email;
+  final Color language;
+  final Color time;
+  final Color help;
+  final Color privacy;
+  final Color developer;
+
+  const AppIconColors({
+    required this.profile,
+    required this.security,
+    required this.notification,
+    required this.email,
+    required this.language,
+    required this.time,
+    required this.help,
+    required this.privacy,
+    required this.developer,
+  });
+
+  /// Light mode icon colors
+  static const light = AppIconColors(
+    profile: Color(0xFF2563EB), // Blue 600
+    security: Color(0xFFEA580C), // Orange 600
+    notification: Color(0xFFDB2777), // Pink 600
+    email: Color(0xFF0284C7), // Sky 600
+    language: Color(0xFF059669), // Emerald 600
+    time: Color(0xFFD97706), // Amber 600
+    help: Color(0xFF7C3AED), // Violet 600
+    privacy: Color(0xFF0D9488), // Teal 600
+    developer: Color(0xFFEA580C), // Orange 600
+  );
+
+  /// Dark mode icon colors (slightly lighter for visibility)
+  static const dark = AppIconColors(
+    profile: Color(0xFF60A5FA), // Blue 400
+    security: Color(0xFFFB923C), // Orange 400
+    notification: Color(0xFFF472B6), // Pink 400
+    email: Color(0xFF38BDF8), // Sky 400
+    language: Color(0xFF34D399), // Emerald 400
+    time: Color(0xFFFBBF24), // Amber 400
+    help: Color(0xFFA78BFA), // Violet 400
+    privacy: Color(0xFF2DD4BF), // Teal 400
+    developer: Color(0xFFFB923C), // Orange 400
+  );
+
+  @override
+  AppIconColors copyWith({
+    Color? profile,
+    Color? security,
+    Color? notification,
+    Color? email,
+    Color? language,
+    Color? time,
+    Color? help,
+    Color? privacy,
+    Color? developer,
+  }) {
+    return AppIconColors(
+      profile: profile ?? this.profile,
+      security: security ?? this.security,
+      notification: notification ?? this.notification,
+      email: email ?? this.email,
+      language: language ?? this.language,
+      time: time ?? this.time,
+      help: help ?? this.help,
+      privacy: privacy ?? this.privacy,
+      developer: developer ?? this.developer,
+    );
+  }
+
+  @override
+  AppIconColors lerp(ThemeExtension<AppIconColors>? other, double t) {
+    if (other is! AppIconColors) return this;
+    return AppIconColors(
+      profile: Color.lerp(profile, other.profile, t)!,
+      security: Color.lerp(security, other.security, t)!,
+      notification: Color.lerp(notification, other.notification, t)!,
+      email: Color.lerp(email, other.email, t)!,
+      language: Color.lerp(language, other.language, t)!,
+      time: Color.lerp(time, other.time, t)!,
+      help: Color.lerp(help, other.help, t)!,
+      privacy: Color.lerp(privacy, other.privacy, t)!,
+      developer: Color.lerp(developer, other.developer, t)!,
     );
   }
 }

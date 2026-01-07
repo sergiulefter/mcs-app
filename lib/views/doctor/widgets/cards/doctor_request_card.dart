@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/controllers/doctor_consultations_controller.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
+import 'package:mcs_app/utils/badge_colors.dart';
 import 'package:provider/provider.dart';
 
 /// Reusable consultation preview card for doctor flows.
@@ -222,38 +223,24 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
     return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
   }
 
-  /// Build urgency badge with appropriate colors matching HTML design
+  /// Build urgency badge with theme-aware colors
   Widget _buildUrgencyBadge(BuildContext context, String urgency) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final badgeColors = Theme.of(context).extension<AppBadgeColors>()!;
+    final style = badgeColors.forUrgency(urgency);
 
-    Color bgColor;
-    Color textColor;
     String label;
-
     switch (urgency.toLowerCase()) {
       case 'high':
       case 'urgent':
-        bgColor = isDark
-            ? Colors.red.shade900.withValues(alpha: 0.4)
-            : Colors.red.shade100;
-        textColor = isDark ? Colors.red.shade300 : Colors.red.shade800;
         label = 'common.urgency.high'.tr();
         break;
       case 'moderate':
       case 'medium':
-        bgColor = isDark
-            ? Colors.amber.shade900.withValues(alpha: 0.4)
-            : Colors.amber.shade100;
-        textColor = isDark ? Colors.amber.shade300 : Colors.amber.shade800;
         label = 'common.urgency.moderate'.tr();
         break;
       case 'low':
       case 'general':
       default:
-        bgColor = isDark
-            ? Colors.teal.shade900.withValues(alpha: 0.4)
-            : Colors.teal.shade100;
-        textColor = isDark ? Colors.teal.shade300 : Colors.teal.shade800;
         label = 'common.urgency.low'.tr();
         break;
     }
@@ -264,13 +251,13 @@ class _DoctorRequestCardState extends State<DoctorRequestCard> {
         vertical: 2,
       ),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: style.bg,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: textColor,
+          color: style.text,
           fontWeight: FontWeight.w500,
           fontSize: 10,
         ),

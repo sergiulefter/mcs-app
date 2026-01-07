@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
+import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/patient_profile_edit_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
 import 'help_center_screen.dart';
@@ -13,6 +14,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final iconColors = Theme.of(context).extension<AppIconColors>()!;
 
     return Scaffold(
       body: SafeArea(
@@ -38,8 +40,10 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.person_outline,
-                          iconColor: Colors.blue,
-                          iconBgColor: Colors.blue.withValues(alpha: 0.1),
+                          iconColor: iconColors.profile,
+                          iconBgColor: iconColors.profile.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'account.edit_profile'.tr(),
                           onTap: () {
                             Navigator.push(
@@ -55,8 +59,10 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.lock_outline,
-                          iconColor: Colors.orange,
-                          iconBgColor: Colors.orange.withValues(alpha: 0.1),
+                          iconColor: iconColors.security,
+                          iconBgColor: iconColors.security.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'account.change_password'.tr(),
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -120,8 +126,10 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.notifications_none_outlined,
-                          iconColor: Colors.pink, // rose-500
-                          iconBgColor: Colors.pink.withValues(alpha: 0.1),
+                          iconColor: iconColors.notification,
+                          iconBgColor: iconColors.notification.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'profile.push_notifications'.tr(),
                           trailing: Switch(
                             value: true, // Dummy value
@@ -132,8 +140,8 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.mail_outline,
-                          iconColor: Colors.lightBlue, // sky-500
-                          iconBgColor: Colors.lightBlue.withValues(alpha: 0.1),
+                          iconColor: iconColors.email,
+                          iconBgColor: iconColors.email.withValues(alpha: 0.1),
                           title: 'profile.email_alerts'.tr(),
                           trailing: Switch(
                             value: false, // Dummy value
@@ -152,8 +160,10 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.language,
-                          iconColor: Colors.green, // emerald-600
-                          iconBgColor: Colors.green.withValues(alpha: 0.1),
+                          iconColor: iconColors.language,
+                          iconBgColor: iconColors.language.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'common.languages'.tr(),
                           value: context.locale.languageCode == 'en'
                               ? 'English (US)'
@@ -164,8 +174,8 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.schedule,
-                          iconColor: Colors.amber, // amber-600
-                          iconBgColor: Colors.amber.withValues(alpha: 0.1),
+                          iconColor: iconColors.time,
+                          iconBgColor: iconColors.time.withValues(alpha: 0.1),
                           title: 'profile.time_zone'.tr(),
                           value: 'profile.system_default'.tr(),
                           onTap: () {},
@@ -182,8 +192,8 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.help_outline,
-                          iconColor: Colors.deepPurple, // violet-600
-                          iconBgColor: Colors.deepPurple.withValues(alpha: 0.1),
+                          iconColor: iconColors.help,
+                          iconBgColor: iconColors.help.withValues(alpha: 0.1),
                           title: 'home.help_center'.tr(),
                           onTap: () {
                             Navigator.push(
@@ -198,8 +208,10 @@ class SettingsScreen extends StatelessWidget {
                         _buildSettingsTile(
                           context,
                           icon: Icons.security,
-                          iconColor: Colors.teal, // teal-600
-                          iconBgColor: Colors.teal.withValues(alpha: 0.1),
+                          iconColor: iconColors.privacy,
+                          iconBgColor: iconColors.privacy.withValues(
+                            alpha: 0.1,
+                          ),
                           title: 'profile.privacy_security'.tr(),
                           onTap: () {},
                         ),
