@@ -9,7 +9,7 @@ import 'controllers/theme_controller.dart';
 import 'controllers/consultations_controller.dart';
 import 'controllers/doctors_controller.dart';
 import 'services/connectivity_service.dart';
-import 'views/patient/screens/splash_screen.dart';
+import 'package:mcs_app/views/shared/screens/splash_screen.dart';
 import 'utils/app_theme.dart';
 import 'utils/constants.dart';
 
@@ -82,11 +82,14 @@ class MyApp extends StatelessWidget {
               SystemChrome.setSystemUIOverlayStyle(
                 SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent,
-                  statusBarIconBrightness:
-                      brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                  statusBarIconBrightness: brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
                   systemNavigationBarColor: theme.colorScheme.surface,
                   systemNavigationBarIconBrightness:
-                      brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                      brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
                 ),
               );
 

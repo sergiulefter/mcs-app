@@ -11,9 +11,9 @@ import 'package:mcs_app/views/patient/widgets/forms/app_text_field.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
 import 'signup_screen.dart';
-import 'patient_main_shell.dart';
+import 'package:mcs_app/views/patient/screens/patient_main_shell.dart';
 import 'package:mcs_app/views/patient/widgets/auth/forgot_password_sheet.dart';
-import 'patient_complete_profile_screen.dart';
+import 'package:mcs_app/views/patient/screens/patient_complete_profile_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

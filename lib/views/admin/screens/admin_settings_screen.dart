@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/patient/screens/login_screen.dart';
+import 'package:mcs_app/views/shared/screens/login_screen.dart';
 import 'package:mcs_app/utils/seed_dev_data.dart';
 
 class AdminSettingsScreen extends StatelessWidget {

@@ -5,7 +5,7 @@ import 'package:mcs_app/controllers/theme_controller.dart';
 import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/patient_profile_edit_screen.dart';
-import 'package:mcs_app/views/patient/screens/login_screen.dart';
+import 'package:mcs_app/views/shared/screens/login_screen.dart';
 import 'package:mcs_app/views/shared/screens/help_center_screen.dart';
 
 class PatientSettingsScreen extends StatelessWidget {

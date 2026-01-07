@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:mcs_app/utils/app_theme.dart';
-import 'package:mcs_app/views/patient/widgets/cards/language_selection_card.dart';
-import 'onboarding_screen.dart';
+import 'package:mcs_app/views/shared/widgets/cards/language_selection_card.dart';
+import 'package:mcs_app/views/shared/screens/onboarding_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   const LanguageSelectionScreen({super.key});
@@ -118,9 +118,9 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         // Title
         Text(
           'language_selection.title'.tr(),
-          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppTheme.spacing12),
@@ -128,9 +128,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         // Subtitle
         Text(
           'language_selection.subtitle'.tr(),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                height: 1.5,
-              ),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(height: 1.5),
           textAlign: TextAlign.center,
         ),
       ],

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mcs_app/models/consultation_model.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/widgets/cards/consultation_card.dart';
-import 'package:mcs_app/views/patient/widgets/cards/onboarding_card.dart';
+import 'package:mcs_app/views/shared/widgets/cards/onboarding_card.dart';
 import 'package:mcs_app/views/patient/widgets/cards/stat_card.dart';
 
 class HomeWelcomeHeader extends StatelessWidget {
@@ -30,15 +30,15 @@ class HomeWelcomeHeader extends StatelessWidget {
               Text(
                 '$greeting, $name',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-                    const SizedBox(height: AppTheme.spacing8),
+              const SizedBox(height: AppTheme.spacing8),
               Text(
                 'home.welcome_subtitle'.tr(),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -62,10 +62,7 @@ class HomeWelcomeHeader extends StatelessWidget {
 class ProfileCompletionBanner extends StatelessWidget {
   final VoidCallback onCompleteProfile;
 
-  const ProfileCompletionBanner({
-    super.key,
-    required this.onCompleteProfile,
-  });
+  const ProfileCompletionBanner({super.key, required this.onCompleteProfile});
 
   @override
   Widget build(BuildContext context) {
@@ -92,9 +89,9 @@ class ProfileCompletionBanner extends StatelessWidget {
               const SizedBox(width: AppTheme.spacing12),
               Text(
                 'home.profile_incomplete'.tr(),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -102,8 +99,8 @@ class ProfileCompletionBanner extends StatelessWidget {
           Text(
             'home.profile_incomplete_desc'.tr(),
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
           const SizedBox(height: AppTheme.spacing12),
           SizedBox(
@@ -141,16 +138,17 @@ class HomeStatsSection extends StatelessWidget {
       builder: (context, constraints) {
         final spacing = AppTheme.spacing12;
         final cardWidth =
-            (constraints.maxWidth - (spacing * 2)) / 3; // three cards + two gaps
+            (constraints.maxWidth - (spacing * 2)) /
+            3; // three cards + two gaps
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'home.your_stats'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: AppTheme.spacing16),
             Row(
@@ -171,7 +169,9 @@ class HomeStatsSection extends StatelessWidget {
                     icon: Icons.pending_actions_outlined,
                     value: '$pendingCount',
                     label: 'common.status.pending'.tr(),
-                    color: Theme.of(context).extension<AppSemanticColors>()!.warning,
+                    color: Theme.of(
+                      context,
+                    ).extension<AppSemanticColors>()!.warning,
                   ),
                 ),
                 SizedBox(width: spacing),
@@ -196,10 +196,7 @@ class HomeStatsSection extends StatelessWidget {
 class HomeQuickActions extends StatelessWidget {
   final VoidCallback onHelpCenterTap;
 
-  const HomeQuickActions({
-    super.key,
-    required this.onHelpCenterTap,
-  });
+  const HomeQuickActions({super.key, required this.onHelpCenterTap});
 
   @override
   Widget build(BuildContext context) {
@@ -208,9 +205,9 @@ class HomeQuickActions extends StatelessWidget {
       children: [
         Text(
           'common.quick_actions'.tr(),
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppTheme.spacing16),
         _HelpCenterActionCard(onTap: onHelpCenterTap),
@@ -244,9 +241,7 @@ class _HelpCenterActionCard extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-          border: Border.all(
-            color: tertiary.withValues(alpha: 0.35),
-          ),
+          border: Border.all(color: tertiary.withValues(alpha: 0.35)),
           boxShadow: Theme.of(context).brightness == Brightness.light
               ? [
                   BoxShadow(
@@ -266,9 +261,7 @@ class _HelpCenterActionCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colorScheme.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
-                border: Border.all(
-                  color: tertiary.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: tertiary.withValues(alpha: 0.3)),
               ),
               child: Icon(
                 Icons.help_outline,
@@ -280,18 +273,18 @@ class _HelpCenterActionCard extends StatelessWidget {
             // Title
             Text(
               'home.help_center'.tr(),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: AppTheme.spacing8),
             // Description
             Text(
               'home.help_center_desc'.tr(),
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.3,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+                height: 1.3,
+              ),
             ),
             const SizedBox(height: AppTheme.spacing12),
             // Pills - now full width available
@@ -303,14 +296,8 @@ class _HelpCenterActionCard extends StatelessWidget {
                   icon: Icons.chat_bubble_outline,
                   label: 'Live chat',
                 ),
-                _SupportPill(
-                  icon: Icons.call_outlined,
-                  label: 'Call back',
-                ),
-                _SupportPill(
-                  icon: Icons.article_outlined,
-                  label: 'FAQ',
-                ),
+                _SupportPill(icon: Icons.call_outlined, label: 'Call back'),
+                _SupportPill(icon: Icons.article_outlined, label: 'FAQ'),
               ],
             ),
             const SizedBox(height: AppTheme.spacing16),
@@ -373,15 +360,16 @@ class _SupportPill extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
     );
   }
 }
+
 class ActiveConsultationsSection extends StatelessWidget {
   final List<ConsultationModel> activeConsultations;
   final int totalConsultations;
@@ -411,9 +399,9 @@ class ActiveConsultationsSection extends StatelessWidget {
             Expanded(
               child: Text(
                 'home.active_consultations'.tr(),
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -476,9 +464,9 @@ class MedicalDisclaimerCard extends StatelessWidget {
             child: Text(
               'home.medical_disclaimer'.tr(),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    height: 1.5,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
             ),
           ),
         ],

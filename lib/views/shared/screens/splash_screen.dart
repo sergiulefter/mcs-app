@@ -8,11 +8,11 @@ import 'package:mcs_app/controllers/consultations_controller.dart';
 import 'package:mcs_app/utils/constants.dart';
 import 'package:mcs_app/views/admin/screens/admin_dashboard_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_main_shell.dart';
-import 'language_selection_screen.dart';
+import 'package:mcs_app/views/shared/screens/language_selection_screen.dart';
 import 'login_screen.dart';
-import 'patient_main_shell.dart';
+import 'package:mcs_app/views/patient/screens/patient_main_shell.dart';
 import 'onboarding_screen.dart';
-import 'patient_complete_profile_screen.dart';
+import 'package:mcs_app/views/patient/screens/patient_complete_profile_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final Future<FirebaseApp> firebaseInitialization;
