@@ -6,7 +6,7 @@ import 'package:mcs_app/controllers/auth_controller.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/patient/screens/patient_profile_edit_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
-import 'patient_help_center_screen.dart';
+import 'package:mcs_app/views/shared/screens/help_center_screen.dart';
 
 class PatientSettingsScreen extends StatelessWidget {
   const PatientSettingsScreen({super.key});
@@ -199,8 +199,7 @@ class PatientSettingsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    const PatientHelpCenterScreen(),
+                                builder: (context) => const HelpCenterScreen(),
                               ),
                             );
                           },

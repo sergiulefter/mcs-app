@@ -2,15 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mcs_app/utils/app_theme.dart';
 
-class PatientHelpCenterScreen extends StatefulWidget {
-  const PatientHelpCenterScreen({super.key});
+class HelpCenterScreen extends StatefulWidget {
+  const HelpCenterScreen({super.key});
 
   @override
-  State<PatientHelpCenterScreen> createState() =>
-      _PatientHelpCenterScreenState();
+  State<HelpCenterScreen> createState() => _HelpCenterScreenState();
 }
 
-class _PatientHelpCenterScreenState extends State<PatientHelpCenterScreen> {
+class _HelpCenterScreenState extends State<HelpCenterScreen> {
   // Track which FAQ items are expanded
   final Map<int, bool> _expandedItems = {};
 

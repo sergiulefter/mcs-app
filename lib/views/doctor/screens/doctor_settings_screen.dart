@@ -9,7 +9,7 @@ import 'package:mcs_app/utils/app_theme.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_profile_edit_screen.dart';
 import 'package:mcs_app/views/doctor/screens/doctor_availability_screen.dart';
 import 'package:mcs_app/views/patient/screens/login_screen.dart';
-import 'package:mcs_app/views/patient/screens/patient_help_center_screen.dart';
+import 'package:mcs_app/views/shared/screens/help_center_screen.dart';
 
 /// Doctor settings hub screen matching the patient settings design.
 class DoctorSettingsScreen extends StatelessWidget {
@@ -168,7 +168,7 @@ class DoctorSettingsScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const PatientHelpCenterScreen(),
+                                builder: (_) => const HelpCenterScreen(),
                               ),
                             );
                           },
