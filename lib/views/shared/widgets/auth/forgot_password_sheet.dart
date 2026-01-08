@@ -37,7 +37,7 @@ class _ForgotPasswordSheetState extends State<ForgotPasswordSheet> {
     if (mounted) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Feature not implemented yet')),
+        const SnackBar(content: Text('Feature not implemented yet')),
       );
     }
   }

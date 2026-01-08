@@ -339,7 +339,7 @@ class _DoctorRequestInfoScreenState extends State<DoctorRequestInfoScreen> {
           child: ElevatedButton.icon(
             onPressed: _isSubmitting ? null : _submit,
             icon: _isSubmitting
-                ? SizedBox(
+                ? const SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(

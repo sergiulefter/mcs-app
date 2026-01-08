@@ -136,7 +136,7 @@ class HomeStatsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final spacing = AppTheme.spacing12;
+        const spacing = AppTheme.spacing12;
         final cardWidth =
             (constraints.maxWidth - (spacing * 2)) /
             3; // three cards + two gaps
@@ -162,7 +162,7 @@ class HomeStatsSection extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-                SizedBox(width: spacing),
+                const SizedBox(width: AppTheme.spacing12),
                 SizedBox(
                   width: cardWidth,
                   child: StatCard(
@@ -174,7 +174,7 @@ class HomeStatsSection extends StatelessWidget {
                     ).extension<AppSemanticColors>()!.warning,
                   ),
                 ),
-                SizedBox(width: spacing),
+                const SizedBox(width: AppTheme.spacing12),
                 SizedBox(
                   width: cardWidth,
                   child: StatCard(
@@ -288,10 +288,10 @@ class _HelpCenterActionCard extends StatelessWidget {
             ),
             const SizedBox(height: AppTheme.spacing12),
             // Pills - now full width available
-            Wrap(
+            const Wrap(
               spacing: AppTheme.spacing8,
               runSpacing: AppTheme.spacing8,
-              children: const [
+              children: [
                 _SupportPill(
                   icon: Icons.chat_bubble_outline,
                   label: 'Live chat',

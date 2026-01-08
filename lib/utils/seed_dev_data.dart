@@ -275,7 +275,7 @@ class DevDataSeeder {
   }
 
   MedicalSpecialty _randomSpecialty() {
-    final values = MedicalSpecialty.values;
+    const values = MedicalSpecialty.values;
     return values[_rand.nextInt(values.length)];
   }
 

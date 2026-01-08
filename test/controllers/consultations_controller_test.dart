@@ -17,8 +17,8 @@ void main() {
       'fetchUserConsultations fetches data and enriches with doctor info',
       () async {
         // 1. Setup Test Data
-        final patientId = 'patient_123';
-        final doctorId = 'doctor_456';
+        const patientId = 'patient_123';
+        const doctorId = 'doctor_456';
         final now = DateTime.now();
 
         // Create a Doctor
@@ -66,8 +66,8 @@ void main() {
     );
 
     test('fetchUserConsultations handles missing doctor gracefully', () async {
-      final patientId = 'patient_123';
-      final doctorId = 'doctor_unknown';
+      const patientId = 'patient_123';
+      const doctorId = 'doctor_unknown';
       final now = DateTime.now();
 
       // Create a Consultation pointing to a non-existent doctor
@@ -98,8 +98,8 @@ void main() {
     test('Set logic correctly handles updates without duplication', () async {
       // This tests that our Set logic in _fetchDoctorInfoForList removes the old item
       // and adds the new one, rather than just adding a duplicate.
-      final patientId = 'patient_123';
-      final doctorId = 'doctor_456';
+      const patientId = 'patient_123';
+      const doctorId = 'doctor_456';
       final now = DateTime.now();
 
       await fakeFirestore.collection('doctors').doc(doctorId).set({

@@ -751,7 +751,7 @@ class AppTheme {
         shadowColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusLarge),
-          side: BorderSide(
+          side: const BorderSide(
             color: dividerDark, // Theme divider to avoid harsh white edges
             width: 1,
           ),

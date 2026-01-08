@@ -926,7 +926,7 @@ class _PatientConsultationDetailScreenState
                     ),
                   ),
                 );
-                if (result == true) {
+                if (result ?? false) {
                   navigator.pop();
                 }
               },
@@ -968,7 +968,7 @@ class _PatientConsultationDetailScreenState
       ),
     );
 
-    if (confirmed == true && mounted) {
+    if ((confirmed ?? false) && mounted) {
       await _cancelConsultation();
     }
   }

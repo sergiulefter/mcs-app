@@ -96,7 +96,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                             builder: (_) => const DoctorProfileEditScreen(),
                           ),
                         );
-                        if (result == true) {
+                        if (result ?? false) {
                           await profile.refresh();
                         }
                       },
@@ -631,7 +631,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                               ),
                             ),
                           );
-                          if (result == true) {
+                          if (result ?? false) {
                             _primeConsultations(force: true);
                           }
                         },

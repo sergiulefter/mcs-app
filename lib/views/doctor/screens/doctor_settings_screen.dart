@@ -61,7 +61,7 @@ class DoctorSettingsScreen extends StatelessWidget {
                                 ),
                               ),
                             );
-                            if (result == true) {
+                            if (result ?? false) {
                               await profileController.refresh();
                             }
                           },

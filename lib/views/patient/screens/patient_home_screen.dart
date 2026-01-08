@@ -360,7 +360,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
     // Status colors
     Color statusColor = const Color(0xFFF59E0B); // Amber default
-    String statusText = status.toUpperCase().replaceAll('_', ' ');
+    final String statusText = status.toUpperCase().replaceAll('_', ' ');
 
     if (status == 'completed') {
       statusColor = Theme.of(context).extension<AppSemanticColors>()!.success;
@@ -838,7 +838,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                   const SizedBox(height: 4),
                   Text(
                     'common.new'.tr(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppTheme.primaryBlue,
                       fontWeight: FontWeight.bold,
                       fontSize: 10,

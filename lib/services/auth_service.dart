@@ -28,7 +28,7 @@ class AuthService {
     String? preferredLanguage,
   }) async {
     // Create user in Firebase Auth
-    UserCredential userCredential = await _authInstance
+    final UserCredential userCredential = await _authInstance
         .createUserWithEmailAndPassword(email: email, password: password);
 
     User? user = userCredential.user;
@@ -42,7 +42,7 @@ class AuthService {
     }
 
     // Create user document in Firestore with preferred language
-    UserModel userModel = UserModel(
+    final UserModel userModel = UserModel(
       uid: user!.uid,
       email: user.email ?? email,
       displayName: displayName,
@@ -66,20 +66,20 @@ class AuthService {
     required String password,
     String? expectedRole,
   }) async {
-    UserCredential userCredential = await _authInstance
+    final UserCredential userCredential = await _authInstance
         .signInWithEmailAndPassword(email: email, password: password);
 
-    User? user = userCredential.user;
+    final User? user = userCredential.user;
     if (user == null) return null;
 
     // Check if user exists in 'users' collection (patients)
-    DocumentSnapshot userDoc = await _firestore
+    final DocumentSnapshot userDoc = await _firestore
         .collection(AppConstants.collectionUsers)
         .doc(user.uid)
         .get();
 
     // Check if user exists in 'doctors' collection
-    DocumentSnapshot doctorDoc = await _firestore
+    final DocumentSnapshot doctorDoc = await _firestore
         .collection(AppConstants.collectionDoctors)
         .doc(user.uid)
         .get();
@@ -125,7 +125,7 @@ class AuthService {
     }
 
     // If user document doesn't exist in either collection, create one in 'users'
-    UserModel userModel = UserModel.fromFirebaseUser(user);
+    final UserModel userModel = UserModel.fromFirebaseUser(user);
     await _firestore
         .collection(AppConstants.collectionUsers)
         .doc(user.uid)
@@ -146,7 +146,7 @@ class AuthService {
   // Get user data from Firestore
   Future<UserModel?> getUserData(String uid) async {
     // First check 'users' collection
-    DocumentSnapshot userDoc = await _firestore
+    final DocumentSnapshot userDoc = await _firestore
         .collection(AppConstants.collectionUsers)
         .doc(uid)
         .get();
@@ -155,7 +155,7 @@ class AuthService {
     }
 
     // Check 'doctors' collection
-    DocumentSnapshot doctorDoc = await _firestore
+    final DocumentSnapshot doctorDoc = await _firestore
         .collection(AppConstants.collectionDoctors)
         .doc(uid)
         .get();
@@ -177,7 +177,7 @@ class AuthService {
     User? user = _authInstance.currentUser;
     if (user == null) throw Exception('No user logged in');
 
-    Map<String, dynamic> updates = {};
+    final Map<String, dynamic> updates = {};
 
     // Update Firebase Auth profile if displayName is provided
     if (displayName != null && displayName != user.displayName) {

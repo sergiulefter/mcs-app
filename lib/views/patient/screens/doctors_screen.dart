@@ -352,10 +352,10 @@ class _DoctorsScreenState extends State<DoctorsScreen> {
     DoctorsController controller,
   ) async {
     // Reuse existing filter sheet logic, preserving context
-    var tempSelectedSpecialties = {...controller.selectedSpecialties};
-    var tempSelectedSubspecialties = {...controller.selectedSubspecialties};
-    var tempSelectedLanguages = {...controller.selectedLanguages};
-    var tempSelectedExperienceRanges = {...controller.selectedExperienceRanges};
+    final tempSelectedSpecialties = {...controller.selectedSpecialties};
+    final tempSelectedSubspecialties = {...controller.selectedSubspecialties};
+    final tempSelectedLanguages = {...controller.selectedLanguages};
+    final tempSelectedExperienceRanges = {...controller.selectedExperienceRanges};
     var tempAvailableOnly = controller.availableOnly;
 
     await showModalBottomSheet(
@@ -754,8 +754,8 @@ class _AnimatedSortDropdownState extends State<_AnimatedSortDropdown>
   }
 
   OverlayEntry _createOverlayEntry() {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    var size = renderBox.size;
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
 
     // Sort labels map (same as in build)
     final sortLabels = {

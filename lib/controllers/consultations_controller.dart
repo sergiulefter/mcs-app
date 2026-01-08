@@ -25,6 +25,9 @@ class ConsultationsController extends ChangeNotifier
     if (timeComparison != 0) return timeComparison;
     return b.id.compareTo(a.id); // Tie-breaker
   });
+
+  // HashMap for O(1) lookups by ID
+  final HashMap<String, ConsultationModel> _consultationsMap = HashMap();
   bool _isLoading = false;
   String? _loadedUserId;
   bool _hasPrimedForUser = false;
@@ -42,6 +45,9 @@ class ConsultationsController extends ChangeNotifier
   String get selectedSegment => _selectedSegment;
   bool get hasPrimedForUser => _hasPrimedForUser;
   bool get hasMore => _hasMore;
+
+  /// O(1) lookup for consultation by ID
+  ConsultationModel? getConsultationById(String id) => _consultationsMap[id];
 
   // Computed counts for segment badges
   int get activeCount => _consultations
@@ -85,6 +91,7 @@ class ConsultationsController extends ChangeNotifier
   Future<void> fetchUserConsultations(String userId) async {
     _isLoading = true;
     _consultations.clear();
+    _consultationsMap.clear();
     _lastDocument = null;
     _hasMore = true;
     notifyListeners();
@@ -97,9 +104,10 @@ class ConsultationsController extends ChangeNotifier
           .limit(_pageSize)
           .get();
 
-      _consultations.addAll(
-        querySnapshot.docs.map((doc) => ConsultationModel.fromFirestore(doc)),
-      );
+      final newConsultations = querySnapshot.docs
+          .map((doc) => ConsultationModel.fromFirestore(doc))
+          .toList();
+      _addConsultationsToState(newConsultations);
 
       _lastDocument = querySnapshot.docs.isNotEmpty
           ? querySnapshot.docs.last
@@ -145,7 +153,7 @@ class ConsultationsController extends ChangeNotifier
           .map((doc) => ConsultationModel.fromFirestore(doc))
           .toList();
 
-      _consultations.addAll(newConsultations);
+      _addConsultationsToState(newConsultations);
       _lastDocument = querySnapshot.docs.isNotEmpty
           ? querySnapshot.docs.last
           : null;
@@ -228,8 +236,8 @@ class ConsultationsController extends ChangeNotifier
 
         // Update main state
         if (_consultations.contains(consultation)) {
-          _consultations.remove(consultation);
-          _consultations.add(updatedConsultation);
+          _removeConsultationFromState(consultation);
+          _addConsultationToState(updatedConsultation);
         }
       }
     }
@@ -275,6 +283,7 @@ class ConsultationsController extends ChangeNotifier
   /// Clear data (e.g., on logout).
   void clear() {
     _consultations.clear();
+    _consultationsMap.clear();
     _isLoading = false;
     _loadedUserId = null;
     _hasPrimedForUser = false;
@@ -283,6 +292,25 @@ class ConsultationsController extends ChangeNotifier
     _selectedStatus = 'all';
     _selectedSegment = 'active';
     notifyListeners();
+  }
+
+  /// Helper to add a single consultation to both Set and Map
+  void _addConsultationToState(ConsultationModel consultation) {
+    _consultations.add(consultation);
+    _consultationsMap[consultation.id] = consultation;
+  }
+
+  /// Helper to add multiple consultations to both Set and Map
+  void _addConsultationsToState(List<ConsultationModel> consultations) {
+    for (final consultation in consultations) {
+      _addConsultationToState(consultation);
+    }
+  }
+
+  /// Helper to remove a consultation from both Set and Map
+  void _removeConsultationFromState(ConsultationModel consultation) {
+    _consultations.remove(consultation);
+    _consultationsMap.remove(consultation.id);
   }
 
   /// Cancel a consultation.
@@ -296,13 +324,13 @@ class ConsultationsController extends ChangeNotifier
           'updatedAt': FieldValue.serverTimestamp(),
         });
 
-    // Update local state - find, remove, update, re-add (Set pattern)
-    final consultation = _consultations.firstWhere(
-      (c) => c.id == consultationId,
-      orElse: () => throw Exception('Consultation not found'),
-    );
-    _consultations.remove(consultation);
-    _consultations.add(
+    // Update local state using O(1) lookup from HashMap
+    final consultation = _consultationsMap[consultationId];
+    if (consultation == null) {
+      throw Exception('Consultation not found');
+    }
+    _removeConsultationFromState(consultation);
+    _addConsultationToState(
       consultation.copyWith(
         status: AppConstants.statusCancelled,
         updatedAt: DateTime.now(),
@@ -319,11 +347,11 @@ class ConsultationsController extends ChangeNotifier
     required List<String> answers,
     String? additionalInfo,
   }) async {
-    // Find the consultation
-    final consultation = _consultations.firstWhere(
-      (c) => c.id == consultationId,
-      orElse: () => throw Exception('Consultation not found'),
-    );
+    // Find the consultation using O(1) lookup from HashMap
+    final consultation = _consultationsMap[consultationId];
+    if (consultation == null) {
+      throw Exception('Consultation not found');
+    }
 
     // Find and update the info request
     final updatedInfoRequests = consultation.infoRequests.map((request) {
@@ -347,9 +375,9 @@ class ConsultationsController extends ChangeNotifier
           'infoRequests': updatedInfoRequests.map((r) => r.toMap()).toList(),
         });
 
-    // Update local state - remove old, add updated (Set pattern)
-    _consultations.remove(consultation);
-    _consultations.add(
+    // Update local state - remove old, add updated
+    _removeConsultationFromState(consultation);
+    _addConsultationToState(
       consultation.copyWith(
         status: AppConstants.statusInReview,
         updatedAt: DateTime.now(),

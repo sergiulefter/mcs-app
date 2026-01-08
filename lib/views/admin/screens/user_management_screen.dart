@@ -114,7 +114,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       ),
     );
 
-    if (confirmed == true && mounted) {
+    if ((confirmed ?? false) && mounted) {
       try {
         await _adminService.deleteUser(user.uid);
         if (mounted) {
@@ -212,7 +212,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               child: Row(
                 children: [
                   const SizedBox(width: AppTheme.spacing12),
-                  Icon(Icons.search, color: AppTheme.slate400, size: 20),
+                  const Icon(Icons.search, color: AppTheme.slate400, size: 20),
                   const SizedBox(width: AppTheme.spacing8),
                   Expanded(
                     child: TextField(
@@ -221,7 +221,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                       style: Theme.of(context).textTheme.bodyMedium,
                       decoration: InputDecoration(
                         hintText: 'admin.users.search_hint'.tr(),
-                        hintStyle: TextStyle(color: AppTheme.slate400),
+                        hintStyle: const TextStyle(color: AppTheme.slate400),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -236,7 +236,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                         _searchController.clear();
                         setState(() {});
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.clear,
                         size: 18,
                         color: AppTheme.slate400,

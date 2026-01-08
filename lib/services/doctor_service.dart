@@ -149,7 +149,7 @@ class DoctorService {
       filtered = filtered.where((d) => d.specialty == specialty).toList();
     }
 
-    if (availableOnly == true) {
+    if (availableOnly ?? false) {
       filtered = filtered.where((d) => d.isCurrentlyAvailable).toList();
     }
 

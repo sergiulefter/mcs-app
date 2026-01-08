@@ -19,7 +19,7 @@ void main() {
       test(
         'returns correct UserModel when user is in "doctors" collection',
         () async {
-          final doctorId = 'doc_123';
+          const doctorId = 'doc_123';
           final now = DateTime.now();
 
           // Create a doctor document
@@ -53,7 +53,7 @@ void main() {
       test(
         'returns correct UserModel when user is in "users" collection',
         () async {
-          final userId = 'patient_456';
+          const userId = 'patient_456';
           final now = DateTime.now();
 
           await fakeFirestore.collection('users').doc(userId).set({

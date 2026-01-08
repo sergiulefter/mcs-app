@@ -114,7 +114,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       child: Container(
         width: 40,
         height: 40,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.transparent, // HTML hover bg handled by InkWell ripple
         ),

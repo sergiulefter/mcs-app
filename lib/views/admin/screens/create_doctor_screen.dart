@@ -215,7 +215,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           _formKey.currentState!.validate();
           _scrollHelper.scrollToFirstError(context);
         } else if (errorCode == 'invalid-argument' &&
-            e.message?.contains('email') == true) {
+            (e.message?.contains('email') ?? false)) {
           setState(() {
             _emailError = 'admin.create_doctor.error_invalid_email'.tr();
           });
@@ -223,7 +223,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
           _formKey.currentState!.validate();
           _scrollHelper.scrollToFirstError(context);
         } else if (errorCode == 'invalid-argument' &&
-            e.message?.contains('password') == true) {
+            (e.message?.contains('password') ?? false)) {
           setState(() {
             _passwordError = 'admin.create_doctor.error_weak_password'.tr();
           });
@@ -1039,7 +1039,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
       ),
       child: ClipRect(
         child: BackdropFilter(
-          filter: ColorFilter.mode(Colors.transparent, BlendMode.srcOver),
+          filter: const ColorFilter.mode(Colors.transparent, BlendMode.srcOver),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

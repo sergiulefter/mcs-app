@@ -128,7 +128,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
       ),
     );
 
-    if (confirmed == true && mounted) {
+    if ((confirmed ?? false) && mounted) {
       try {
         await _adminService.deleteDoctor(doctor.uid);
         if (mounted) {
@@ -226,7 +226,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
               child: Row(
                 children: [
                   const SizedBox(width: AppTheme.spacing12),
-                  Icon(Icons.search, color: AppTheme.slate400, size: 20),
+                  const Icon(Icons.search, color: AppTheme.slate400, size: 20),
                   const SizedBox(width: AppTheme.spacing8),
                   Expanded(
                     child: TextField(
@@ -235,7 +235,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
                       style: Theme.of(context).textTheme.bodyMedium,
                       decoration: InputDecoration(
                         hintText: 'admin.doctors.search_hint'.tr(),
-                        hintStyle: TextStyle(color: AppTheme.slate400),
+                        hintStyle: const TextStyle(color: AppTheme.slate400),
                         border: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -250,7 +250,7 @@ class _DoctorManagementScreenState extends State<DoctorManagementScreen> {
                         _searchController.clear();
                         setState(() {});
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.clear,
                         size: 18,
                         color: AppTheme.slate400,

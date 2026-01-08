@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
         );
-      } else if (user?.isDoctor == true) {
+      } else if (user?.isDoctor ?? false) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const DoctorMainShell()),
         );

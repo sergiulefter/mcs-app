@@ -86,7 +86,7 @@ class _SplashScreenState extends State<SplashScreen>
           // Admin users go to admin dashboard
           if (!mounted) return;
           _navigateToAdminDashboard();
-        } else if (user?.isDoctor == true) {
+        } else if (user?.isDoctor ?? false) {
           // Doctor users go to doctor portal
           if (!mounted) return;
           _navigateToDoctorShell();

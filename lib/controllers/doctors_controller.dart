@@ -17,6 +17,9 @@ class DoctorsController extends ChangeNotifier {
     }
     return a.fullName.compareTo(b.fullName);
   });
+
+  // HashMap for O(1) lookups by ID
+  final HashMap<String, DoctorModel> _doctorsMap = HashMap();
   bool _isLoading = false;
   bool _hasPrimed = false;
 
@@ -38,6 +41,9 @@ class DoctorsController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get hasPrimed => _hasPrimed;
   bool get hasMore => _hasMore;
+
+  /// O(1) lookup for doctor by ID
+  DoctorModel? getDoctorById(String id) => _doctorsMap[id];
   Set<String> get selectedSpecialties => _selectedSpecialties;
   Set<String> get selectedSubspecialties => _selectedSubspecialties;
   Set<String> get selectedLanguages => _selectedLanguages;
@@ -106,7 +112,7 @@ class DoctorsController extends ChangeNotifier {
 
   // Filtered and sorted doctors
   List<DoctorModel> get filteredDoctors {
-    var result = _doctors.where((doctor) {
+    final result = _doctors.where((doctor) {
       // Only show doctors with complete profiles to patients
       if (!doctor.isProfileComplete) {
         return false;
@@ -206,13 +212,14 @@ class DoctorsController extends ChangeNotifier {
   Future<void> fetchDoctors() async {
     _isLoading = true;
     _doctors.clear();
+    _doctorsMap.clear();
     _lastDocument = null;
     _hasMore = true;
     notifyListeners();
 
     try {
       final result = await _doctorService.fetchDoctorsPage();
-      _doctors.addAll(result.doctors);
+      _addDoctorsToState(result.doctors);
       _lastDocument = result.lastDoc;
       _hasMore = result.doctors.length >= DoctorService.defaultPageSize;
       _hasPrimed = true;
@@ -234,7 +241,7 @@ class DoctorsController extends ChangeNotifier {
       final result = await _doctorService.fetchDoctorsPage(
         startAfterDoc: _lastDocument,
       );
-      _doctors.addAll(result.doctors);
+      _addDoctorsToState(result.doctors);
       _lastDocument = result.lastDoc;
       _hasMore = result.doctors.length >= DoctorService.defaultPageSize;
     } finally {
@@ -336,6 +343,7 @@ class DoctorsController extends ChangeNotifier {
   /// Clear data (e.g., on logout).
   void clear() {
     _doctors.clear();
+    _doctorsMap.clear();
     _isLoading = false;
     _hasPrimed = false;
     _lastDocument = null;
@@ -346,5 +354,18 @@ class DoctorsController extends ChangeNotifier {
     _selectedSort = 'availability';
     _searchQuery = '';
     notifyListeners();
+  }
+
+  /// Helper to add a single doctor to both Set and Map
+  void _addDoctorToState(DoctorModel doctor) {
+    _doctors.add(doctor);
+    _doctorsMap[doctor.uid] = doctor;
+  }
+
+  /// Helper to add multiple doctors to both Set and Map
+  void _addDoctorsToState(List<DoctorModel> doctors) {
+    for (final doctor in doctors) {
+      _addDoctorToState(doctor);
+    }
   }
 }
