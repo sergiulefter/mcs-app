@@ -21,8 +21,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return [
       OnboardingSlide(
-        imageUrl:
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuDuz0QEJo_kUQjoIu78pGQcIw7tggGXp0AcJgxmxPGQskK7L2ZQS2ruYt4DCfcXRri9h2vlo-YDwOseOo-vd8Z7x9AHj3T3PdPSFUKwlk9ppeLiFVeye76ANtT7kj67W4aToEGm0LvACwfpS1KvRZFAUuMiAyXWZtMq4d184lwsw6emh4fqOS2b_qNTs6fmsx1Uj2G4_bWmG29cjSCmfex07S37Odru58d97O4ZpLIQsAHLH1mXNObkrLyx-eQc23Oe0h83SO1ebVtc',
+        imagePath: 'assets/images/onboarding/find_specialists.jpg',
         title: 'Find Top Specialists',
         description:
             'Browse verified doctors by specialty. View profiles, experience, and availability instantly.',
@@ -33,27 +32,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         accentColor: primary,
       ),
       OnboardingSlide(
-        imageUrl:
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuDtRyf2N6CjPY_-h-hDuQjiZVeOS70nHSChN0fGmrpmocSamayyHfHAo9sl3n8hGmvALdMYfvlGh_Du6D1FdXCX-43aRdCV0wRAUOGKmzO2db1pJIKFnK-j0tUFLKXKP9JZxz2LaT-lZ3NbXy2tH7NOVCNmOw4nscodht9rkTYqAzNmhLW6ggKDb2pWjyO27MyDbImcp_CXETUalUOrJFzmjOHR_W38Lwkg2LBPQykscFaNadzri7uNRCAZAGIhCbFIrb4JrTGJqo6t',
+        imagePath: 'assets/images/onboarding/consult_anytime.jpg',
         title: 'Consult Anytime',
         description:
             'No appointments needed. Submit your symptoms and medical questions asynchronously, 24/7.',
         badgeIcon: Icons.forum,
         badgeTitle: 'Consult Anytime',
         badgeSubtitle: 'Async Support 24/7',
-        badgeColor: semantic.warning, // Coral/Orange accent
+        badgeColor: semantic.warning,
         accentColor: semantic.warning,
       ),
       OnboardingSlide(
-        imageUrl:
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuBRQDu3ruKAc7WNAWcxbRt5tJO16ef7NhkxJjZ7kUr-wFxaJh8boJxM5taI7AmsUkBuWvumLdQN4LqxuZY4kKANqKY-B623COu2ZYk-lDSQXkqR7r-uQWjr6cOW16eY8x0CWqUaB8Q8GrjU997IHlWLP-KwL_zzRxnuSyG2fXt3wp2Fx58lwlq-mvgJxtruK_9m98uRfwOoPmVke45EwfyW6qBNFjPASmgnXm6Pu3uLNfsDEX3TYs1w12QM7oYO0FnsGT4Akbs7vaTJ',
+        imagePath: 'assets/images/onboarding/expert_treatment.jpg',
         title: 'Get Expert Treatment',
         description:
             'Receive detailed medical advice, prescriptions, and follow-up care directly in the app.',
         badgeIcon: Icons.medical_services,
         badgeTitle: 'Expert Care',
         badgeSubtitle: 'Rx & Follow-up',
-        badgeColor: semantic.success, // Emerald accent
+        badgeColor: semantic.success,
         accentColor: semantic.success,
       ),
     ];
@@ -206,22 +203,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        // Image
-                        Image.network(
-                          slide.imageUrl,
+                        // Image (local asset - loads instantly)
+                        Image.asset(
+                          slide.imagePath,
                           fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            );
-                          },
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
                                 color: Colors.grey[200],
@@ -452,7 +437,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class OnboardingSlide {
-  final String imageUrl;
+  final String imagePath;
   final String title;
   final String description;
   final IconData badgeIcon;
@@ -462,7 +447,7 @@ class OnboardingSlide {
   final Color accentColor;
 
   OnboardingSlide({
-    required this.imageUrl,
+    required this.imagePath,
     required this.title,
     required this.description,
     required this.badgeIcon,
