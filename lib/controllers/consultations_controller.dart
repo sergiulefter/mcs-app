@@ -8,13 +8,38 @@ import '../models/doctor_model.dart';
 import '../utils/constants.dart';
 import 'mixins/consultation_filter_mixin.dart';
 
-/// Patient consultations controller
+/// Patient consultations controller with singleton pattern.
+/// Use `ConsultationsController()` to get the singleton instance.
+/// For testing, pass `firestore` to get a fresh test instance.
 class ConsultationsController extends ChangeNotifier
     with ConsultationFilterMixin {
+  // Singleton instance
+  static ConsultationsController? _instance;
+
   final FirebaseFirestore _firestore;
 
-  ConsultationsController({FirebaseFirestore? firestore})
+  /// Private named constructor
+  ConsultationsController._internal({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  /// Factory constructor.
+  /// Returns singleton for production use.
+  /// When [firestore] is passed (for testing), returns a fresh instance.
+  factory ConsultationsController({FirebaseFirestore? firestore}) {
+    // For testing: return fresh instance when dependency is injected
+    if (firestore != null) {
+      return ConsultationsController._internal(firestore: firestore);
+    }
+    // For production: return singleton
+    _instance ??= ConsultationsController._internal();
+    return _instance!;
+  }
+
+  /// Reset singleton instance (for testing only)
+  @visibleForTesting
+  static void resetInstance() {
+    _instance = null;
+  }
 
   /// Default page size for pagination
   static const int _pageSize = 20;

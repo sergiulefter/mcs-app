@@ -4,8 +4,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Controller for managing app theme (light/dark/system)
-/// Uses Provider pattern for state management
+/// Uses Provider pattern with singleton pattern for state management
 class ThemeController extends ChangeNotifier {
+  // Singleton instance
+  static ThemeController? _instance;
+
   // Theme mode (light, dark, or follow system)
   ThemeMode _themeMode = ThemeMode.system;
 
@@ -18,15 +21,28 @@ class ThemeController extends ChangeNotifier {
   bool get isDarkMode {
     if (_themeMode == ThemeMode.system) {
       // Check system brightness
-      final brightness = SchedulerBinding.instance.platformDispatcher.platformBrightness;
+      final brightness =
+          SchedulerBinding.instance.platformDispatcher.platformBrightness;
       return brightness == Brightness.dark;
     }
     return _themeMode == ThemeMode.dark;
   }
 
-  /// Initialize theme controller and load saved preference
-  ThemeController() {
+  /// Private named constructor
+  ThemeController._internal() {
     _loadThemePreference();
+  }
+
+  /// Factory constructor returns singleton instance
+  factory ThemeController() {
+    _instance ??= ThemeController._internal();
+    return _instance!;
+  }
+
+  /// Reset singleton instance (for testing only)
+  @visibleForTesting
+  static void resetInstance() {
+    _instance = null;
   }
 
   /// Load theme preference from SharedPreferences

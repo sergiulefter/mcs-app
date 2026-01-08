@@ -5,8 +5,12 @@ import '../services/auth_service.dart';
 import '../models/user_model.dart';
 import '../utils/constants.dart';
 
-/// Authentication controller
+/// Authentication controller with singleton pattern.
+/// Use `AuthController()` to get the singleton instance.
 class AuthController extends ChangeNotifier {
+  // Singleton instance
+  static AuthController? _instance;
+
   final AuthService _authService = AuthService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -19,8 +23,21 @@ class AuthController extends ChangeNotifier {
   bool get isAuthenticated => _currentUser != null;
   bool get authStateInitialized => _authStateInitialized;
 
-  AuthController() {
+  /// Private named constructor
+  AuthController._internal() {
     _initAuthListener();
+  }
+
+  /// Factory constructor returns singleton instance
+  factory AuthController() {
+    _instance ??= AuthController._internal();
+    return _instance!;
+  }
+
+  /// Reset singleton instance (for testing only)
+  @visibleForTesting
+  static void resetInstance() {
+    _instance = null;
   }
 
   /// Listen to authentication state changes.

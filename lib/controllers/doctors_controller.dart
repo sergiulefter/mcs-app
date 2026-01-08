@@ -5,9 +5,28 @@ import 'package:flutter/material.dart';
 import '../models/doctor_model.dart';
 import '../services/doctor_service.dart';
 
-/// Doctors list controller
+/// Doctors list controller with singleton pattern.
+/// Use `DoctorsController()` to get the singleton instance.
 class DoctorsController extends ChangeNotifier {
+  // Singleton instance
+  static DoctorsController? _instance;
+
   final DoctorService _doctorService = DoctorService();
+
+  /// Private named constructor
+  DoctorsController._internal();
+
+  /// Factory constructor returns singleton instance
+  factory DoctorsController() {
+    _instance ??= DoctorsController._internal();
+    return _instance!;
+  }
+
+  /// Reset singleton instance (for testing only)
+  @visibleForTesting
+  static void resetInstance() {
+    _instance = null;
+  }
 
   // State - SplayTreeSet for automatic deduplication and sorting
   final Set<DoctorModel> _doctors = SplayTreeSet((a, b) {
