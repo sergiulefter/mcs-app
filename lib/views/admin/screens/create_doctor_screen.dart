@@ -336,6 +336,7 @@ class _CreateDoctorScreenState extends State<CreateDoctorScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: isDark
           ? AppTheme.backgroundDark
           : AppTheme.backgroundLight,

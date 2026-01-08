@@ -130,6 +130,7 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: Column(
             children: [
@@ -142,6 +143,7 @@ class _PatientProfileEditScreenState extends State<PatientProfileEditScreen> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           children: [

@@ -161,6 +161,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
   Widget build(BuildContext context) {
     if (_isLoading || _doctor == null) {
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: Column(
             children: [
@@ -173,6 +174,7 @@ class _DoctorProfileEditScreenState extends State<DoctorProfileEditScreen> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           children: [

@@ -64,6 +64,7 @@ class _PatientRespondInfoScreenState extends State<PatientRespondInfoScreen> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: isDark
           ? AppTheme.backgroundDark
           : AppTheme.backgroundLight,

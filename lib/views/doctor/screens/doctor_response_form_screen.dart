@@ -47,6 +47,7 @@ class _DoctorResponseFormScreenState extends State<DoctorResponseFormScreen> {
 
     if (consultation == null) {
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: isDark
             ? AppTheme.backgroundDark
             : AppTheme.backgroundLight,
@@ -64,6 +65,7 @@ class _DoctorResponseFormScreenState extends State<DoctorResponseFormScreen> {
     _scrollHelper.register('response', _responseKey);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: isDark
           ? AppTheme.backgroundDark
           : AppTheme.backgroundLight,

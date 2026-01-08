@@ -218,6 +218,7 @@ class _PatientCreateConsultationScreenState
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           children: [
