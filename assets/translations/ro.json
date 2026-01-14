@@ -12,12 +12,18 @@
   },
   "onboarding": {
     "get_started": "Începe",
-    "slide1_title": "Opinii Medicale de Expert",
-    "slide1_description": "Conectează-te cu specialiști medicali verificați pentru a doua opinie profesională asupra diagnosticului tău",
-    "slide2_title": "Încarcă Documentele Medicale",
-    "slide2_description": "Încarcă în siguranță fișele medicale, rezultatele testelor și imagistica pentru evaluare de specialitate",
-    "slide3_title": "Primește Perspective de Expert",
-    "slide3_description": "Obține opinii profesionale detaliate care te ajută să iei decizii informate despre sănătatea ta"
+    "slide1_title": "Găsește Specialiști de Top",
+    "slide1_description": "Explorează medici verificați după specialitate. Vezi profiluri, experiență și disponibilitate instant.",
+    "slide1_badge_title": "Specialiști de Top",
+    "slide1_badge_subtitle": "Profiluri Verificate",
+    "slide2_title": "Consultă Oricând",
+    "slide2_description": "Fără programări necesare. Trimite simptomele și întrebările medicale asincron, 24/7.",
+    "slide2_badge_title": "Consultă Oricând",
+    "slide2_badge_subtitle": "Suport Asincron 24/7",
+    "slide3_title": "Primește Tratament Expert",
+    "slide3_description": "Primește sfaturi medicale detaliate, prescripții și îngrijire de urmărire direct în aplicație.",
+    "slide3_badge_title": "Îngrijire de Expert",
+    "slide3_badge_subtitle": "Rețetă și Urmărire"
   },
   "consultation_guide": {
     "title": "Cum Funcționează Consultațiile",

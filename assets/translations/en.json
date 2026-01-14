@@ -12,12 +12,18 @@
   },
   "onboarding": {
     "get_started": "Get Started",
-    "slide1_title": "Expert Medical Opinions",
-    "slide1_description": "Connect with verified medical specialists for professional second opinions on your diagnosis",
-    "slide2_title": "Share Your Medical Documents",
-    "slide2_description": "Securely upload your medical records, test results, and imaging for expert review",
-    "slide3_title": "Receive Expert Insights",
-    "slide3_description": "Get detailed professional opinions to help you make informed decisions about your health"
+    "slide1_title": "Find Top Specialists",
+    "slide1_description": "Browse verified doctors by specialty. View profiles, experience, and availability instantly.",
+    "slide1_badge_title": "Top Specialists",
+    "slide1_badge_subtitle": "Verified Profiles",
+    "slide2_title": "Consult Anytime",
+    "slide2_description": "No appointments needed. Submit your symptoms and medical questions asynchronously, 24/7.",
+    "slide2_badge_title": "Consult Anytime",
+    "slide2_badge_subtitle": "Async Support 24/7",
+    "slide3_title": "Get Expert Treatment",
+    "slide3_description": "Receive detailed medical advice, prescriptions, and follow-up care directly in the app.",
+    "slide3_badge_title": "Expert Care",
+    "slide3_badge_subtitle": "Rx & Follow-up"
   },
   "consultation_guide": {
     "title": "How Consultations Work",
